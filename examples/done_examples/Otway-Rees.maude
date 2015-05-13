@@ -1,0 +1,123 @@
+fmod PROTOCOL-EXAMPLE-SYMBOLS is protecting DEFINITION-PROTOCOL-RULES .
+sorts UName  SName  Name  Key  Nonce  Masterkey  Sessionkey .
+subsorts Masterkey  Sessionkey < Key .
+subsorts SName  UName < Name < Public .
+op n : Name  Fresh -> Nonce [ frozen ] .
+ops a  b  i : -> UName .
+op s : -> SName .
+op mkey : Name  Name -> Masterkey [ frozen ] .
+op seskey : Name  Name  Nonce -> Sessionkey [ frozen ] .
+op e : Key  Msg -> Msg [ frozen ] .
+op d : Key  Msg -> Msg [ frozen ] .
+op _;_ : Msg  Msg -> Msg [ gather  (  e  E  )  frozen ] .
+subsorts UName  SName  Name  Key  Nonce  Masterkey  Sessionkey < Msg .
+op _$;_ : Msg Msg -> Msg [ctor gather(e E) frozen].
+endfm
+
+fmod PROTOCOL-EXAMPLE-ALGEBRAIC is protecting PROTOCOL-EXAMPLE-SYMBOLS .
+eq d(K:Key, e(K:Key, Z:Msg)) = Z:Msg [ variant ] .
+eq e(K:Key, d(K:Key, Z:Msg)) = Z:Msg [ variant ] .
+endfm
+fmod PROTOCOL-SPECIFICATION is protecting PROTOCOL-EXAMPLE-SYMBOLS .
+protecting DEFINITION-PROTOCOL-RULES .
+protecting DEFINITION-CONSTRAINTS-INPUT .
+eq STRANDS-DOLEVYAO = 
+:: nil ::
+[ nil | 
+   +(s), nil]  & 
+:: nil ::
+[ nil | 
+   +(P:UName), nil]  & 
+:: nil ::
+[ nil | 
+   +(mkey(i, s)), nil]  & 
+:: nil ::
+[ nil | 
+   -(M:Msg), 
+   -(N:Msg), 
+   +(M:Msg ; N:Msg), nil]  & 
+:: nil ::
+[ nil | 
+   -(P:UName), 
+   +(mkey(i, P:UName)), nil]  & 
+:: nil ::
+[ nil | 
+   -(P:UName), 
+   +(mkey(P:UName, i)), nil]  & 
+:: nil ::
+[ nil | 
+   -(K:Key), 
+   -(M:Msg), 
+   +(e(K:Key, M:Msg)), nil]  & 
+:: nil ::
+[ nil | 
+   -(K:Key), 
+   -(M:Msg), 
+   +(d(K:Key, M:Msg)), nil]  & 
+:: nil ::
+[ nil | 
+   -(M:Msg ; N:Msg), 
+   +(N:Msg), nil]  & 
+:: nil ::
+[ nil | 
+   -(M:Msg ; N:Msg), 
+   +(M:Msg), nil] [nonexec].
+eq STRANDS-PROTOCOL = 
+:: r':Fresh ::
+[ nil | 
+   -(CB:Nonce ; ANAME:UName ; BNAME:UName ; M1:Msg), 
+   +(CB:Nonce ; ANAME:UName ; BNAME:UName ; M1:Msg ; e(mkey(BNAME:UName, SNAME:SName), n(BNAME:UName, r':Fresh) ; CB:Nonce ; ANAME:UName ; BNAME:UName)), 
+   -(CB:Nonce ; MA:Msg ; e(mkey(BNAME:UName, SNAME:SName), n(BNAME:UName, r':Fresh) ; KCB:Sessionkey)), 
+   +(CB:Nonce ; MA:Msg), nil]  & 
+:: r'':Fresh ::
+[ nil | 
+   -(CS:Nonce ; ANAME:UName ; BNAME:UName ; e(mkey(ANAME:UName, SNAME:SName), RA:Nonce ; CS:Nonce ; ANAME:UName ; BNAME:UName) ; e(mkey(BNAME:UName, SNAME:SName), RB:Nonce ; CS:Nonce ; ANAME:UName ; BNAME:UName)), 
+   +(CS:Nonce ; e(mkey(ANAME:UName, SNAME:SName), RA:Nonce ; seskey(ANAME:UName, BNAME:UName, n(SNAME:SName, r'':Fresh))) ; e(mkey(BNAME:UName, SNAME:SName), RB:Nonce ; seskey(ANAME:UName, BNAME:UName, n(SNAME:SName, r'':Fresh)))), nil]  & 
+:: r:Fresh,rM:Fresh ::
+[ nil | 
+   +(n(ANAME:UName, rM:Fresh) ; ANAME:UName ; BNAME:UName ; e(mkey(ANAME:UName, SNAME:SName), n(ANAME:UName, r:Fresh) ; n(ANAME:UName, rM:Fresh) ; ANAME:UName ; BNAME:UName)), 
+   -(n(ANAME:UName, rM:Fresh) ; e(mkey(ANAME:UName, SNAME:SName), n(ANAME:UName, r:Fresh) ; KCA:Sessionkey)), nil] [nonexec].
+var LIST : SMsgList-R . var K : IntruderKnowledge . var S : StrandSet . eq ATTACK-STATE(0)= 
+:: r:Fresh,rM:Fresh ::
+[ nil, 
+   +(n(a, rM:Fresh) ; a ; b ; e(mkey(a, s), n(a, r:Fresh) ; n(a, rM:Fresh) ; a ; b)), 
+   -(n(a, rM:Fresh) ; e(mkey(a, s), n(a, r:Fresh) ; KCA:Sessionkey)) | nil] 
+|| empty
+|| 
+nil
+|| 
+nil
+|| 
+nil[nonexec].
+ eq ATTACK-STATE(1)= 
+:: r:Fresh,rM:Fresh ::
+[ nil, 
+   +(n(a, rM:Fresh) ; a ; b ; e(mkey(a, s), n(a, r:Fresh) ; n(a, rM:Fresh) ; a ; b)), 
+   -(n(a, rM:Fresh) ; e(mkey(a, s), n(a, r:Fresh) ; KCA:Sessionkey)) | nil] 
+|| 
+KCA:Sessionkey inI
+|| 
+nil
+|| 
+nil
+|| 
+nil[nonexec].
+ eq ATTACK-STATE(2)= 
+:: r:Fresh,rM:Fresh ::
+[ nil, 
+   +(n(a, rM:Fresh) ; a ; b ; e(mkey(a, s), n(a, r:Fresh) ; n(a, rM:Fresh) ; a ; b)), 
+   -(n(a, rM:Fresh) ; e(mkey(a, s), n(a, r:Fresh) ; KCA:Sessionkey)) | nil] 
+|| empty
+|| 
+nil
+|| 
+nil
+|| never((S & 
+:: r':Fresh ::
+[ nil, 
+   -(CB:Nonce ; a ; b ; e(mkey(a, s), n(a, rM:Fresh) ; n(a, r:Fresh) ; a ; b)), 
+   +(CB:Nonce ; a ; b ; e(mkey(a, s), n(a, rM:Fresh) ; n(a, r:Fresh) ; a ; b) ; e(mkey(b, s), n(b, r':Fresh) ; CB:Nonce ; a ; b)), 
+   -(CB:Nonce ; MA:Msg ; e(mkey(b, s), n(b, r':Fresh) ; KCB:Sessionkey)), 
+   +(CB:Nonce ; MA:Msg) | nil] ) || K)[nonexec].
+ endfm
+select MAUDE-NPA .

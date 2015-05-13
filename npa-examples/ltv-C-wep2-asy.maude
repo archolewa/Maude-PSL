@@ -1,0 +1,153 @@
+***(
+LTV09 paper - protocol C - Wired Equivalent Privacy Protocol
+
+Notations:
+A, B: principals 
+X: any principal (B or the intruder) 
+M1,M2: messages 
+KAB: symmetric key 
+RC4: function modeling the RC4 algorithm (message,symmetric key -> message) 
+v: initial vector used with RC4 (a constant)
+C: integrity checksum (message -> message)
+
+Protocol scheme:
+0. A −-> X :	v,([M1,C(M1)]*RC4(v,KAX)) 
+1. A −-> B :	v,([M2,C(M2)]*RC4(v,KAB))
+
+where * is the exclusive or operator and exclusive or has the following algebraic properties:
+  X * X = 0 .
+  X * X * Y = Y .
+  X * 0 = X .
+
+--------------------
+The property to be verified was the secrecy of M2 between A and B. 
+There is an attack:
+0.1. A −-> B : v,([M1,C(M1)]*RC4(v,KAB))
+0.2. A −-> I : v,([M1,C(M1)]*RC4(v,KAI))
+1. A −-> I :   v,([M2,C(M2)]*RC4(v,KAB))
+
+A fix is to send a different 'v' with every message.
+
+[ I have defined 2 separate strands, one just sending a single message as 
+in the actual protocol, the other sending the same payload twice but under
+ different keys, which is legal in this protocol and will be used to break it.]
+
+[[[To check the 'fixed version' proposed in the paper, simply change that 
+second strand to use different vectors for each sent message (use
+neverpattern in attack state, I guess)]]]
+
+)***
+
+fmod PROTOCOL-EXAMPLE-SYMBOLS is
+  --- Importing sorts Msg, Fresh, Public, and GhostData
+  protecting DEFINITION-PROTOCOL-RULES .
+  
+  ----------------------------------------------------------
+  --- Overwrite this module with the syntax of your protocol
+  --- Notes:
+  --- * Sort Msg and Fresh are special and imported
+  --- * Every sort must be a subsort of Msg
+  --- * No sort can be a supersort of Msg
+  ----------------------------------------------------------
+
+  --- Sort Information 
+  sorts Name Nonce Null Vector Key CheckNonce .
+  subsort Name Nonce Null Vector Key CheckNonce < Msg .
+  subsort Name < Public .
+  subsort Null < Msg .
+
+ops v v2 : -> Vector .
+op k : Name Name -> Key [frozen] .
+op rc4 : Vector Key -> Msg [frozen] .
+op c : Nonce -> CheckNonce [frozen] .
+op [_,_] : Nonce CheckNonce -> Msg [frozen] .
+op pair : Vector Msg -> Msg [frozen] .
+
+  --- Nonce operator
+  op n : Name Fresh -> Nonce [frozen] .
+  
+  --- Principals
+  op a : -> Name . --- Alice
+  op b : -> Name . --- Bob
+  op i : -> Name . --- Intruder
+  
+  --- XOR operator
+  op _*_ : Msg Msg -> Msg [frozen assoc comm] .
+  op null : -> Null .
+
+endfm
+
+fmod PROTOCOL-EXAMPLE-ALGEBRAIC is
+  protecting PROTOCOL-EXAMPLE-SYMBOLS .
+  
+  ----------------------------------------------------------
+  --- Overwrite this module with the algebraic properties 
+  --- of your protocol
+  ----------------------------------------------------------
+
+  *** Exclusive or properties
+  eq null * X:Msg = X:Msg [nonexec label XOR-UNITY metadata "builtin-unify"] .
+  eq X:Msg * X:Msg = null [nonexec label XOR-NilPotent metadata "builtin-unify"] .
+endfm
+
+fmod PROTOCOL-SPECIFICATION is
+  protecting PROTOCOL-EXAMPLE-SYMBOLS .
+  protecting DEFINITION-PROTOCOL-RULES .
+  protecting DEFINITION-CONSTRAINTS-INPUT .
+
+  ----------------------------------------------------------
+  --- Overwrite this module with the strands 
+  --- of your protocol
+  ----------------------------------------------------------
+  
+  vars X Y  : Msg .
+  vars r r' : Fresh .
+  vars N N' : Nonce .
+  vars A B C : Name .
+  var V : Vector .
+
+  eq STRANDS-DOLEVYAO
+   = :: nil :: [ nil | -(X), -(Y), +(X * Y), nil ] &
+     :: nil :: [ nil | -(A), +(k(A,i)), nil ] & 
+     :: nil :: [ nil | -(pair(V, X)), +(V), nil ] & 
+     :: nil :: [ nil | -(pair(V, X)), +(X), nil ] & 
+     :: nil :: [ nil | -(V), -(k(A,B)), +(rc4(V,k(A,B))), nil ] &
+     :: nil :: [ nil | -(N), +(c(N)), nil ] & 
+     :: nil :: [ nil | -([N,c(N')]), +(N), nil ] & 
+     :: nil :: [ nil | +(A), nil ] &
+     :: nil :: [ nil | +(null), nil ]
+  [nonexec] .
+
+  eq STRANDS-PROTOCOL
+  = :: r :: 
+    [nil | +(pair(V, ([n(A,r), c(n(A,r))] * rc4(V,k(A,B))))),
+           nil] 
+    &
+    :: r' :: 
+    [nil | +(pair(V, ([n(A,r'), c(n(A,r'))] * rc4(V,k(A,B))))), 
+            +(pair(V, ([n(A,r'), c(n(A,r'))] * rc4(V,k(A,C))))), 
+           nil] 
+  [nonexec] .
+
+  eq ATTACK-STATE(0)
+   = :: r :: 
+     [nil, +(pair(v, ([n(a,r), c(n(a,r))] * rc4(v,k(a,b))))) | nil]
+     || n(a,r) inI, empty
+     || nil
+     || nil
+     || nil
+  [nonexec] .
+
+  ----------------------------------------------------------
+  --- Grammars for co-invariant generation
+  --- Keyword GENERATED-GRAMMARS -> seed terms for grammar generation 
+  --- (if not, use automaticly generated seed terms)
+  --- Keyword EXTRA-GRAMMARS -> seed terms for grammar generation 
+  --- apart of automaticly generated ones
+  --- Format of seed terms (grl Conditions => Term inL .) ! S1/S2
+  ----------------------------------------------------------
+
+endfm
+
+--- THIS HAS TO BE THE LAST LOADED MODULE !!!!
+select MAUDE-NPA .

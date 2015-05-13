@@ -1,0 +1,117 @@
+fmod PROTOCOL-EXAMPLE-SYMBOLS is
+  --- Importing sorts Msg, Fresh, Public, and GhostData
+  protecting DEFINITION-PROTOCOL-RULES .
+  
+  ----------------------------------------------------------
+  --- Overwrite this module with the syntax of your protocol
+  --- Notes:
+  --- * Sort Msg and Fresh are special and imported
+  --- * Every sort must be a subsort of Msg
+  --- * No sort can be a supersort of Msg
+  ----------------------------------------------------------
+
+  --- Sort Information 
+  sorts Name Nonce NNSet Null .
+  subsort Name Nonce NNSet < Msg .
+  subsort Name < Public .
+  subsort Null < Public .
+  subsort  Nonce < NNSet .
+  subsort  Null < NNSet .
+
+  --- Encoding operators for public/private encryption
+  op pk : Name Msg -> Msg [frozen] .
+  op sk : Name Msg -> Msg [frozen] .  --- (?)
+
+   --- Nonce operator
+  op n : Name Fresh -> Nonce [frozen] .
+  
+  --- Principals
+  op a : -> Name . --- Alice
+  op b : -> Name . --- Bob
+  op i : -> Name . --- Intruder
+  
+ --- Exclusive or
+  op _*_ : NNSet NNSet -> NNSet [frozen assoc comm] .
+  op null : -> Null .
+
+endfm
+
+fmod PROTOCOL-EXAMPLE-ALGEBRAIC is
+  protecting PROTOCOL-EXAMPLE-SYMBOLS .
+  
+  ----------------------------------------------------------
+  --- Overwrite this module with the algebraic properties 
+  --- of your protocol
+  ----------------------------------------------------------
+
+  var A : Name .
+  vars X Y Z : Msg .
+  vars XN YN ZN : Msg .
+
+
+  *** Exclusive or properties
+  eq null * XN = XN [nonexec label XOR-UNITY metadata "builtin-unify"] .
+  eq XN * XN = null [nonexec label XOR-NilPotent metadata "builtin-unify"] .
+
+ 
+
+endfm
+
+fmod PROTOCOL-SPECIFICATION is
+  protecting PROTOCOL-EXAMPLE-SYMBOLS .
+  protecting DEFINITION-PROTOCOL-RULES .
+  protecting DEFINITION-CONSTRAINTS-INPUT .
+
+  ----------------------------------------------------------
+  --- Overwrite this module with the strands 
+  --- of your protocol
+  ----------------------------------------------------------
+  
+  vars X Y Z : Msg .
+  vars r r' : Fresh .
+  vars A B : Name .
+  vars N NA NB : Nonce .
+  vars XN YN : NNSet .
+
+  eq STRANDS-DOLEVYAO
+   = :: nil :: [ nil | -(XN), -(YN), +(XN * YN), nil ] &
+     :: nil :: [ nil | -(X), +(sk(i,X)), nil ] & 
+     :: nil :: [ nil | -(pk(i,X)), +(X), nil ] & 
+     :: nil :: [ nil | -(X), +(pk(A,X)), nil ] &
+     :: nil :: [ nil | -(sk(A,X)), +(X), nil ] &
+     :: nil :: [ nil | +(null), nil ] & 
+     :: r   :: [ nil | +(n(i,r)), nil ] & 
+     :: nil :: [ nil | +(A), nil ]
+  [nonexec] .
+
+  eq STRANDS-PROTOCOL
+  = :: r ::  *** Bob ***
+    [nil |  +(pk(A, n(B,r))), 
+            -(pk(B, YN)), 
+            +(YN * n(B,r)), nil] 
+    &
+    :: r' :: *** Alice ***
+    [nil |  -(pk(A, XN)), 
+            +(pk(B, n(A,r'))), 
+            -(XN * n(A,r')), nil]
+  [nonexec] .
+
+  eq EXTRA-GRAMMARS
+   = (grl XN notInI => pk(A,XN) inL . 
+      ! S1 )
+  [nonexec] .
+
+  eq ATTACK-STATE(0)
+  =  :: r' :: *** Alice ***
+     [nil,  -(pk(a, XN)), 
+             +(pk(b, n(a,r'))), 
+             -(XN * n(a,r')) | nil]
+     || empty
+     || nil
+     || nil
+     || nil
+  [nonexec] .
+endfm
+
+--- THIS HAS TO BE THE LAST LOADED MODULE !!!!
+select MAUDE-NPA .

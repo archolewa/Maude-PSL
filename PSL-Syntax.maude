@@ -1,0 +1,465 @@
+---(
+The following modules contain the operators and axioms for the data structures
+used in the translation from Maude-PSL to Maud-NPA specifications. Anything
+prefixed by a '$' is considered "internal," and shouldn't be used outside
+of the associated SEMANTICS module in psl.maude.
+
+The translation rules can be found in psl.maude.
+
+Note: Because of the ambiguity in Maude's multi-line syntax, I use [] instead of parenthesis inside of multi-line comments.
+---)
+load NPA-Syntax.maude .
+---load nspk.maude
+---(
+    Contains the high level data structures used to store the PSL-specification
+    and the derived strands. This is the core of Omega from
+    Andrew Cholewa's masters thesis.
+---)    
+fmod TRANSLATION-SYNTAX is
+    protecting DEFINITION-PROTOCOL-RULES .
+    protecting PROTOCOL-EXAMPLE-SYMBOLS .
+    protecting NAT .
+
+
+    ---Terms of sort TranslationData are ACU soups. The soup contains the
+    ---Maude-PSL specification, and all of the data structures used in the
+    ---translation. Bracket operators ([_]) are used to inject various sorts
+    ---into TranslationData.
+    sort TranslationData .
+    op mt : -> TranslationData .
+    op __ : TranslationData TranslationData -> 
+        TranslationData [assoc comm id: mt format(n n o)] .
+
+    sort MyNatList .
+    subsort Nat < MyNatList .
+    op mt : -> MyNatList .
+    op _:_ : Nat Nat -> MyNatList [assoc id: mt] .
+
+    ---StrandData and its singular form StrandDatum are mappings from
+    ---a role a to the role's associated input, strand, and output. Terms
+    ---of this form are built from the Protocol section, and are used to
+    ---populate the attack states.
+    sort StrandDatum StrandData .
+    subsort StrandDatum < StrandData .
+    op mt : -> StrandData [ctor] .
+    op _&_ : StrandData StrandData -> StrandData [assoc comm id: mt format(d d n d)] .
+    op [_] : StrandData -> TranslationData .
+    ---(
+    A mapping from roles to strands.
+    Arguments:
+    1. The role to whom this strand and belongs
+    2. The role's input.
+    3. The role's strand.
+    4. The role's output
+    ---)
+    op _|->{_}_{_} : Role MsgSet Strand MsgSet -> StrandDatum [ctor prec 30] .
+endfm
+
+
+---(
+    Contains the syntax for the sections Protocol, Intruder and Attacks. 
+    Note that we group them within a larger Specification section in the 
+    Maude code. This is an artifact of an earlier iteration of the 
+    Maude-PSL syntax.
+---)
+fmod SECTION-SYNTAX is
+    protecting TRANSLATION-SYNTAX .
+
+    *************************Section*********************************
+    sort Section SubSection SectionName Stmt Stmts .
+    subsort Section < TranslationData .
+    subsort Stmt < Stmts .
+    op pass : -> Stmts [ctor] .
+    ---These are any statements that may appear in a Maude-PSL specification.
+    ---Each section will have its own subsort of Stmts for the statements
+    ---that appear in that section.
+    op __ : Stmts Stmts -> Stmts [assoc id: pass format(n n o) prec 55] .
+    ops Protocol Intruder Attacks : -> SectionName .
+    sorts ProtocolSection IntruderSection AttackSection .
+    subsorts ProtocolSection IntruderSection AttackSection < SubSection .
+    op mt : -> SubSection .
+
+    op Protocol{} : -> SubSection .
+    op Intruder{} : -> SubSection .
+    op Attacks{} : -> SubSection .
+    eq Protocol{} = Protocol{ pass } .
+    eq Intruder{} = Intruder{ pass } .
+    eq Attacks{} = Attacks{ pass } .
+    ---(
+    Subsections are treated as free floating entities within the larger
+    Specification Section.
+    ---)
+    op __ : SubSection SubSection -> SubSection 
+        [ctor assoc comm id: mt format(d n o)] .
+
+    op Specification{_} : SubSection -> Section [ctor format(d d n o d)] .
+    op _{_} : SectionName Stmts -> SubSection [prec 30 format(d o ntt nt o)] .
+
+endfm
+
+fmod DEFINITION-SYNTAX is
+    protecting TRANSLATION-SYNTAX .
+    sort Definition NeDefinitions Definitions .
+    subsort Definition < NeDefinitions < Definitions .
+    op _:=_ : Msg Msg -> Definition [prec 30] .
+    op _,_ : Definitions Definitions -> Definitions [ctor comm assoc id: $noDefs] .
+    op _,_ : NeDefinitions NeDefinitions -> NeDefinitions [ctor ditto] .
+    op $noDefs : -> Definitions .
+    ---(
+    The following two functions make the definitions map idempotent. Basically, if we have:
+    da |-> t
+    dp |-> f[da]
+    Then these functions will turn the above into
+    da |-> t
+    dp |-> f[t]
+
+    If after Nat iterations we fail to compute an idempotent substitution, then we throw an error.
+    ---)
+    op $makeIdem : Definitions -> Definitions .
+    ---(
+    Args:
+    1. Definition after n-1 applications of the other Defs.
+    2. Definition after n applications of the other Defs. [If these two are equal, that Def has been fully simplified]
+    3. The Definitions that have not yet been fully simplified.
+    4. The original definition
+    5. Our current Iteration.
+    ---)
+    op $makeIdem : Definition Definition Definitions Definition Nat -> Definitions .
+    op [_] : Definitions -> TranslationData .
+    op numIterations : -> Nat .
+
+    op $cantMakeDefsIdempotent : Definitions Nat -> [Definitions] .
+
+    ---(
+    This structure is used to pair definitions with line numbers for any preliminary error checking that needs to be done on
+    user-defined terms that don't come up while parsing the terms, or in the Python error checking. For example:
+    key := (A, B, n(B, r1)) does not throw an error anywhere, however it lifts TranslationData into the kind. We need to be able
+    recognize these kinds of problems and report them.
+    ---)
+    sort ShorthandLineNum . 
+    subsort ShorthandLineNum < Msg .
+    op ((_,_)) : Msg Nat -> ShorthandLineNum .
+    ---(
+    If a malformed definition term provided by the user lifts the definitions (and the entire specification) to the kind, then
+    this function will generate an error term for Python to process.
+    If the definitions are well formed, we just strip away the line number and start translating. Otherwise, we eliminate those
+    definitions that are well-formed, and report the rest.
+    ---)
+    op $$$malformedDefs : [Definitions] -> [Definitions] .
+    op $checkWellFormed : [Definitions]  -> [Definitions] .
+    op $checkWellFormed : Definitions -> Definitions .
+
+    ---(
+    Given a multiset of (malformed) definitions of the form
+    (shorthand, lineNum) := result
+    converts the list into a list of terms of the form
+    (shorthand := result$$,$$ lineNum)
+    in order to simplify error processing by python.
+    ---)
+    op ((_$$,$$_)) : [Definition] Nat -> [Definition] . 
+    op _$$;;;$$_ : [Definition] [Definition] -> [Definitions] [assoc id: $noDefs] .
+    op $moveLineNum : [Definitions] -> [Definitions] .
+endfm
+
+fmod PROTOCOL-SYNTAX is
+    protecting TRANSLATION-SYNTAX .
+    protecting SECTION-SYNTAX .
+    protecting DEFINITION-SYNTAX .
+
+    sort ProtStmt ProtStmts .
+    subsort ProtStmt < Stmt .
+    subsort ProtStmt < ProtStmts < Stmts .
+    op $emptyProtocol : -> ProtocolSection .
+    ---Associative with identity pass.
+    op __ : ProtStmts ProtStmts -> ProtStmts [ctor ditto] .
+
+    ---The natural number at the end of each statement is the line number
+    ---on which the statement begins in the original PSL specification. 
+    ---This number is used when reporting translation errors to the user.
+    op In`(_`) = _.[_] : Role MsgSet Nat -> ProtStmt .
+    op Out`(_`) = _.[_] : Role MsgSet Nat -> ProtStmt .
+    op _._->_:_|-_.[_] : Nat Role Role Msg Msg Nat -> ProtStmt [prec 30] .
+
+endfm
+
+fmod INTRUDER-SYNTAX is
+    protecting TRANSLATION-SYNTAX .
+    protecting SECTION-SYNTAX .
+    protecting DEFINITION-SYNTAX .
+
+    sort IntStmt IntStmts .
+    subsort IntStmt < Stmt .
+    subsort IntStmt < IntStmts < Stmts .
+
+    ---StrandSet is declared in the Maude-NPA syntax (NPA-Syntax.maude), and
+    ---is used as the target of the Intruder translation.
+    op [_] : StrandSet -> TranslationData [ctor] .
+    op $emptyIntruder : -> IntruderSection .
+    op __ : IntStmts IntStmts -> IntStmts [ctor ditto] .
+    op _=>_.[_] : MsgSet MsgSet Nat -> IntStmt [prec 50] . 
+    op _=>_.[_] : MsgSet Msg Nat -> IntStmt [prec 50] .
+    op =>_.[_] : MsgSet Nat -> IntStmt [prec 50] .
+    op _<=>_.[_] : MsgSet MsgSet Nat -> IntStmts [prec 50] .
+
+endfm
+
+---(
+Mappings are used both in the Attack Section, and when composing
+protocols, hence its separation into its own module.
+---)
+fmod MAPPINGS is 
+    protecting TRANSLATION-SYNTAX .
+    sorts Mapping Mappings .
+    subsort Mapping < Mappings .
+    op id : -> Mappings [ctor] .
+    op _|->_ : Msg Msg -> Mapping [ctor prec 20] .
+    op _,_ : Mappings Mappings -> Mappings [ctor assoc comm id: id prec 25] .
+endfm
+
+fmod ATTACK-SYNTAX is
+    protecting TRANSLATION-SYNTAX .
+    protecting SECTION-SYNTAX .
+    protecting PROTOCOL-SYNTAX .
+    protecting DEFINITION-PROTOCOL-RULES . 
+    protecting MAPPINGS .
+
+    ---The following code allows us to simulate Maude style variable 
+    ---declarations. We need to be able to add a variable of sort StrandSet,
+    ---and one of sort IntruderKnowledge to the attack states. However,
+    ---we can't just declare a constant S:StrandSet, because that's ambiguous. 
+    ---Neither can we just insert a variable, because then Maude complains
+    ---that the variable is unbound.
+    ---So instead we need to have two constants S, and K and a simulation
+    ---of variable declarations which can be added to the Maude module 
+    ---at the end.
+    sort NPA-Sort VarDecl .
+    ops StrandSet IntruderKnowledge SMsgList-R : -> NPA-Sort .
+    op S : -> StrandSet .
+    op K : -> IntruderKnowledge .
+    op LIST : -> SMsgList-R .
+    op var_:_. : StrandSet NPA-Sort -> VarDecl .
+    op var_:_. : IntruderKnowledge NPA-Sort -> VarDecl .
+    op var_:_. : SMsgList-R NPA-Sort -> VarDecl .
+    op [_] : VarDecl -> TranslationData .
+
+    op $emptyAttacks : -> AttackSection .
+    op $emptyAttackData : -> AttackData .
+
+    sort AttDef AttDefs .
+    subsort AttDef < AttDefs < Stmts .
+    subsort AttDef < Stmt .
+    op __ : AttDefs AttDefs -> AttDefs [ctor ditto] .
+    ---An AttDef is an attack pattern.
+    op _.{_} : Nat AttackPSL -> AttDef .
+
+    sorts AttStmt AttStmts .
+    subsort AttStmt < AttStmts .
+    op __ : AttStmts AttStmts -> AttStmts [ctor assoc] .
+    op emptyAttStmt : -> AttStmts [ctor] .
+
+    sort Subst .
+    op Subst`(_`) = _.[_] : Role Mappings Nat -> Subst [ctor prec 26] .
+
+    sort ExecStatement .
+    op _executes protocol .[_] : Role Nat -> ExecStatement [ctor prec 28] .
+    op _executes up to_.[_] : Role Nat Nat -> ExecStatement [ctor prec 28] .
+
+
+    sort Disequality Disequalities Constraints .
+    subsort Disequality < Disequalities .
+    ---Observe that this isn't exactly the same as !=. This is to avoid clashes
+    ---with the operator defined in NPA-Syntax, whose connected component isn't 
+    ---compatible with Disequalities'. However, the Python code will convert
+    ---the != seen in PSL specifications into $!= before it ever reaches
+    ---the Maude code.
+    op _$!=_ : Msg Msg -> Disequality [ctor prec 26] .
+    op $noIneq : -> Disequalities .
+    op _,_ : Disequalities Disequalities -> Disequalities [ctor assoc comm id: $noIneq] .
+    op $noConstraints : -> Constraints [ctor] .
+    op With constraints_.[_] : Disequalities Nat -> Constraints [prec 31] .
+
+    sort IntruderKnowledgeStmt .
+    op Intruder learns_.[_] : MsgSet Nat -> IntruderKnowledgeStmt .
+
+    sorts CoreAttack .
+    subsort ExecStatement Subst Constraints IntruderKnowledgeStmt < CoreAttack .
+    op $noCore : -> CoreAttack .
+    op __ : CoreAttack CoreAttack -> CoreAttack [ctor assoc comm id: $noCore prec 33] .
+
+    sorts WithoutBlock WithoutBlocks .
+    subsort WithoutBlock < WithoutBlocks .
+    op __ : WithoutBlocks WithoutBlocks -> WithoutBlocks [ctor] .
+    op without:_ : CoreAttack -> WithoutBlock [ctor prec 35] .
+
+
+    sort AttackPSL .
+    subsort CoreAttack < AttackPSL .
+    op __ : CoreAttack WithoutBlocks -> AttackPSL [ctor] .
+       
+
+    sort AttackData .
+    op __ : AttackData AttackData -> AttackData 
+        [ctor comm assoc id: $emptyAttackData] .
+    op [_|->_] : Nat System -> AttackData .
+    op [_] : AttackData -> TranslationData .
+    op {_} : StrandSet -> TranslationData .
+    op {_} : IntruderKnowledge -> TranslationData .
+
+    ---Error checking operators.
+    ---Takes as argument the set of all pairs that form an invalid order-sorted
+    ---substitution.
+    op $$$invalidSorting : MsgPairs -> [Mapping] .
+
+    ---(
+    The following sorts and operators are used as part of checking that
+    a user-provided attack substitution is a valid order-sorted substitution
+    that can be idempotenized.
+    ---)
+    sort MsgPair MsgPairs MsgNum MsgNumSet .
+    subsort MsgPair < MsgPairs .
+    subsort MsgNum < MsgNumSet .
+    ---Ties a Msg m with a natural number n. m is meant to represent one 
+    ---of the messages in the range of an attack substitution. n is the 
+    ---line number in the PSL specification on which the attack was originally
+    ---defined. The line number will be important when reporting error messages.
+    op ${_;_}$ : Msg Nat -> MsgNum [prec 28] .
+    op __ : MsgNumSet MsgNumSet -> MsgNumSet [ctor assoc comm prec 29] .
+    eq ${M:Msg ; N:Nat}$ ${M:Msg ; N:Nat}$ = ${M:Msg ; N:Nat}$ .
+    ---This a msg m with a set of msg pairs p_1, p_2, ... p_n. m is meant
+    ---to be a message in the domain of an attack substitution, while 
+    ---p_1, p_2, ..., p_n contain all of the messages that m maps to. 
+    ---In a well-defined substitution, n=1. However, in an invalid substitution
+    ---there may be more than one. We need to be able to extract the invalid
+    ---mappings as well as the lines on which they appear.
+    op _|->_ : Msg MsgNumSet -> MsgPair [prec 30] .
+    op $none : -> MsgPairs .
+    op __ : MsgPairs MsgPairs -> MsgPairs [ctor assoc comm id: $none] .
+    ---Stores the information on an invalid substitution. The Python code
+    ---invoking this Maude code then scans the output for the presence of
+    ---this term. If the Python code finds this term, then it extracts the
+    ---arguments and uses them to build a (hopefully) useful error message.
+    ---Second argument is the list of line numbers on which the offending messages are defined.
+    op $$$notAFunction : MsgPairs -> [MsgPairs] .
+
+endfm
+
+fmod SPECIFICATION-SYNTAX is
+    protecting SECTION-SYNTAX .
+    protecting PROTOCOL-SYNTAX .
+    protecting INTRUDER-SYNTAX .
+    protecting ATTACK-SYNTAX .
+endfm
+
+fmod PSL-SYNTAX is
+    protecting TRANSLATION-SYNTAX .
+    protecting SPECIFICATION-SYNTAX .
+endfm
+
+fmod TRANSLATION-TO-MAUDE-NPA-SYNTAX is
+    protecting PSL-SYNTAX .
+
+    sort ModuleNPA .
+    subsort ModuleNPA < TranslationData .
+
+    op fmod PROTOCOL-SPECIFICATION is 
+        protecting PROTOCOL-EXAMPLE-SYMBOLS .
+        protecting DEFINITION-PROTOCOL-RULES .
+        protecting DEFINITION-CONSTRAINTS-INPUT .
+        eq STRANDS-DOLEVYAO =_[nonexec] .
+        eq STRANDS-PROTOCOL =_[nonexec] .
+        _ endfm : StrandSet StrandSet AttackList -> ModuleNPA 
+        ---The format string to end all format strings.
+            [format(n o d d d d n o d n o d n o d d d d d d n o d d d d d d n o d)] .
+
+    op fmod PROTOCOL-SPECIFICATION is 
+        protecting PROTOCOL-EXAMPLE-SYMBOLS .
+        protecting DEFINITION-PROTOCOL-RULES .
+        protecting DEFINITION-CONSTRAINTS-INPUT .
+        eq STRANDS-DOLEVYAO =_[nonexec] .
+        eq STRANDS-PROTOCOL =_[nonexec] .
+        endfm : StrandSet StrandSet -> ModuleNPA 
+            [format(n o d d d d n o d n o d n o d d d d d d n o d d d d d n o d)] .
+
+
+        sort AttackEq AttackList VarDecls .
+        subsort AttackEq VarDecls < AttackList .
+        op eq ATTACK-STATE`(_`) = _[nonexec] . : Nat System -> AttackEq 
+        [format(d d d d d d d d d d d n)] .
+        op $emptyAttackList : -> AttackList .
+        op __ : AttackList AttackList -> AttackList 
+            [ctor assoc id: $emptyAttackList] .
+
+        subsort VarDecl < VarDecls .
+        op __ : VarDecls VarDecls -> VarDecls [ctor ditto] .
+
+    op $translate : -> TranslationData . 
+    ---Extracts the strands from a set of mappings from roles to strands.
+    op convert : StrandData -> StrandSet .
+    op shiftBarLeft : Strand -> Strand .
+
+endfm
+
+
+---(
+    Syntax for protocol composition.
+---)
+fmod COMPOSITION-SYNTAX is
+    protecting TRANSLATION-SYNTAX .
+    protecting SECTION-SYNTAX .
+    protecting MAPPINGS .
+    protecting TRANSLATION-TO-MAUDE-NPA-SYNTAX .
+
+    sort Composition CompType .
+    ---One-to-One composition
+    op _;1_ : Role Role -> CompType [prec 25] .
+    ---One-to-many composition
+    op _;*_ : Role Role -> CompType [prec 25] .
+    op _:_.[_] : CompType Mappings Nat -> Composition [prec 26] .
+    op __ : Composition Composition -> 
+        Composition [gather(e E) prec 28 id: emptyComp] .
+    op emptyComp : -> Composition .
+
+    op var_:_. : Role NPA-Sort -> VarDecl .
+    op ROLE : -> Role .
+
+    ---(
+        The TranslationData is the PSL data of one of the protocols being
+        composed.
+        As a part of the Python parsing, the composing sections are split
+        up and assigned a number based on the order the section appears
+        in the specification.
+        Each protocol is assigned a number by the Python script based on the
+        order in the composing statement. translate takes that number
+        as first argument.
+        Note that the translation performed inside of "translate" stops
+        just before being converted into a Maude-NPA module.
+    ---)
+    op $translate : Nat TranslationData -> TranslationData .
+    ---Marks that the PSL specification in the second argument has been
+    ---completely translated.
+    op $translated : Nat TranslationData -> TranslationData .
+
+    ---(
+    The following sorts and operators contain the information about which
+    protocols are being composed.
+    Essentially we convert a block of the form
+    spec A;B is
+        composing A ; B .
+    comp A ; B 
+        S_1
+
+    into
+    translate(1, codeA)
+    translate(2, codeB) 
+    [comp(1, 2) |-> S_1]
+    Then, after codeA and codeB have been translated, we use the information in 
+    S_1 to generate the composed protocol.
+    ---)
+    sort Composing CompList .
+    op comp : Nat Nat -> Composing .
+    op _|->_ : Composing Composition -> CompList [prec 30] .
+    op $noCM : -> CompList .
+    op __ : CompList CompList -> CompList [assoc id: $noCM prec 32] .
+    op [_] : CompList -> TranslationData .
+
+endfm

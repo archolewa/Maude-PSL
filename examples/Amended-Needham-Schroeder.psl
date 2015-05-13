@@ -1,0 +1,100 @@
+spec NEEDHAM-SCHROEDER is
+Theory
+  types   SName Name Key Nonce Masterkey Sessionkey .
+  subtypes Masterkey  Sessionkey < Key .
+  subtype SName < Name .
+  subtype Name < Public .
+
+  // Nonce operator
+  op n : Name Fresh -> Nonce .
+
+  // Principals
+  op a : -> Name . // Alice
+  op b : -> Name . // Bob
+  op i : -> Name . // Intruder
+  
+  // Server name
+  op s : ->  SName . 
+
+ 
+  // MKey
+  op mkey : Name Name -> Masterkey .
+ 
+  // Seskey
+  op seskey : Name Name Nonce -> Sessionkey .
+
+  //encrypt
+  op e : Key Msg -> Msg .
+  op d : Key Msg -> Msg .
+
+  // successor
+  op dec : Nonce -> Msg .
+  op null : -> Msg .
+
+  // Concatenation
+  op _;_ : Msg Msg -> Msg [gather (e E)] .
+  
+  eq d(K:Key, e (K:Key, Z:Msg )) = Z:Msg .
+  eq e(K:Key, d (K:Key, Z:Msg )) = Z:Msg .
+
+Protocol
+  vars ANAME BNAME SNAME A1NAME A2NAME B2NAME : Name .  
+  var r r0 r1 r2 : Fresh .
+  vars M1 M2 : Msg .
+  vars KA KB : Key . 
+  vars NA2 NB NB2 : Nonce .
+
+  roles A B S .
+
+  Def(A) =      na := n(ANAME, r),      keyAS := mkey(ANAME, SNAME) .
+  Def(B) =      nb := n(BNAME, r0),     keyBS := mkey(BNAME, SNAME), 
+               nb1 := n(BNAME, r2) .
+  Def(S) = keyA2S  := mkey(A2NAME, SNAME), keyB2S := mkey(B2NAME, SNAME),
+            sesKey := seskey(A2NAME, B2NAME, n(SNAME, r1)) .
+
+  In(A) = ANAME, SNAME, BNAME .
+  In(B) = SNAME, BNAME .
+  In(S) = SNAME .
+
+  1 . A -> B : ANAME |- A1NAME .
+
+  2 . B -> A : e(keyBS, A1NAME ; nb) |- M1 .
+
+  3 . A -> S : ANAME  ; BNAME  ; na  ; M1  |- 
+               A2NAME ; B2NAME ; NA2 ; e(keyB2S, A2NAME ; NB2) .
+
+  4 . S -> A : e(keyA2S, NA2 ; B2NAME ; sesKey ; e(keyB2S, sesKey ; NB2 ; A2NAME)) |-
+               e(keyAS,  na  ; BNAME  ; KA     ; M2) . 
+
+  5 . A -> B : M2 |- e(keyBS, KB ; nb ; A1NAME) .
+
+  6 . B -> A : e(KB, nb1) |- e(KA, NB) . 
+
+  7 . A -> B : e(KA, dec(NB)) |- e(KB, dec(nb1)) . 
+
+  Out(A) = KA .
+  Out(B) = KB .
+  Out(S) = sesKey .
+                    
+
+Intruder
+    var A : Name . 
+    var r : Fresh .
+    var K : Key .
+    vars M M1 : Msg .
+    var N : Nonce .
+
+           => A, s, n(i, r) .
+           => mkey(i, A), mkey(A, i) . 
+           => mkey(i, s), mkey(s, i) . 
+    M, M1 <=> M ; M1 .
+    K, M   => d(K, M), e(K, M) .
+    N     <=> dec(N) .
+
+Attacks
+    0 .
+        //Get rid of In(), Out() and replace it with
+        //Subst() that looks at all the variables.
+        B executes protocol .
+        Subst(B) = A1NAME |-> a, BNAME |-> b, SNAME |-> s .
+ends

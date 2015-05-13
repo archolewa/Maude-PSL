@@ -1,0 +1,102 @@
+spec ISO5 is
+Theory
+  types UName SName Name Key Nonce Masterkey Sessionkey .
+  subtype Masterkey Sessionkey < Key .
+  subtype SName UName < Name .
+  subtype Name < Public .
+
+  op n : Name Fresh -> Nonce  .
+  ops a b i : -> UName [ctor] .
+  op s : ->  SName [ctor]  . 
+  op mkey : Name Name -> Masterkey [comm] .
+  op seskey : Name Name Nonce -> Sessionkey .
+  op e : Key Msg -> Msg .
+  op d : Key Msg -> Msg .
+  op _;_ : Msg Msg -> Msg [gather (e E)] .
+
+  eq d(K:Key, e(K:Key, Z:Msg )) = Z:Msg .
+  eq e(K:Key, d(K:Key, Z:Msg )) = Z:Msg . 
+
+/* I think there is a typo in the Maude-NPA example */
+
+    
+     /*
+        A -> B : A,na
+        B -> S : A,na,B,nb1
+        S -> B : E(kbs:nb1,kab,A), E(kas:na,kab,B)
+        B -> A : E(kas:na,kab,B),E(kab:nb,na)
+        A -> B : E(kab:na,nb)
+    */
+
+Protocol
+  vars A B AB AS BS : UName .
+  var S : SName .
+  vars K : Key .
+  vars SKA SKB : Sessionkey .
+  vars r r' : Fresh .
+  vars NAB NAS NBA NBS : Nonce .
+  var MA : Msg .
+
+  Def(A) = na := n(A, r), kas := mkey(A,S) .
+  In(A) = A, B, S .
+
+  Def(B) = nb := n(B, r), nb1 := n(B, r'), kbs := mkey(B,S) .
+  In(B) = B, S .
+
+  Def(S) = ksa := mkey(AS,S), ksb := mkey(BS,S) , 
+           kab := seskey(AS, BS, n(s,r)) .
+  In(S) = S .
+
+  1 . A -> B : A  ; na 
+            |- AB ; NAB .
+
+  2 . B -> S : AB ; NAB ; B  ; nb1 
+            |- AS ; NAS ; BS ; NBS .
+
+  3 . S -> B : e(ksb, NBS ; kab  ; A)  ; e(ksa, NAS ; kab ; BS)
+            |- e(kbs, nb1 ; SKB  ; AB) ; MA .
+
+  4 . B -> A : MA                    ; e(SKB, nb  ; NAB) 
+            |- e(kas, na ; SKA ; B ) ; e(SKA, NBA ; na) .
+
+  5 . A -> B : e(SKA, na  ; NBA)
+            |- e(SKB, NAB ; nb) .
+
+  Out(A) = na, NBA, SKA .
+  Out(B) = NAB, nb, nb1, SKB .
+  Out(S) = NAS, NBS, kab .
+
+Intruder
+   vars C D : Name .
+   var K : Key .
+   vars M N : Msg .
+   var r : Fresh .
+
+   => C, s, mkey(i, D), mkey(i, s), n(i, r) .
+   K, M => d(K, M), e(K, M) .
+   M, N <=> M ; N .
+
+Attacks
+  vars A B : UName .
+  var S : SName .
+  var SK : Sessionkey .
+  var NBA : Nonce .
+  var r : Fresh .
+
+  0 . 
+       B executes protocol .
+       Subst(B) = AB |-> a , B |-> b, S |-> s . 
+
+  1 .
+      B executes protocol .
+      Subst(B) = AB |-> a , B |-> b , S |-> s .
+      Intruder learns SKB .
+
+   2 .
+      B executes protocol .
+      Subst(B) = AB |-> a , B |-> b , S |-> s .
+       without:
+           A executes protocol .
+           Subst(A) = A |-> a, B |-> b , S |-> s, NBA |-> n(b, r) .
+
+ends

@@ -1,0 +1,1179 @@
+Santiagos-MacBook-Pro:prototype-20121204 sescobar$ examples/esorics12-asy-command 
+Wed Dec  5 10:42:15 CET 2012
+		     \||||||||||||||||||/
+		   --- Welcome to Maude ---
+		     /||||||||||||||||||\
+	    Maude alpha96b built: Nov  9 2012 18:20:01
+	    Copyright 1997-2011 SRI International
+		   Wed Dec  5 10:42:15 2012
+Maude> 
+	    Maude-NPA Version:  Dec 4 2012 with direct composition
+	    Copyright (c) 2012, University of Illinois
+	    All rights reserved.
+
+ Commands:
+ red unification? .           for getting the unification algorithm
+ red genGrammars .            for generating grammars
+ red run(X,Y).                for Y backwards analysis steps for attack pattern X
+ red summary(X,Y).            for summary of analysis steps
+ red initials(X,Y).           for showing only initial steps
+==========================================
+reduce in MAUDE-NPA : genGrammars .
+rewrites: 15614800 in 31877ms cpu (32374ms real) (489837 rewrites/second)
+result GrammarList: (errorNoHeuristicApplied {
+grl #0:NNSet inL => (#0:NNSet * #1:NNSet) inL .,
+	'#1:NNSet <- 'n['#3:Name,'#4:Fresh],
+grl #0:NNSet inL => pk(#3:Name, #0:NNSet) inL .,none,
+grl (#0:NNSet * #5:NNSet) notInI, (#0:NNSet notLeq n(#6:Name, #7:Fresh)), (#0:NNSet * #5:NNSet) notLeq #8:NNSet * #9:NNSet => pk(#3:Name, #0:NNSet) inL .} usingGrammar 
+grl #0:Msg inL => pk(#1:Name, #0:Msg) inL . ; 
+grl #0:Msg inL => sk(#1:Name, #0:Msg) inL . ; 
+grl #0:NNSet inL => (#0:NNSet * #1:NNSet) inL . ; 
+grl #0:Msg notInI, (#0:Msg notLeq n(#1:Name, #2:Fresh)), #0:Msg notLeq #3:NNSet * #4:NNSet => pk(#5:Name, #0:Msg) inL . ; 
+grl #0:NNSet notInI, (#0:NNSet notLeq n(#1:Name, #2:Fresh)), #0:NNSet notLeq #3:NNSet * #4:NNSet => (#0:NNSet * #5:NNSet) inL . ; 
+grl (#0:NNSet * #1:NNSet) notInI, (#0:NNSet notLeq n(#2:Name, #3:Fresh)), (#0:NNSet * #1:NNSet) notLeq #4:NNSet * #5:NNSet => #0:NNSet inL .)
+| (errorNoHeuristicApplied {
+grl empty => (#1:NNSet * #2:NNSet) inL .,none,
+grl empty => (#1:NNSet,#2:NNSet) inL .,none,
+grl empty => (#1:NNSet,#2:NNSet) inL .} usingGrammar 
+grl empty => (#1:NNSet * #2:NNSet) inL .)
+| (errorNoHeuristicApplied {
+grl empty => n(#1:Name, #2:Fresh) inL .,none,
+grl empty => pk(#1:Name, null) inL .,none,
+grl empty => pk(#1:Name, null) inL .} usingGrammar 
+grl empty => n(#1:Name, #2:Fresh) inL .)
+| (
+grl #0:Msg inL => pk(#1:Name, #0:Msg) inL . ; 
+grl #0:Msg inL => sk(#1:Name, #0:Msg) inL . ; 
+grl #0:Nonce inL => (#1:NNSet * #0:Nonce) inL . ; 
+grl #0:Msg notInI, #0:Msg notLeq n(#1:Name, #2:Fresh) => pk(#3:Name, #0:Msg) inL .)
+| (errorNoHeuristicApplied {
+grl empty => pk(#1:Name, #2:Msg) inL .,none,
+grl empty => #2:Msg inL .,none,
+grl empty => #2:Msg inL .} usingGrammar 
+grl empty => pk(#1:Name, #2:Msg) inL .)
+| (
+grl #0:Msg inL => pk(#1:Name, #0:Msg) inL . ; 
+grl #0:Msg inL => sk(#1:Name, #0:Msg) inL . ; 
+grl #0:Nonce inL => (#1:NNSet * #0:Nonce) inL . ; 
+grl #0:Msg notInI => sk(#1:Name, #0:Msg) inL .)
+| (
+grl #0:Msg inL => pk(#1:Name, #0:Msg) inL . ; 
+grl #0:Msg inL => sk(#1:Name, #0:Msg) inL . ; 
+grl #0:Nonce inL => (#1:NNSet * #0:Nonce) inL . ; 
+grl sk(#0:Name, #1:Msg) notLeq sk(i, #2:Msg) => sk(#0:Name, #1:Msg) inL .)
+| 
+grl #0:Msg inL => pk(#1:Name, #0:Msg) inL . ; 
+grl #0:Msg inL => sk(#1:Name, #0:Msg) inL . ; 
+grl #0:Nonce inL => (#1:NNSet * #0:Nonce) inL . ; 
+grl #0:NNSet notInI, #0:NNSet notLeq n(#1:Name, #2:Fresh) => pk(#3:Name, #0:NNSet) inL .
+==========================================
+reduce in MAUDE-NPA : run(0) .
+rewrites: 3215 in 49ms cpu (50ms real) (64725 rewrites/second)
+result IdSystem: < 1 > 
+:: r':Fresh ::
+[ nil, 
+   -(pk(a, XN:NNSet)), 
+   +(pk(b, n(a, r':Fresh))), 
+   -(XN:NNSet * n(a, r':Fresh)) | nil] 
+|| empty
+|| 
+nil
+|| 
+nil
+|| 
+nil
+==========================================
+reduce in MAUDE-NPA : summary(1) .
+rewrites: 3266992 in 8498ms cpu (8563ms real) (384435 rewrites/second)
+result Summary: States>> 10 Solutions>> 0
+==========================================
+reduce in MAUDE-NPA : summary(2) .
+rewrites: 2977513 in 6679ms cpu (6734ms real) (445800 rewrites/second)
+result Summary: States>> 5 Solutions>> 0
+==========================================
+reduce in MAUDE-NPA : summary(3) .
+rewrites: 1653319 in 4422ms cpu (4456ms real) (373834 rewrites/second)
+result Summary: States>> 2 Solutions>> 1
+==========================================
+reduce in MAUDE-NPA : summary(4) .
+rewrites: 477543 in 911ms cpu (923ms real) (523960 rewrites/second)
+result Summary: States>> 4 Solutions>> 1
+==========================================
+reduce in MAUDE-NPA : summary(5) .
+rewrites: 1125009 in 2106ms cpu (2121ms real) (534112 rewrites/second)
+result Summary: States>> 3 Solutions>> 2
+==========================================
+reduce in MAUDE-NPA : summary(6) .
+rewrites: 574154 in 1103ms cpu (1110ms real) (520248 rewrites/second)
+result Summary: States>> 2 Solutions>> 2
+==========================================
+reduce in MAUDE-NPA : run(1) .
+rewrites: 18 in 0ms cpu (0ms real) (~ rewrites/second)
+result IdSystemSet: (< (1 [1]) . 1 > (
+:: nil ::
+[ nil | 
+   -(pk(i, n(a, #0:Fresh))), 
+   +(n(a, #0:Fresh)), nil]  & 
+:: #0:Fresh ::
+[ nil, 
+   -(pk(a, null)), 
+   +(pk(b, n(a, #0:Fresh))) | 
+   -(n(a, #0:Fresh)), nil] )
+|| 
+n(a, #0:Fresh) !inI,
+pk(i, n(a, #0:Fresh)) inI,
+irr(n(a, #0:Fresh))
+|| 
+-(pk(i, n(a, #0:Fresh))), 
++(n(a, #0:Fresh)), 
+-(n(a, #0:Fresh))
+|| 
+nil
+|| 
+nil)
+(< (1 [1]) . (3 [2]) > (
+:: nil ::
+[ nil | 
+   -(%5:NNSet), 
+   -(%5:NNSet * n(a, #1:Fresh)), 
+   +(n(a, #1:Fresh)), nil]  & 
+:: #1:Fresh ::
+[ nil, 
+   -(pk(a, null)), 
+   +(pk(b, n(a, #1:Fresh))) | 
+   -(n(a, #1:Fresh)), nil] )
+|| 
+n(a, #1:Fresh) !inI,
+(%5:NNSet * n(a, #1:Fresh)) inI,
+irr(n(a, #1:Fresh)),
+irr(%5:NNSet * n(a, #1:Fresh)),
+inst(%5:NNSet)
+|| 
+-(%5:NNSet), 
+-(%5:NNSet * n(a, #1:Fresh)), 
++(n(a, #1:Fresh)), 
+-(n(a, #1:Fresh))
+|| 
+ghost( %5:NNSet,
+   :: nil ::
+   [ nil | 
+      -(%5:NNSet), 
+      -(%5:NNSet * n(a, #1:Fresh)), 
+      +(n(a, #1:Fresh)), nil]  & 
+   :: #1:Fresh ::
+   [ nil, 
+      -(pk(a, null)), 
+      +(pk(b, n(a, #1:Fresh))) | 
+      -(n(a, #1:Fresh)), nil] ,    
+   n(a, #1:Fresh) !inI,
+   (%5:NNSet * n(a, #1:Fresh)) inI,
+   irr(n(a, #1:Fresh)),
+   irr(%5:NNSet * n(a, #1:Fresh)),
+   inst(%5:NNSet),    
+   -(%5:NNSet), 
+   -(%5:NNSet * n(a, #1:Fresh)), 
+   +(n(a, #1:Fresh)), 
+   -(n(a, #1:Fresh)),    
+   nil )
+|| 
+nil)
+(< (1 [1]) . (4 [2]) > (
+:: #0:Fresh ::
+[ nil, 
+   +(pk(#1:Name, n(#2:Name, #0:Fresh))) | 
+   -(pk(#2:Name, n(a, #3:Fresh) * n(#2:Name, #0:Fresh))), 
+   +(n(a, #3:Fresh)), nil]  & 
+:: #3:Fresh ::
+[ nil, 
+   -(pk(a, null)), 
+   +(pk(b, n(a, #3:Fresh))) | 
+   -(n(a, #3:Fresh)), nil] )
+|| 
+n(a, #3:Fresh) !inI,
+pk(#2:Name, n(a, #3:Fresh) * n(#2:Name, #0:Fresh)) inI,
+irr(pk(#2:Name, n(a, #3:Fresh) * n(#2:Name, #0:Fresh))),
+irr(n(a, #3:Fresh)),
+inst(#2:Name)
+|| 
+-(pk(#2:Name, n(a, #3:Fresh) * n(#2:Name, #0:Fresh))), 
++(n(a, #3:Fresh)), 
+-(n(a, #3:Fresh))
+|| 
+nil
+|| 
+nil)
+(< (1 [2]) . (3 [2]) > (
+:: nil ::
+[ nil | 
+   -(#1:NNSet), 
+   -(n(a, #2:Fresh)), 
+   +(#1:NNSet * n(a, #2:Fresh)), nil]  & 
+:: #2:Fresh ::
+[ nil, 
+   -(pk(a, #1:NNSet)), 
+   +(pk(b, n(a, #2:Fresh))) | 
+   -(#1:NNSet * n(a, #2:Fresh)), nil] )
+|| 
+(#1:NNSet * n(a, #2:Fresh)) !inI,
+n(a, #2:Fresh) inI,
+irr(#1:NNSet * n(a, #2:Fresh)),
+inst(#1:NNSet)
+|| 
+-(#1:NNSet), 
+-(n(a, #2:Fresh)), 
++(#1:NNSet * n(a, #2:Fresh)), 
+-(#1:NNSet * n(a, #2:Fresh))
+|| 
+ghost( #1:NNSet,
+   :: nil ::
+   [ nil | 
+      -(#1:NNSet), 
+      -(n(a, #2:Fresh)), 
+      +(#1:NNSet * n(a, #2:Fresh)), nil]  & 
+   :: #2:Fresh ::
+   [ nil, 
+      -(pk(a, #1:NNSet)), 
+      +(pk(b, n(a, #2:Fresh))) | 
+      -(#1:NNSet * n(a, #2:Fresh)), nil] ,    
+   (#1:NNSet * n(a, #2:Fresh)) !inI,
+   n(a, #2:Fresh) inI,
+   irr(#1:NNSet * n(a, #2:Fresh)),
+   inst(#1:NNSet),    
+   -(#1:NNSet), 
+   -(n(a, #2:Fresh)), 
+   +(#1:NNSet * n(a, #2:Fresh)), 
+   -(#1:NNSet * n(a, #2:Fresh)),    
+   nil )
+|| 
+nil)
+(< (1 [2]) . (3 [6]) > (
+:: nil ::
+[ nil | 
+   -(#1:NNSet * %6:NNSet), 
+   -(%6:NNSet * n(a, #2:Fresh)), 
+   +(#1:NNSet * n(a, #2:Fresh)), nil]  & 
+:: #2:Fresh ::
+[ nil, 
+   -(pk(a, #1:NNSet)), 
+   +(pk(b, n(a, #2:Fresh))) | 
+   -(#1:NNSet * n(a, #2:Fresh)), nil] )
+|| 
+(#1:NNSet * n(a, #2:Fresh)) !inI,
+(%6:NNSet * n(a, #2:Fresh)) inI,
+irr(#1:NNSet * n(a, #2:Fresh)),
+irr(%6:NNSet * n(a, #2:Fresh)),
+inst(#1:NNSet),
+inst(%6:NNSet)
+|| 
+-(#1:NNSet * %6:NNSet), 
+-(%6:NNSet * n(a, #2:Fresh)), 
++(#1:NNSet * n(a, #2:Fresh)), 
+-(#1:NNSet * n(a, #2:Fresh))
+|| 
+ghost( #1:NNSet * %6:NNSet,
+   :: nil ::
+   [ nil | 
+      -(#1:NNSet * %6:NNSet), 
+      -(%6:NNSet * n(a, #2:Fresh)), 
+      +(#1:NNSet * n(a, #2:Fresh)), nil]  & 
+   :: #2:Fresh ::
+   [ nil, 
+      -(pk(a, #1:NNSet)), 
+      +(pk(b, n(a, #2:Fresh))) | 
+      -(#1:NNSet * n(a, #2:Fresh)), nil] ,    
+   (#1:NNSet * n(a, #2:Fresh)) !inI,
+   (%6:NNSet * n(a, #2:Fresh)) inI,
+   irr(#1:NNSet * n(a, #2:Fresh)),
+   irr(%6:NNSet * n(a, #2:Fresh)),
+   inst(#1:NNSet),
+   inst(%6:NNSet),    
+   -(#1:NNSet * %6:NNSet), 
+   -(%6:NNSet * n(a, #2:Fresh)), 
+   +(#1:NNSet * n(a, #2:Fresh)), 
+   -(#1:NNSet * n(a, #2:Fresh)),    
+   nil )
+|| 
+nil)
+(< (1 [2]) . (4 [2]) > (
+:: #0:Fresh ::
+[ nil, 
+   +(pk(#1:Name, n(#2:Name, #0:Fresh))) | 
+   -(pk(#2:Name, n(a, #4:Fresh))), 
+   +(n(a, #4:Fresh) * n(#2:Name, #0:Fresh)), nil]  & 
+:: #4:Fresh ::
+[ nil, 
+   -(pk(a, n(#2:Name, #0:Fresh))), 
+   +(pk(b, n(a, #4:Fresh))) | 
+   -(n(a, #4:Fresh) * n(#2:Name, #0:Fresh)), nil] )
+|| 
+(n(a, #4:Fresh) * n(#2:Name, #0:Fresh)) !inI,
+pk(#2:Name, n(a, #4:Fresh)) inI,
+irr(pk(#2:Name, n(a, #4:Fresh))),
+irr(n(a, #4:Fresh) * n(#2:Name, #0:Fresh)),
+inst(#2:Name)
+|| 
+-(pk(#2:Name, n(a, #4:Fresh))), 
++(n(a, #4:Fresh) * n(#2:Name, #0:Fresh)), 
+-(n(a, #4:Fresh) * n(#2:Name, #0:Fresh))
+|| 
+nil
+|| 
+nil)
+(< (1 [2]) . (4 [3]) > (
+:: #0:Fresh ::
+[ nil, 
+   +(pk(#1:Name, n(#2:Name, #0:Fresh))) | 
+   -(pk(#2:Name, %10:NNSet * n(a, #4:Fresh))), 
+   +(%10:NNSet * n(a, #4:Fresh) * n(#2:Name, #0:Fresh)), nil]  & 
+:: #4:Fresh ::
+[ nil, 
+   -(pk(a, %10:NNSet * n(#2:Name, #0:Fresh))), 
+   +(pk(b, n(a, #4:Fresh))) | 
+   -(%10:NNSet * n(a, #4:Fresh) * n(#2:Name, #0:Fresh)), nil] )
+|| 
+(%10:NNSet * n(a, #4:Fresh) * n(#2:Name, #0:Fresh)) !inI,
+pk(#2:Name, %10:NNSet * n(a, #4:Fresh)) inI,
+irr(pk(#2:Name, %10:NNSet * n(a, #4:Fresh))),
+irr(%10:NNSet * n(a, #4:Fresh) * n(#2:Name, #0:Fresh)),
+inst(#2:Name),
+inst(%10:NNSet)
+|| 
+-(pk(#2:Name, %10:NNSet * n(a, #4:Fresh))), 
++(%10:NNSet * n(a, #4:Fresh) * n(#2:Name, #0:Fresh)), 
+-(%10:NNSet * n(a, #4:Fresh) * n(#2:Name, #0:Fresh))
+|| 
+nil
+|| 
+nil)
+(< (1 [2]) . (4 [4]) > (
+:: #0:Fresh ::
+[ nil, 
+   +(pk(#1:Name, n(#2:Name, #0:Fresh))) | 
+   -(pk(#2:Name, #3:NNSet * n(a, #4:Fresh) * n(#2:Name, #0:Fresh))), 
+   +(#3:NNSet * n(a, #4:Fresh)), nil]  & 
+:: #4:Fresh ::
+[ nil, 
+   -(pk(a, #3:NNSet)), 
+   +(pk(b, n(a, #4:Fresh))) | 
+   -(#3:NNSet * n(a, #4:Fresh)), nil] )
+|| 
+(#3:NNSet * n(a, #4:Fresh)) !inI,
+pk(#2:Name, #3:NNSet * n(a, #4:Fresh) * n(#2:Name, #0:Fresh)) inI,
+irr(pk(#2:Name, #3:NNSet * n(a, #4:Fresh) * n(#2:Name, #0:Fresh))),
+irr(#3:NNSet * n(a, #4:Fresh)),
+inst(#2:Name),
+inst(#3:NNSet)
+|| 
+-(pk(#2:Name, #3:NNSet * n(a, #4:Fresh) * n(#2:Name, #0:Fresh))), 
++(#3:NNSet * n(a, #4:Fresh)), 
+-(#3:NNSet * n(a, #4:Fresh))
+|| 
+nil
+|| 
+nil)
+(< (1 [3]) . 1 > (
+:: nil ::
+[ nil | 
+   +(null), nil]  & 
+:: #0:Fresh ::
+[ nil, 
+   -(pk(a, n(a, #0:Fresh))), 
+   +(pk(b, n(a, #0:Fresh))) | 
+   -(null), nil] )
+|| 
+null !inI,
+irr(null)
+|| 
++(null), 
+-(null)
+|| 
+nil
+|| 
+nil)
+< (1 [4]) . 2 > (
+:: nil ::
+[ nil | 
+   -(pk(i, #0:NNSet)), 
+   +(#0:NNSet), nil]  & 
+:: #1:Fresh ::
+[ nil, 
+   -(pk(a, #0:NNSet * n(a, #1:Fresh))), 
+   +(pk(b, n(a, #1:Fresh))) | 
+   -(#0:NNSet), nil] )
+|| 
+#0:NNSet !inI,
+irr(#0:NNSet)
+|| 
+-(pk(i, #0:NNSet)), 
++(#0:NNSet), 
+-(#0:NNSet)
+|| 
+ghost( pk(i, #0:NNSet),
+   :: nil ::
+   [ nil | 
+      -(pk(i, #0:NNSet)), 
+      +(#0:NNSet), nil]  & 
+   :: #1:Fresh ::
+   [ nil, 
+      -(pk(a, #0:NNSet * n(a, #1:Fresh))), 
+      +(pk(b, n(a, #1:Fresh))) | 
+      -(#0:NNSet), nil] ,    
+   #0:NNSet !inI,
+   irr(#0:NNSet),    
+   -(pk(i, #0:NNSet)), 
+   +(#0:NNSet), 
+   -(#0:NNSet),    
+   nil )
+|| 
+nil
+==========================================
+reduce in MAUDE-NPA : run(2) .
+rewrites: 18 in 0ms cpu (0ms real) (~ rewrites/second)
+result IdSystemSet: (< (1 [1]) . (3 [2]) . 5 > (
+:: nil ::
+[ nil | 
+   -(#3:NNSet), 
+   -(#3:NNSet * n(a, #4:Fresh)), 
+   +(n(a, #4:Fresh)), nil]  & 
+:: #0:Fresh ::
+[ nil, 
+   +(pk(#1:Name, n(#2:Name, #0:Fresh))) | 
+   -(pk(#2:Name, #3:NNSet * n(a, #4:Fresh) * n(#2:Name, #0:Fresh))), 
+   +(#3:NNSet * n(a, #4:Fresh)), nil]  & 
+:: #4:Fresh ::
+[ nil, 
+   -(pk(a, null)), 
+   +(pk(b, n(a, #4:Fresh))) | 
+   -(n(a, #4:Fresh)), nil] )
+|| 
+n(a, #4:Fresh) !inI,
+(#3:NNSet * n(a, #4:Fresh)) !inI,
+pk(#2:Name, #3:NNSet * n(a, #4:Fresh) * n(#2:Name, #0:Fresh)) inI,
+irr(n(a, #4:Fresh)),
+irr(#3:NNSet * n(a, #4:Fresh)),
+inst(#3:NNSet)
+|| 
+-(pk(#2:Name, #3:NNSet * n(a, #4:Fresh) * n(#2:Name, #0:Fresh))), 
++(#3:NNSet * n(a, #4:Fresh)), 
+-(#3:NNSet), 
+-(#3:NNSet * n(a, #4:Fresh)), 
++(n(a, #4:Fresh)), 
+-(n(a, #4:Fresh))
+|| 
+ghost( #3:NNSet,
+   :: nil ::
+   [ nil | 
+      -(#3:NNSet), 
+      -(#3:NNSet * n(a, #4:Fresh)), 
+      +(n(a, #4:Fresh)), nil]  & 
+   :: #4:Fresh ::
+   [ nil, 
+      -(pk(a, null)), 
+      +(pk(b, n(a, #4:Fresh))) | 
+      -(n(a, #4:Fresh)), nil] ,    
+   n(a, #4:Fresh) !inI,
+   (#3:NNSet * n(a, #4:Fresh)) inI,
+   irr(n(a, #4:Fresh)),
+   irr(#3:NNSet * n(a, #4:Fresh)),
+   inst(#3:NNSet),    
+   -(#3:NNSet), 
+   -(#3:NNSet * n(a, #4:Fresh)), 
+   +(n(a, #4:Fresh)), 
+   -(n(a, #4:Fresh)),    
+   nil )
+|| 
+nil)
+(< (1 [2]) . (3 [2]) . 2 > (
+:: nil ::
+[ nil | 
+   -(#1:NNSet), 
+   -(n(a, #0:Fresh)), 
+   +(#1:NNSet * n(a, #0:Fresh)), nil]  & 
+:: nil ::
+[ nil | 
+   -(pk(i, n(a, #0:Fresh))), 
+   +(n(a, #0:Fresh)), nil]  & 
+:: #0:Fresh ::
+[ nil, 
+   -(pk(a, #1:NNSet)), 
+   +(pk(b, n(a, #0:Fresh))) | 
+   -(#1:NNSet * n(a, #0:Fresh)), nil] )
+|| 
+n(a, #0:Fresh) !inI,
+(#1:NNSet * n(a, #0:Fresh)) !inI,
+pk(i, n(a, #0:Fresh)) inI,
+irr(#1:NNSet * n(a, #0:Fresh)),
+inst(#1:NNSet)
+|| 
+-(pk(i, n(a, #0:Fresh))), 
++(n(a, #0:Fresh)), 
+-(#1:NNSet), 
+-(n(a, #0:Fresh)), 
++(#1:NNSet * n(a, #0:Fresh)), 
+-(#1:NNSet * n(a, #0:Fresh))
+|| 
+ghost( #1:NNSet,
+   :: nil ::
+   [ nil | 
+      -(#1:NNSet), 
+      -(n(a, #0:Fresh)), 
+      +(#1:NNSet * n(a, #0:Fresh)), nil]  & 
+   :: #0:Fresh ::
+   [ nil, 
+      -(pk(a, #1:NNSet)), 
+      +(pk(b, n(a, #0:Fresh))) | 
+      -(#1:NNSet * n(a, #0:Fresh)), nil] ,    
+   (#1:NNSet * n(a, #0:Fresh)) !inI,
+   n(a, #0:Fresh) inI,
+   irr(#1:NNSet * n(a, #0:Fresh)),
+   inst(#1:NNSet),    
+   -(#1:NNSet), 
+   -(n(a, #0:Fresh)), 
+   +(#1:NNSet * n(a, #0:Fresh)), 
+   -(#1:NNSet * n(a, #0:Fresh)),    
+   nil )
+|| 
+nil)
+(< (1 [2]) . (3 [2]) . (5 [2]) > (
+:: nil ::
+[ nil | 
+   -(#4:NNSet), 
+   -(n(a, #3:Fresh)), 
+   +(#4:NNSet * n(a, #3:Fresh)), nil]  & 
+:: #0:Fresh ::
+[ nil, 
+   +(pk(#1:Name, n(#2:Name, #0:Fresh))) | 
+   -(pk(#2:Name, n(a, #3:Fresh) * n(#2:Name, #0:Fresh))), 
+   +(n(a, #3:Fresh)), nil]  & 
+:: #3:Fresh ::
+[ nil, 
+   -(pk(a, #4:NNSet)), 
+   +(pk(b, n(a, #3:Fresh))) | 
+   -(#4:NNSet * n(a, #3:Fresh)), nil] )
+|| 
+n(a, #3:Fresh) !inI,
+(#4:NNSet * n(a, #3:Fresh)) !inI,
+pk(#2:Name, n(a, #3:Fresh) * n(#2:Name, #0:Fresh)) inI,
+irr(pk(#2:Name, n(a, #3:Fresh) * n(#2:Name, #0:Fresh))),
+irr(#4:NNSet * n(a, #3:Fresh)),
+inst(#2:Name),
+inst(#4:NNSet)
+|| 
+-(pk(#2:Name, n(a, #3:Fresh) * n(#2:Name, #0:Fresh))), 
++(n(a, #3:Fresh)), 
+-(#4:NNSet), 
+-(n(a, #3:Fresh)), 
++(#4:NNSet * n(a, #3:Fresh)), 
+-(#4:NNSet * n(a, #3:Fresh))
+|| 
+ghost( #4:NNSet,
+   :: nil ::
+   [ nil | 
+      -(#4:NNSet), 
+      -(n(a, #3:Fresh)), 
+      +(#4:NNSet * n(a, #3:Fresh)), nil]  & 
+   :: #3:Fresh ::
+   [ nil, 
+      -(pk(a, #4:NNSet)), 
+      +(pk(b, n(a, #3:Fresh))) | 
+      -(#4:NNSet * n(a, #3:Fresh)), nil] ,    
+   (#4:NNSet * n(a, #3:Fresh)) !inI,
+   n(a, #3:Fresh) inI,
+   irr(#4:NNSet * n(a, #3:Fresh)),
+   inst(#4:NNSet),    
+   -(#4:NNSet), 
+   -(n(a, #3:Fresh)), 
+   +(#4:NNSet * n(a, #3:Fresh)), 
+   -(#4:NNSet * n(a, #3:Fresh)),    
+   nil )
+|| 
+nil)
+(< (1 [2]) . (3 [6]) . 5 > (
+:: nil ::
+[ nil | 
+   -(#3:NNSet * #5:NNSet), 
+   -(#3:NNSet * n(a, #4:Fresh)), 
+   +(#5:NNSet * n(a, #4:Fresh)), nil]  & 
+:: #0:Fresh ::
+[ nil, 
+   +(pk(#1:Name, n(#2:Name, #0:Fresh))) | 
+   -(pk(#2:Name, #3:NNSet * n(a, #4:Fresh) * n(#2:Name, #0:Fresh))), 
+   +(#3:NNSet * n(a, #4:Fresh)), nil]  & 
+:: #4:Fresh ::
+[ nil, 
+   -(pk(a, #5:NNSet)), 
+   +(pk(b, n(a, #4:Fresh))) | 
+   -(#5:NNSet * n(a, #4:Fresh)), nil] )
+|| 
+(#3:NNSet * n(a, #4:Fresh)) !inI,
+(#5:NNSet * n(a, #4:Fresh)) !inI,
+pk(#2:Name, #3:NNSet * n(a, #4:Fresh) * n(#2:Name, #0:Fresh)) inI,
+irr(#3:NNSet * n(a, #4:Fresh)),
+irr(#5:NNSet * n(a, #4:Fresh)),
+inst(#3:NNSet),
+inst(#5:NNSet)
+|| 
+-(pk(#2:Name, #3:NNSet * n(a, #4:Fresh) * n(#2:Name, #0:Fresh))), 
++(#3:NNSet * n(a, #4:Fresh)), 
+-(#3:NNSet * #5:NNSet), 
+-(#3:NNSet * n(a, #4:Fresh)), 
++(#5:NNSet * n(a, #4:Fresh)), 
+-(#5:NNSet * n(a, #4:Fresh))
+|| 
+ghost( #3:NNSet * #5:NNSet,
+   :: nil ::
+   [ nil | 
+      -(#3:NNSet * #5:NNSet), 
+      -(#3:NNSet * n(a, #4:Fresh)), 
+      +(#5:NNSet * n(a, #4:Fresh)), nil]  & 
+   :: #4:Fresh ::
+   [ nil, 
+      -(pk(a, #5:NNSet)), 
+      +(pk(b, n(a, #4:Fresh))) | 
+      -(#5:NNSet * n(a, #4:Fresh)), nil] ,    
+   (#5:NNSet * n(a, #4:Fresh)) !inI,
+   (#3:NNSet * n(a, #4:Fresh)) inI,
+   irr(#3:NNSet * n(a, #4:Fresh)),
+   irr(#5:NNSet * n(a, #4:Fresh)),
+   inst(#3:NNSet),
+   inst(#5:NNSet),    
+   -(#3:NNSet * #5:NNSet), 
+   -(#3:NNSet * n(a, #4:Fresh)), 
+   +(#5:NNSet * n(a, #4:Fresh)), 
+   -(#5:NNSet * n(a, #4:Fresh)),    
+   nil )
+|| 
+nil)
+< (1 [2]) . (4 [2]) . 2 > (
+:: #0:Fresh ::
+[ nil, 
+   +(pk(#1:Name, n(b, #0:Fresh))) | 
+   -(pk(b, n(a, #2:Fresh))), 
+   +(n(a, #2:Fresh) * n(b, #0:Fresh)), nil]  & 
+:: #2:Fresh ::
+[ nil | 
+   -(pk(a, n(b, #0:Fresh))), 
+   +(pk(b, n(a, #2:Fresh))), 
+   -(n(a, #2:Fresh) * n(b, #0:Fresh)), nil] )
+|| 
+pk(b, n(a, #2:Fresh)) !inI,
+(n(a, #2:Fresh) * n(b, #0:Fresh)) !inI,
+pk(a, n(b, #0:Fresh)) inI,
+irr(pk(b, n(a, #2:Fresh))),
+irr(n(a, #2:Fresh) * n(b, #0:Fresh))
+|| 
+-(pk(a, n(b, #0:Fresh))), 
++(pk(b, n(a, #2:Fresh))), 
+-(pk(b, n(a, #2:Fresh))), 
++(n(a, #2:Fresh) * n(b, #0:Fresh)), 
+-(n(a, #2:Fresh) * n(b, #0:Fresh))
+|| 
+nil
+|| 
+nil
+==========================================
+reduce in MAUDE-NPA : run(3) .
+rewrites: 18 in 0ms cpu (0ms real) (~ rewrites/second)
+result IdSystemSet: (< (1 [2]) . (4 [2]) . 2 . 1 > (
+:: #0:Fresh ::
+[ nil | 
+   +(pk(a, n(b, #0:Fresh))), 
+   -(pk(b, n(a, #1:Fresh))), 
+   +(n(a, #1:Fresh) * n(b, #0:Fresh)), nil]  & 
+:: #1:Fresh ::
+[ nil | 
+   -(pk(a, n(b, #0:Fresh))), 
+   +(pk(b, n(a, #1:Fresh))), 
+   -(n(a, #1:Fresh) * n(b, #0:Fresh)), nil] )
+|| 
+pk(a, n(b, #0:Fresh)) !inI,
+pk(b, n(a, #1:Fresh)) !inI,
+(n(a, #1:Fresh) * n(b, #0:Fresh)) !inI,
+irr(pk(b, n(a, #1:Fresh))),
+irr(n(a, #1:Fresh) * n(b, #0:Fresh))
+|| 
++(pk(a, n(b, #0:Fresh))), 
+-(pk(a, n(b, #0:Fresh))), 
++(pk(b, n(a, #1:Fresh))), 
+-(pk(b, n(a, #1:Fresh))), 
++(n(a, #1:Fresh) * n(b, #0:Fresh)), 
+-(n(a, #1:Fresh) * n(b, #0:Fresh))
+|| 
+nil
+|| 
+nil)
+< (1 [2]) . (4 [2]) . 2 . 5 > (
+:: nil ::
+[ nil | 
+   -(n(b, #0:Fresh)), 
+   +(pk(a, n(b, #0:Fresh))), nil]  & 
+:: #0:Fresh ::
+[ nil, 
+   +(pk(#1:Name, n(b, #0:Fresh))) | 
+   -(pk(b, n(a, #2:Fresh))), 
+   +(n(a, #2:Fresh) * n(b, #0:Fresh)), nil]  & 
+:: #2:Fresh ::
+[ nil | 
+   -(pk(a, n(b, #0:Fresh))), 
+   +(pk(b, n(a, #2:Fresh))), 
+   -(n(a, #2:Fresh) * n(b, #0:Fresh)), nil] )
+|| 
+pk(a, n(b, #0:Fresh)) !inI,
+pk(b, n(a, #2:Fresh)) !inI,
+(n(a, #2:Fresh) * n(b, #0:Fresh)) !inI,
+n(b, #0:Fresh) inI,
+irr(pk(b, n(a, #2:Fresh))),
+irr(n(a, #2:Fresh) * n(b, #0:Fresh))
+|| 
+-(n(b, #0:Fresh)), 
++(pk(a, n(b, #0:Fresh))), 
+-(pk(a, n(b, #0:Fresh))), 
++(pk(b, n(a, #2:Fresh))), 
+-(pk(b, n(a, #2:Fresh))), 
++(n(a, #2:Fresh) * n(b, #0:Fresh)), 
+-(n(a, #2:Fresh) * n(b, #0:Fresh))
+|| 
+nil
+|| 
+nil
+==========================================
+reduce in MAUDE-NPA : run(4) .
+rewrites: 18 in 0ms cpu (0ms real) (18000000 rewrites/second)
+result IdSystemSet: (< (1 [2]) . (4 [2]) . 2 . 1 > (
+:: #0:Fresh ::
+[ nil | 
+   +(pk(a, n(b, #0:Fresh))), 
+   -(pk(b, n(a, #1:Fresh))), 
+   +(n(a, #1:Fresh) * n(b, #0:Fresh)), nil]  & 
+:: #1:Fresh ::
+[ nil | 
+   -(pk(a, n(b, #0:Fresh))), 
+   +(pk(b, n(a, #1:Fresh))), 
+   -(n(a, #1:Fresh) * n(b, #0:Fresh)), nil] )
+|| 
+pk(a, n(b, #0:Fresh)) !inI,
+pk(b, n(a, #1:Fresh)) !inI,
+(n(a, #1:Fresh) * n(b, #0:Fresh)) !inI,
+irr(pk(b, n(a, #1:Fresh))),
+irr(n(a, #1:Fresh) * n(b, #0:Fresh))
+|| 
++(pk(a, n(b, #0:Fresh))), 
+-(pk(a, n(b, #0:Fresh))), 
++(pk(b, n(a, #1:Fresh))), 
+-(pk(b, n(a, #1:Fresh))), 
++(n(a, #1:Fresh) * n(b, #0:Fresh)), 
+-(n(a, #1:Fresh) * n(b, #0:Fresh))
+|| 
+nil
+|| 
+nil)
+(< (1 [2]) . (4 [2]) . 2 . 5 . 2 > (
+:: nil ::
+[ nil | 
+   -(pk(i, n(b, #0:Fresh))), 
+   +(n(b, #0:Fresh)), nil]  & 
+:: nil ::
+[ nil | 
+   -(n(b, #0:Fresh)), 
+   +(pk(a, n(b, #0:Fresh))), nil]  & 
+:: #0:Fresh ::
+[ nil, 
+   +(pk(#1:Name, n(b, #0:Fresh))) | 
+   -(pk(b, n(a, #2:Fresh))), 
+   +(n(a, #2:Fresh) * n(b, #0:Fresh)), nil]  & 
+:: #2:Fresh ::
+[ nil | 
+   -(pk(a, n(b, #0:Fresh))), 
+   +(pk(b, n(a, #2:Fresh))), 
+   -(n(a, #2:Fresh) * n(b, #0:Fresh)), nil] )
+|| 
+pk(a, n(b, #0:Fresh)) !inI,
+pk(b, n(a, #2:Fresh)) !inI,
+n(b, #0:Fresh) !inI,
+(n(a, #2:Fresh) * n(b, #0:Fresh)) !inI,
+pk(i, n(b, #0:Fresh)) inI,
+irr(pk(b, n(a, #2:Fresh))),
+irr(n(a, #2:Fresh) * n(b, #0:Fresh))
+|| 
+-(pk(i, n(b, #0:Fresh))), 
++(n(b, #0:Fresh)), 
+-(n(b, #0:Fresh)), 
++(pk(a, n(b, #0:Fresh))), 
+-(pk(a, n(b, #0:Fresh))), 
++(pk(b, n(a, #2:Fresh))), 
+-(pk(b, n(a, #2:Fresh))), 
++(n(a, #2:Fresh) * n(b, #0:Fresh)), 
+-(n(a, #2:Fresh) * n(b, #0:Fresh))
+|| 
+nil
+|| 
+nil)
+(< (1 [2]) . (4 [2]) . 2 . 5 . (4 [2]) > (
+:: nil ::
+[ nil | 
+   -(%5:NNSet), 
+   -(%5:NNSet * n(b, #1:Fresh)), 
+   +(n(b, #1:Fresh)), nil]  & 
+:: nil ::
+[ nil | 
+   -(n(b, #1:Fresh)), 
+   +(pk(a, n(b, #1:Fresh))), nil]  & 
+:: #1:Fresh ::
+[ nil, 
+   +(pk(#2:Name, n(b, #1:Fresh))) | 
+   -(pk(b, n(a, #3:Fresh))), 
+   +(n(a, #3:Fresh) * n(b, #1:Fresh)), nil]  & 
+:: #3:Fresh ::
+[ nil | 
+   -(pk(a, n(b, #1:Fresh))), 
+   +(pk(b, n(a, #3:Fresh))), 
+   -(n(a, #3:Fresh) * n(b, #1:Fresh)), nil] )
+|| 
+pk(a, n(b, #1:Fresh)) !inI,
+pk(b, n(a, #3:Fresh)) !inI,
+n(b, #1:Fresh) !inI,
+(n(a, #3:Fresh) * n(b, #1:Fresh)) !inI,
+(%5:NNSet * n(b, #1:Fresh)) inI,
+irr(pk(b, n(a, #3:Fresh))),
+irr(%5:NNSet * n(b, #1:Fresh)),
+irr(n(a, #3:Fresh) * n(b, #1:Fresh)),
+inst(%5:NNSet)
+|| 
+-(%5:NNSet), 
+-(%5:NNSet * n(b, #1:Fresh)), 
++(n(b, #1:Fresh)), 
+-(n(b, #1:Fresh)), 
++(pk(a, n(b, #1:Fresh))), 
+-(pk(a, n(b, #1:Fresh))), 
++(pk(b, n(a, #3:Fresh))), 
+-(pk(b, n(a, #3:Fresh))), 
++(n(a, #3:Fresh) * n(b, #1:Fresh)), 
+-(n(a, #3:Fresh) * n(b, #1:Fresh))
+|| 
+ghost( %5:NNSet,
+   :: nil ::
+   [ nil | 
+      -(%5:NNSet), 
+      -(%5:NNSet * n(b, #1:Fresh)), 
+      +(n(b, #1:Fresh)), nil]  & 
+   :: nil ::
+   [ nil | 
+      -(n(b, #1:Fresh)), 
+      +(pk(a, n(b, #1:Fresh))), nil]  & 
+   :: #1:Fresh ::
+   [ nil, 
+      +(pk(#2:Name, n(b, #1:Fresh))) | 
+      -(pk(b, n(a, #3:Fresh))), 
+      +(n(a, #3:Fresh) * n(b, #1:Fresh)), nil]  & 
+   :: #3:Fresh ::
+   [ nil | 
+      -(pk(a, n(b, #1:Fresh))), 
+      +(pk(b, n(a, #3:Fresh))), 
+      -(n(a, #3:Fresh) * n(b, #1:Fresh)), nil] ,    
+   pk(a, n(b, #1:Fresh)) !inI,
+   pk(b, n(a, #3:Fresh)) !inI,
+   n(b, #1:Fresh) !inI,
+   (n(a, #3:Fresh) * n(b, #1:Fresh)) !inI,
+   (%5:NNSet * n(b, #1:Fresh)) inI,
+   irr(pk(b, n(a, #3:Fresh))),
+   irr(%5:NNSet * n(b, #1:Fresh)),
+   irr(n(a, #3:Fresh) * n(b, #1:Fresh)),
+   inst(%5:NNSet),    
+   -(%5:NNSet), 
+   -(%5:NNSet * n(b, #1:Fresh)), 
+   +(n(b, #1:Fresh)), 
+   -(n(b, #1:Fresh)), 
+   +(pk(a, n(b, #1:Fresh))), 
+   -(pk(a, n(b, #1:Fresh))), 
+   +(pk(b, n(a, #3:Fresh))), 
+   -(pk(b, n(a, #3:Fresh))), 
+   +(n(a, #3:Fresh) * n(b, #1:Fresh)), 
+   -(n(a, #3:Fresh) * n(b, #1:Fresh)),    
+   nil )
+|| 
+nil)
+< (1 [2]) . (4 [2]) . 2 . 5 . (5 [2]) > (
+:: nil ::
+[ nil | 
+   -(n(b, #3:Fresh)), 
+   +(pk(a, n(b, #3:Fresh))), nil]  & 
+:: #0:Fresh ::
+[ nil, 
+   +(pk(#1:Name, n(#2:Name, #0:Fresh))) | 
+   -(pk(#2:Name, n(b, #3:Fresh) * n(#2:Name, #0:Fresh))), 
+   +(n(b, #3:Fresh)), nil]  & 
+:: #3:Fresh ::
+[ nil, 
+   +(pk(#4:Name, n(b, #3:Fresh))) | 
+   -(pk(b, n(a, #5:Fresh))), 
+   +(n(a, #5:Fresh) * n(b, #3:Fresh)), nil]  & 
+:: #5:Fresh ::
+[ nil | 
+   -(pk(a, n(b, #3:Fresh))), 
+   +(pk(b, n(a, #5:Fresh))), 
+   -(n(a, #5:Fresh) * n(b, #3:Fresh)), nil] )
+|| 
+pk(a, n(b, #3:Fresh)) !inI,
+pk(b, n(a, #5:Fresh)) !inI,
+n(b, #3:Fresh) !inI,
+(n(a, #5:Fresh) * n(b, #3:Fresh)) !inI,
+pk(#2:Name, n(b, #3:Fresh) * n(#2:Name, #0:Fresh)) inI,
+irr(pk(b, n(a, #5:Fresh))),
+irr(pk(#2:Name, n(b, #3:Fresh) * n(#2:Name, #0:Fresh))),
+irr(n(a, #5:Fresh) * n(b, #3:Fresh)),
+inst(#2:Name)
+|| 
+-(pk(#2:Name, n(b, #3:Fresh) * n(#2:Name, #0:Fresh))), 
++(n(b, #3:Fresh)), 
+-(n(b, #3:Fresh)), 
++(pk(a, n(b, #3:Fresh))), 
+-(pk(a, n(b, #3:Fresh))), 
++(pk(b, n(a, #5:Fresh))), 
+-(pk(b, n(a, #5:Fresh))), 
++(n(a, #5:Fresh) * n(b, #3:Fresh)), 
+-(n(a, #5:Fresh) * n(b, #3:Fresh))
+|| 
+nil
+|| 
+nil
+==========================================
+reduce in MAUDE-NPA : run(5) .
+rewrites: 18 in 0ms cpu (0ms real) (~ rewrites/second)
+result IdSystemSet: (< (1 [2]) . (4 [2]) . 2 . 1 > (
+:: #0:Fresh ::
+[ nil | 
+   +(pk(a, n(b, #0:Fresh))), 
+   -(pk(b, n(a, #1:Fresh))), 
+   +(n(a, #1:Fresh) * n(b, #0:Fresh)), nil]  & 
+:: #1:Fresh ::
+[ nil | 
+   -(pk(a, n(b, #0:Fresh))), 
+   +(pk(b, n(a, #1:Fresh))), 
+   -(n(a, #1:Fresh) * n(b, #0:Fresh)), nil] )
+|| 
+pk(a, n(b, #0:Fresh)) !inI,
+pk(b, n(a, #1:Fresh)) !inI,
+(n(a, #1:Fresh) * n(b, #0:Fresh)) !inI,
+irr(pk(b, n(a, #1:Fresh))),
+irr(n(a, #1:Fresh) * n(b, #0:Fresh))
+|| 
++(pk(a, n(b, #0:Fresh))), 
+-(pk(a, n(b, #0:Fresh))), 
++(pk(b, n(a, #1:Fresh))), 
+-(pk(b, n(a, #1:Fresh))), 
++(n(a, #1:Fresh) * n(b, #0:Fresh)), 
+-(n(a, #1:Fresh) * n(b, #0:Fresh))
+|| 
+nil
+|| 
+nil)
+(< (1 [2]) . (4 [2]) . 2 . 5 . 2 . 1 > (
+:: nil ::
+[ nil | 
+   -(pk(i, n(b, #0:Fresh))), 
+   +(n(b, #0:Fresh)), nil]  & 
+:: nil ::
+[ nil | 
+   -(n(b, #0:Fresh)), 
+   +(pk(a, n(b, #0:Fresh))), nil]  & 
+:: #0:Fresh ::
+[ nil | 
+   +(pk(i, n(b, #0:Fresh))), 
+   -(pk(b, n(a, #1:Fresh))), 
+   +(n(a, #1:Fresh) * n(b, #0:Fresh)), nil]  & 
+:: #1:Fresh ::
+[ nil | 
+   -(pk(a, n(b, #0:Fresh))), 
+   +(pk(b, n(a, #1:Fresh))), 
+   -(n(a, #1:Fresh) * n(b, #0:Fresh)), nil] )
+|| 
+pk(a, n(b, #0:Fresh)) !inI,
+pk(b, n(a, #1:Fresh)) !inI,
+pk(i, n(b, #0:Fresh)) !inI,
+n(b, #0:Fresh) !inI,
+(n(a, #1:Fresh) * n(b, #0:Fresh)) !inI,
+irr(pk(b, n(a, #1:Fresh))),
+irr(n(a, #1:Fresh) * n(b, #0:Fresh))
+|| 
++(pk(i, n(b, #0:Fresh))), 
+-(pk(i, n(b, #0:Fresh))), 
++(n(b, #0:Fresh)), 
+-(n(b, #0:Fresh)), 
++(pk(a, n(b, #0:Fresh))), 
+-(pk(a, n(b, #0:Fresh))), 
++(pk(b, n(a, #1:Fresh))), 
+-(pk(b, n(a, #1:Fresh))), 
++(n(a, #1:Fresh) * n(b, #0:Fresh)), 
+-(n(a, #1:Fresh) * n(b, #0:Fresh))
+|| 
+nil
+|| 
+nil)
+< (1 [2]) . (4 [2]) . 2 . 5 . (4 [2]) . 5 > (
+:: nil ::
+[ nil | 
+   -(#3:NNSet), 
+   -(#3:NNSet * n(b, #4:Fresh)), 
+   +(n(b, #4:Fresh)), nil]  & 
+:: nil ::
+[ nil | 
+   -(n(b, #4:Fresh)), 
+   +(pk(a, n(b, #4:Fresh))), nil]  & 
+:: #0:Fresh ::
+[ nil, 
+   +(pk(#1:Name, n(#2:Name, #0:Fresh))) | 
+   -(pk(#2:Name, #3:NNSet * n(b, #4:Fresh) * n(#2:Name, #0:Fresh))), 
+   +(#3:NNSet * n(b, #4:Fresh)), nil]  & 
+:: #4:Fresh ::
+[ nil, 
+   +(pk(#5:Name, n(b, #4:Fresh))) | 
+   -(pk(b, n(a, #6:Fresh))), 
+   +(n(a, #6:Fresh) * n(b, #4:Fresh)), nil]  & 
+:: #6:Fresh ::
+[ nil | 
+   -(pk(a, n(b, #4:Fresh))), 
+   +(pk(b, n(a, #6:Fresh))), 
+   -(n(a, #6:Fresh) * n(b, #4:Fresh)), nil] )
+|| 
+pk(a, n(b, #4:Fresh)) !inI,
+pk(b, n(a, #6:Fresh)) !inI,
+n(b, #4:Fresh) !inI,
+(#3:NNSet * n(b, #4:Fresh)) !inI,
+(n(a, #6:Fresh) * n(b, #4:Fresh)) !inI,
+pk(#2:Name, #3:NNSet * n(b, #4:Fresh) * n(#2:Name, #0:Fresh)) inI,
+irr(pk(b, n(a, #6:Fresh))),
+irr(#3:NNSet * n(b, #4:Fresh)),
+irr(n(a, #6:Fresh) * n(b, #4:Fresh)),
+inst(#3:NNSet)
+|| 
+-(pk(#2:Name, #3:NNSet * n(b, #4:Fresh) * n(#2:Name, #0:Fresh))), 
++(#3:NNSet * n(b, #4:Fresh)), 
+-(#3:NNSet), 
+-(#3:NNSet * n(b, #4:Fresh)), 
++(n(b, #4:Fresh)), 
+-(n(b, #4:Fresh)), 
++(pk(a, n(b, #4:Fresh))), 
+-(pk(a, n(b, #4:Fresh))), 
++(pk(b, n(a, #6:Fresh))), 
+-(pk(b, n(a, #6:Fresh))), 
++(n(a, #6:Fresh) * n(b, #4:Fresh)), 
+-(n(a, #6:Fresh) * n(b, #4:Fresh))
+|| 
+ghost( #3:NNSet,
+   :: nil ::
+   [ nil | 
+      -(#3:NNSet), 
+      -(#3:NNSet * n(b, #4:Fresh)), 
+      +(n(b, #4:Fresh)), nil]  & 
+   :: nil ::
+   [ nil | 
+      -(n(b, #4:Fresh)), 
+      +(pk(a, n(b, #4:Fresh))), nil]  & 
+   :: #4:Fresh ::
+   [ nil, 
+      +(pk(#5:Name, n(b, #4:Fresh))) | 
+      -(pk(b, n(a, #6:Fresh))), 
+      +(n(a, #6:Fresh) * n(b, #4:Fresh)), nil]  & 
+   :: #6:Fresh ::
+   [ nil | 
+      -(pk(a, n(b, #4:Fresh))), 
+      +(pk(b, n(a, #6:Fresh))), 
+      -(n(a, #6:Fresh) * n(b, #4:Fresh)), nil] ,    
+   pk(a, n(b, #4:Fresh)) !inI,
+   pk(b, n(a, #6:Fresh)) !inI,
+   n(b, #4:Fresh) !inI,
+   (n(a, #6:Fresh) * n(b, #4:Fresh)) !inI,
+   (#3:NNSet * n(b, #4:Fresh)) inI,
+   irr(pk(b, n(a, #6:Fresh))),
+   irr(#3:NNSet * n(b, #4:Fresh)),
+   irr(n(a, #6:Fresh) * n(b, #4:Fresh)),
+   inst(#3:NNSet),    
+   -(#3:NNSet), 
+   -(#3:NNSet * n(b, #4:Fresh)), 
+   +(n(b, #4:Fresh)), 
+   -(n(b, #4:Fresh)), 
+   +(pk(a, n(b, #4:Fresh))), 
+   -(pk(a, n(b, #4:Fresh))), 
+   +(pk(b, n(a, #6:Fresh))), 
+   -(pk(b, n(a, #6:Fresh))), 
+   +(n(a, #6:Fresh) * n(b, #4:Fresh)), 
+   -(n(a, #6:Fresh) * n(b, #4:Fresh)),    
+   nil )
+|| 
+nil
+==========================================
+reduce in MAUDE-NPA : run(6) .
+rewrites: 18 in 0ms cpu (0ms real) (~ rewrites/second)
+result IdSystemSet: (< (1 [2]) . (4 [2]) . 2 . 1 > (
+:: #0:Fresh ::
+[ nil | 
+   +(pk(a, n(b, #0:Fresh))), 
+   -(pk(b, n(a, #1:Fresh))), 
+   +(n(a, #1:Fresh) * n(b, #0:Fresh)), nil]  & 
+:: #1:Fresh ::
+[ nil | 
+   -(pk(a, n(b, #0:Fresh))), 
+   +(pk(b, n(a, #1:Fresh))), 
+   -(n(a, #1:Fresh) * n(b, #0:Fresh)), nil] )
+|| 
+pk(a, n(b, #0:Fresh)) !inI,
+pk(b, n(a, #1:Fresh)) !inI,
+(n(a, #1:Fresh) * n(b, #0:Fresh)) !inI,
+irr(pk(b, n(a, #1:Fresh))),
+irr(n(a, #1:Fresh) * n(b, #0:Fresh))
+|| 
++(pk(a, n(b, #0:Fresh))), 
+-(pk(a, n(b, #0:Fresh))), 
++(pk(b, n(a, #1:Fresh))), 
+-(pk(b, n(a, #1:Fresh))), 
++(n(a, #1:Fresh) * n(b, #0:Fresh)), 
+-(n(a, #1:Fresh) * n(b, #0:Fresh))
+|| 
+nil
+|| 
+nil)
+< (1 [2]) . (4 [2]) . 2 . 5 . 2 . 1 > (
+:: nil ::
+[ nil | 
+   -(pk(i, n(b, #0:Fresh))), 
+   +(n(b, #0:Fresh)), nil]  & 
+:: nil ::
+[ nil | 
+   -(n(b, #0:Fresh)), 
+   +(pk(a, n(b, #0:Fresh))), nil]  & 
+:: #0:Fresh ::
+[ nil | 
+   +(pk(i, n(b, #0:Fresh))), 
+   -(pk(b, n(a, #1:Fresh))), 
+   +(n(a, #1:Fresh) * n(b, #0:Fresh)), nil]  & 
+:: #1:Fresh ::
+[ nil | 
+   -(pk(a, n(b, #0:Fresh))), 
+   +(pk(b, n(a, #1:Fresh))), 
+   -(n(a, #1:Fresh) * n(b, #0:Fresh)), nil] )
+|| 
+pk(a, n(b, #0:Fresh)) !inI,
+pk(b, n(a, #1:Fresh)) !inI,
+pk(i, n(b, #0:Fresh)) !inI,
+n(b, #0:Fresh) !inI,
+(n(a, #1:Fresh) * n(b, #0:Fresh)) !inI,
+irr(pk(b, n(a, #1:Fresh))),
+irr(n(a, #1:Fresh) * n(b, #0:Fresh))
+|| 
++(pk(i, n(b, #0:Fresh))), 
+-(pk(i, n(b, #0:Fresh))), 
++(n(b, #0:Fresh)), 
+-(n(b, #0:Fresh)), 
++(pk(a, n(b, #0:Fresh))), 
+-(pk(a, n(b, #0:Fresh))), 
++(pk(b, n(a, #1:Fresh))), 
+-(pk(b, n(a, #1:Fresh))), 
++(n(a, #1:Fresh) * n(b, #0:Fresh)), 
+-(n(a, #1:Fresh) * n(b, #0:Fresh))
+|| 
+nil
+|| 
+nil
+Maude> Bye.
+Wed Dec  5 10:43:13 CET 2012
+Santiagos-MacBook-Pro:prototype-20121204 sescobar$ 

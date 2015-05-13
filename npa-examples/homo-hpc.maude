@@ -1,0 +1,189 @@
+***(
+The informal journal-level description of this protocol is as follows:
+
+*** Taken from an e-mail by Cathy!!!
+In this protocol, Alice and Bob each have secret data DA and DB.
+There is a function f(DA,DB) that they want to have computed, but
+1- They cannot compute it themselves
+2- Even if they could, they don't want to share their data with each other
+
+There is a server that can compute f, but they don't want the server to see DA and DB either.
+The server is assumed to be "honest but curious", that is, it is trusted to follow the rules of the
+protocol, but it will try to find out everything it can about DA and DB in the process.  
+
+The protocol uses three public key algorithms.  
+One, hpke is homomorphic with respect to f.  
+The second, pke, is a regular pubic key encryption algorithm.  
+The third, sign, is a digital signature algorithm.  
+Unlike the three encryption algorithms in the last example, 
+whose choice was completely arbitrary, 
+the use of these three algorithms is motivated by their roles in the protocol.
+
+The protocol works as follows.  
+
+1.  A and B share public and private key pairs for the algorithm hpke.  Encryption of message
+M with hpke is thus modeled as hpke(M,k(A,B)).
+2.  A,B, and the server s are all able to digitally sign their messages using algorithm sign
+3.  The server possesses a public and private key pair for algorithm pke
+
+The protocol is as follows
+
+A -> B   : sign( B ; NA ;  pke( hpke (DA, k(A,B)), s ),A)
+B -> A   : sign( NA ; NB ; pke( hpke (DB, k(A,B)), s ),B)
+A -> s   : sign( A ; B ; NA ; NB ; pke(hpke(DA,k(A,B)),s) ; pke(hpke(DB,k(A,B)), s), A)
+s -> A,B : sign( A ; B ; NA ; NB ; f( hpke(DA,k(A,B)) , hpke(DB,k(A,B)) ), s)
+
+It has the following flaw when A and B final messages do not ask for f(X3,X4) from the server:
+
+A -> I_B : sign( B ; NA ;  pke( hpke (DA, k(A,B)), s ),A)
+I_B -> B : sign( B ; NA ; XE, i)
+B -> A   : sign( NA ; NB ; pke( hpke (DB, k(i,B)), s ),B)
+A -> s   : sign( A ; B ; NA ; NB ; pke(hpke(DA,k(A,B)),s) ; pke(hpke(DB,k(i,B)), s), A)
+s -> A,B : sign( A ; B ; NA ; NB ; f( hpke(DA,k(A,B)) , hpke(DB,k(i,B)) ), s)
+
+The protocol may or may not have other flaws.  If it does, it would be interesting to see what
+happens wrt Maude-NPA.
+
+I also think I've got a way to model the "honest-but-curious" behavior of the server 
+in Maude-NPA so that it can be demonstrated that the server doesn't learn the secret data. 
+If this is the case, it would be a new contribution of the paper, because 
+I don't believe anyone has tried to model honest-but curious in a Dolev-Yao based tool before.
+
+)
+
+fmod PROTOCOL-EXAMPLE-SYMBOLS is
+ --- Importing sorts Msg, Fresh, Public, and GhostData
+ protecting DEFINITION-PROTOCOL-RULES .
+
+ ----------------------------------------------------------
+ --- Overwrite this module with the syntax of your protocol
+ --- Notes:
+ --- * Sort Msg and Fresh are special and imported
+ --- * Every sort must be a subsort of Msg
+ --- * No sort can be a supersort of Msg
+ ----------------------------------------------------------
+
+ --- Sort Information 
+ sorts Name Nonce Pkey Data  Enc Sign HEnc .
+ subsorts Nonce Pkey Data Name Enc Sign HEnc < Msg  .
+ subsort Name < Public .
+
+ --- Nonce operators
+ op n : Name Fresh -> Nonce [frozen] .
+ op data : Name Fresh -> Data [frozen] .
+
+ --- Principals
+ op a : -> Name . --- Alice
+ op b : -> Name . --- Bob
+ op s : -> Name . --- Server
+ op i : -> Name . --- Intruder
+
+--- Concatenation operator
+ op _;_ : Msg Msg -> Msg [gather (e E) frozen] .
+
+--- Public and Private Key operators
+ op pkey : Name Name -> Pkey [frozen] .
+
+--- f operator
+ op f : Msg Msg -> HEnc [frozen] .
+
+--- Encryption Operators
+ op pke : Msg Name -> Enc [frozen] .
+ op hpke : Msg Pkey -> HEnc [frozen] .
+ op sign : Msg Name -> Sign [frozen] .
+
+endfm
+
+fmod PROTOCOL-EXAMPLE-ALGEBRAIC is
+ protecting PROTOCOL-EXAMPLE-SYMBOLS .
+
+ ----------------------------------------------------------
+ --- Overwrite this module with the algebraic properties 
+ --- of your protocol
+ ----------------------------------------------------------
+
+ vars X Y : Msg .
+ var K : Pkey .
+
+ ***Homomorphic encryption over f
+ eq hpke(f(X,Y) , K) = f(hpke(X , K) , hpke(Y , K)) 
+    [nonexec label homomorphism metadata "builtin-unify"] .
+
+endfm
+
+fmod PROTOCOL-SPECIFICATION is
+ protecting PROTOCOL-EXAMPLE-SYMBOLS .
+ protecting DEFINITION-PROTOCOL-RULES .
+ protecting DEFINITION-CONSTRAINTS-INPUT .
+
+ ----------------------------------------------------------
+ --- Overwrite this module with the strands 
+ --- of your protocol
+ ----------------------------------------------------------
+
+ vars X Y Z W  : Msg .
+ vars X1 X2 X3 X4 : HEnc .
+ vars Y1 Y2 : Enc .
+ vars Z1 Z2 : Sign .
+ vars X' Y' Z' V' W' : Msg .
+ vars r r' r'' r1 r2 r3 r4 : Fresh .
+ vars N N1 N2 : Nonce .
+ vars V P A B : Name .
+
+
+
+
+ eq STRANDS-DOLEVYAO
+  = :: nil :: [ nil | -(X), -(Y), +(X ; Y), nil ] &
+    :: nil :: [ nil | -(X ; Y), +(X), nil ] &
+    :: nil :: [ nil | -(X ; Y), +(Y), nil ] &
+    :: nil :: [ nil | -(X), -(A),  +(pke(X, A)), nil ] & 
+    :: nil :: [ nil | -(pke(X,i)), +(X), nil ] &
+    :: nil :: [ nil | -(X),   +(sign(X,i)), nil ] & 
+    :: nil :: [ nil | -(sign(X,A)), +(X), nil ] & 
+    :: nil :: [ nil | -(X), -(A), -(B),  +(hpke(X,pkey(A,B))), nil ] &
+    :: nil :: [ nil | -(hpke(X,pkey(A,i))),  +(X), nil ] & 
+    :: nil :: [ nil | -(hpke(X,pkey(i,B))),  +(X), nil ] & 
+    :: nil :: [ nil | +(A), nil ] 
+ [nonexec] .
+
+ eq STRANDS-PROTOCOL
+  = :: r, r'  :: *** Alice ***
+    [ nil | +(sign( B ; n(A,r)  ; pke(hpke(data(A,r'),pkey(A,B)),s),A)),
+            -(sign( n(A,r) ; N ; Y1 , B)), 
+            +(sign( A ; B ; n(A,r) ; N ; pke(hpke(data(A,r'),pkey(A,B)),s) ; Y1  , A)),
+	    -(sign( A ; B ; n(A,r) ; N ; X1 , s )) ,
+      nil ] &
+    :: r, r'  :: ***Bob ***
+    [ nil | -(sign( B ; N1  ; Y2, A)),
+            +(sign( N1 ; n(B,r) ; pke(hpke(data(B,r'),pkey(A,B)),s), B)), 
+	    -(sign( A ; B ; N1 ; n(B,r) ; X2, s )) ,
+      nil ] &
+    :: nil :: *** Server ***
+    [ nil | -(sign( A ; B ; N1 ; N2 ; pke(X3 , s) ; pke(X4 , s) , A)),
+            +(sign( A ; B ; N1 ; N2 ; f(X3,X4) , s)) ,
+      nil ]
+ [nonexec] .
+
+ eq ATTACK-STATE(0)
+   = :: r, r' ::  *** Alice ***
+     [ nil , +(sign( b ; n(a,r) ; pke(hpke (data(a,r'),pkey(a,b)),s),a)),
+             -(sign( n(a,r) ; N ; Y1 ,b )), 
+             +(sign( a ; b ; n(a,r) ; N ; pke(hpke (data(a,r'),pkey(a,b)),s) ; Y1 , a)),
+  	     -(sign( a ; b ; n(a,r) ; N ; X1 , s )) |
+       nil ]
+     || empty
+     || nil
+     || nil
+     || never(
+     *** Authentication ***
+     :: r1, r2  :: ***Bob ***
+     [ nil | -(sign( b ; n(a,r) ; pke(hpke(data(a,r'),pkey(a,b)),s), a)),
+             +(sign( n(a,r) ; n(b,r1) ; pke(hpke(data(b,r2),pkey(a,b)),s), b)),
+       nil ] 
+     & S:StrandSet || IK:IntruderKnowledge)
+ [nonexec] .
+
+endfm
+--- THIS HAS TO BE THE LAST LOADED MODULE !!!!
+select MAUDE-NPA .

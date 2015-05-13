@@ -1,0 +1,98 @@
+spec Carlse-SK is
+Theory
+  types Uname Sname name Key Nonce Masterkey Sessionkey .
+  subtype Masterkey Sessionkey < Key .
+  subtype Sname Uname < name .
+  subtype name < Public . 
+
+  op n : name Fresh -> Nonce  .
+  ops a b i : -> Uname [ctor] .
+  op s : ->  Sname [ctor] . 
+  op mkey : name name -> Masterkey [comm] .
+  op seskey : name name Nonce -> Sessionkey .
+  op e  : Key Msg -> Msg .
+  op d : Key Msg -> Msg .
+  op _;_ : Msg Msg -> Msg [gather (e E)] .
+
+  eq d(K:Key, e (K:Key, Z:Msg )) = Z:Msg .
+  eq e(K:Key, d (K:Key, Z:Msg )) = Z:Msg . 
+
+   /*
+       A -> B : A,na
+       B -> S : A,na,B,nb
+       S -> B : E(kbs:kab,nb,A),E(kas:na,B,kab)
+       B -> A : E(kas:na,B,kab),E(kab:na),nb'
+       A -> B : E(kab:nb')
+    */
+Protocol
+    vars A B A1 A2 B1 : Uname .
+    var S S1 S2 : Sname .
+    vars M N MA : Msg .
+    vars NA NA1 NB NB1 : Nonce .
+    var K : Key .
+    var SKA SKB : Sessionkey .
+    vars r r1 : Fresh .
+
+    Def(A) = na := n(A, r), kas := mkey(A, s) .
+    In(A) = A, B, S .
+
+    Def(B) = nb := n(B, r), kbs := mkey(B, s), nb1 := n(B, r1) .
+    In(B) = B, S .
+
+    Def(S) = ns := n(s, r),     kab := seskey(A, B, n(s,r)),
+            ksa := mkey(A2, s), ksb := mkey(B1, s) . 
+    In(S) = S .
+
+    1 . A -> B : A  ; na
+              |- A1 ; NA  .
+
+    2 . B -> S : A1 ; NA  ; B  ; nb
+              |- A2 ; NA1 ; B1 ; NB .
+
+    3 . S -> B : e(ksb, kab  ; NB ; A2)  ; e(ksa, NA1 ; B1 ; kab)
+              |- e(ks, SKB   ; nb ; A)   ; MA .
+
+    4 . B -> A : MA                   ; e(SKB, NA) ; nb1
+              |- e(kas, na ; B ; SKA) ; e(SKA, na) ; NB1 .
+
+    5 . A -> B : e(SKA, NB1) 
+              |- e(SKB, nb1) .
+
+    Out(A) = SKA, NB1, na .
+    Out(B) = SKB, nb1, nb, NA .
+    Out(S) = kab, NB, NA1 . 
+
+Intruder
+    vars A B : Uname .
+    var r : Fresh .
+    vars M N : Msg .
+    var K : Key .
+
+    => A, s, n(i, r), mkey(i, s), mkey(i, A) . 
+    K, M => d(K, M), e(K, M) .
+    M, N <=> M ; N .
+
+Attacks
+    vars A B : Uname .
+    var S : Sname .
+    var SK : Sessionkey .
+    var NB1 : Nonce .
+    var r1 : Fresh .
+
+    0 . 
+       B executes protocol .
+       Subst(B) = A1 |-> a , B |-> b, S |-> s .
+
+    1 .
+      B executes protocol .
+      Subst(B) = A1 |-> a, B |-> b, S |-> s .
+      Intruder learns SK .
+
+    2 .
+      B executes protocol .
+      Subst(B) = A1 |-> a, B |-> b, S |-> s .
+      without:
+          A executes protocol .
+          Subst(A) = A |-> a, B |-> b, S |-> s, NB1 |-> n(b, r1) .
+
+ends

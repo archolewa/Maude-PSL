@@ -1,0 +1,23 @@
+While implemented Amended-Needham-Schroeder, I accidentally wrote the following very subtle bug:
+
+Intruder
+    var M : Msg .
+    var N : Nonce .
+    M, N <=> M ; N .
+
+rather than the intended
+
+Intruder
+    vars M M1 : Msg .
+
+    M, M1 <=> M ; M1 .
+
+
+I only realized this was a bug when I was failing to find the expected attack, and I looked at the generated Maude file, in which I
+saw the very helpful: 
+      -M:Msg,
+      -N:Nonce,
+      +(M:Msg ; N:Nonce) 
+
+Catching this kind of bug is tricky, because 
+

@@ -1,0 +1,83 @@
+spec Woolam is
+Theory
+    types  UName SName Name Key Nonce  Masterkey Sessionkey .
+    subtype Masterkey  Sessionkey < Key .
+    subtype SName UName < Name .
+    subtype Name < Public . 
+
+    op n : Name Fresh -> Nonce .
+    ops a b i : -> UName [ctor] .
+    op s : ->  SName  [ctor] . 
+    op mkey : Name Name -> Masterkey .
+    op seskey : Name Name Nonce -> Sessionkey .
+    op e  : Key Msg -> Msg .
+    op d : Key Msg -> Msg  .
+    op _;_ : Msg Msg -> Msg [gather (e E)] .
+
+    eq d(K:Key, e(K:Key, Z:Msg )) = Z:Msg .
+    eq e(K:Key, d(K:Key, Z:Msg )) = Z:Msg . 
+
+
+  /*
+   A -> B : A
+   B -> A : nb
+   A -> B : E(kas:nb)
+   B -> S : E(kbs:A,E(kas:nb))
+   S -> B : E(kbs:nb)
+  */
+
+Protocol
+    vars A B : UName .
+    var S : SName .
+    vars NB : Nonce .
+    vars MA M N : Msg .
+    var r : Fresh .
+    var K : Key .
+    var D : Name .
+
+    Def(A) = kas := mkey(A, s) . 
+    In(A) = A, B, S .
+
+    Def(B) = nb := n(B,r), kbs := mkey(B, s) .
+    In(B) = A, B, S .
+
+    Def(S) = kas := mkey(A,s), kbs := mkey(B,s) .
+    In(S) = A, B, S .
+
+    1 . A -> B : A  |- A   .
+
+    //This is very very prone to typos. We need to come up with a better naming convention for macros. I'm thinking all lower-case. It might clash a little bit with
+    //constants, but constants are rarely used in the protocol declaration.
+    2 . B -> A : nb |- NB .
+
+    3 . A -> B : e(kas, NB) |- MA .
+
+    4 . B -> S : e(kbs, A ; MA)
+              |- e(kbs, A ; e(kas, NB)) .
+
+    5 . S -> B : e(kbs, NB) 
+              |- e(kbs, nb) .
+
+    Out(A) = NB .
+    Out(B) = nb .
+    Out(S) = NB .
+
+
+Intruder
+    => D:Name, n(i, r:Fresh), mkey(D:Name, i), mkey(i, D:Name) .
+    K:Key, M:Msg => d(K:Key, M:Msg), e(K:Key, M:Msg) .
+    M:Msg, N:Msg <=> M:Msg ; N:Msg .
+
+
+Attacks
+    vars A B : UName . 
+    var S : SName .
+
+    //Empty attack for debugging purposes. If an "attack" isn't found, then there's something wrong with the specification.
+    0 . 
+       In(B) = A |-> a , B |-> b, S |-> s . 
+       B executes protocol .
+       Out(B) = ditto .
+
+
+ends

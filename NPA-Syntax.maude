@@ -1,0 +1,272 @@
+---(
+    Changes made by Andrew Cholewa Wed Oct 30:
+    Removed the {_} : Module -> ParsedData operator and made Module a subsort of 
+    ParsedData to match FModule, and so that it doesn't clash with the wrapper
+    being used in parsePSL to put modules in Data.
+    Commented out the error Sort and constant around line 520 in the module
+    GEN-MOD in order to avoid clashes with the error in parsePSL. Plus, error
+    checking at this point should not be necessary.
+
+    Changed the System sort to System to avoid clashes with the System imported from
+    prelude and used in the psl-loop module for the user input.  
+
+    Added a rule for processing the attack states to handle the case where there is
+    an empty never pattern.
+---)
+
+---(About changing System to System: In order to avoid confusion and conflicting with Maude-NPA, we assume that we don't need to load our modules together with Maude-NPA. --Fan
+---)
+
+fmod DEFINITION-PROTOCOL-RULES is
+  protecting META-LEVEL .
+  sort Universal . --- Special sort used for unsorted actions (don't remove)
+  sort Msg . --- Generic sort for messages
+  sort Fresh . --- Sort for private information.
+  sort Public . --- Handy sort to say what is public
+  subsort Public < Msg .
+  op emptyPublic : -> Public .
+  op nullFresh : -> Fresh .
+
+  op pair : Msg Msg -> Msg [frozen] . --- Special treatment for indistinguishability
+
+  sort MsgSet .
+  subsort Msg < MsgSet .
+  op emptyMsgSet : -> MsgSet [ctor] .
+  op _,_ : MsgSet MsgSet -> MsgSet [ctor assoc comm id: emptyMsgSet] .
+
+  op noMsg : -> Msg . --- Auxiliar useless message used as a marker
+
+  sort SMsg .
+
+  sort SignedSMsg . 
+  subsort SignedSMsg < SMsg .
+  op +`(_`) : Msg -> SignedSMsg [format (nir d d d o)] .
+  op -`(_`) : Msg -> SignedSMsg [format (nib d d d o)] .
+
+  sort Resuscitated .
+  subsort Resuscitated < SMsg .
+  op resuscitated`(_`) : Msg -> Resuscitated [ctor format (nic d d d o)] .
+
+  sort LazyLearnt .
+  subsort LazyLearnt < SMsg .
+  op generatedByIntruder`(_`) : Msg -> LazyLearnt [ctor format (nic d d d o)] .
+
+  sort EmptyList .
+  op nil : -> EmptyList [ctor format (ni d)] .
+  op _,_ : EmptyList EmptyList -> EmptyList
+    [ctor assoc id: nil format (d d s d)] .
+
+  sort SMsgList .
+  subsort SMsg Synchro Resuscitated < SMsgList .
+  subsort EmptyList < SMsgList .
+  subsort ResuscitatedList < SMsgList .
+  op _,_ : SMsgList SMsgList -> SMsgList
+    [ctor assoc id: nil format (d d s d)] .
+
+  sort ResuscitatedList .
+  subsort Resuscitated < ResuscitatedList .
+  subsort EmptyList < ResuscitatedList .
+  op _,_ : ResuscitatedList ResuscitatedList -> ResuscitatedList
+    [ctor assoc id: nil format (d d s d)] .
+
+  --- We duplicate the SMsgList sort because A-unification may generate
+  --- an infinite number of most-general unifiers.
+  sort SMsgList-L SMsgList-R .
+
+  op nil : -> SMsgList-R [ctor] .
+  op _,_ : SMsg SMsgList-R -> SMsgList-R
+    [ctor format (d d s d) gather (e E)] .
+  op _,_ : Synchro SMsgList-R -> SMsgList-R
+    [ctor format (d d s d) gather (e E)] .
+
+  op nil : -> SMsgList-L [ctor] .
+  op _,_ : SMsgList-L SMsg -> SMsgList-L
+    [ctor format (d d s d) gather (E e)] .
+  op _,_ : SMsgList-L Synchro -> SMsgList-L
+    [ctor format (d d s d) gather (E e)] .
+
+  --- Composition
+  sort Synchro .
+  op {_->_;;_;;_} : Role Role How Msg -> Synchro [format (nig d d d d d d d d o)] .
+
+  sort Role .
+  op initiator : -> Role .
+  op responder : -> Role .
+
+  sort How .
+  op 1-1 : -> How .
+  op 1-* : -> How .
+    
+  --- Strands
+  sort FreshSet .
+  subsort Fresh < FreshSet .
+  op nil : -> FreshSet [ctor] .
+  op _,_ : FreshSet FreshSet -> FreshSet 
+    [ctor comm assoc id: nil] .
+    
+  sort Strand .
+  op ::_::[_|_] : FreshSet SMsgList-L SMsgList-R -> Strand 
+                  [format (ni d d ni s+++ s--- s+++ d s---)] .
+
+  sort StrandSet .
+  subsort Strand < StrandSet .
+  op empty : -> StrandSet [ctor] .
+  op _&_ : StrandSet StrandSet -> StrandSet
+    [ctor assoc comm id: empty format (d d d d)] .
+
+  sort Knowledge-!inI Knowledge-inI Knowledge-!= Knowledge 
+       Knowledge-irr Knowledge-inst Knowledge-CPSA .
+  subsort Knowledge-!inI Knowledge-inI Knowledge-!=
+          Knowledge-irr Knowledge-inst Knowledge-CPSA < Knowledge .
+  op _!inI : Msg -> Knowledge-!inI [format (ni d o)] .
+  op _inI : Msg -> Knowledge-inI [format (niu d o)] .
+  ---prec 26 added by Andrew Cholewa to ensure Maude parses != correctly in
+  ---Maude-PSL 10/27/14
+  op _!=_ : Msg Msg -> Knowledge-!= [comm format (nig d d o) prec 26] .
+  op irr`(_`) : Msg -> Knowledge-irr [format (nim d d d o)] .
+  op inst`(_`) : Msg -> Knowledge-inst [format (nim d d d o)] .
+  op _before_ : MsgInStrand MsgInStrand -> Knowledge-CPSA [format (nim d d o)] .
+  op secret`(_`) : Msg -> Knowledge-CPSA [format (nim d d d o)] .
+
+  sort MsgInStrand PosNat .
+  op `(_InStrand_`) : PosNat Fresh -> MsgInStrand .
+
+  ops 1st 2nd 3rd 4th 5th 6th 7th 8th 9th 10th 11th 12th 13th 14th 15th 16th 17th 18th 19th 20th : -> PosNat .
+  op z : -> PosNat .
+  op s : PosNat -> PosNat [iter] .
+  
+  sort Ghost .
+  op ghost`(_`,_`,_`,_`,_`) : Msg StrandSet IntruderKnowledge SMsgList Properties 
+                        -> Ghost 
+     [frozen format (ni d s+++ d d d si d si d si s--- d)] .
+
+  sort GhostList .
+  subsort Ghost < GhostList .
+  op nil : -> GhostList [ctor format (ni d)] .
+  op _,_ : GhostList GhostList -> GhostList 
+           [ctor assoc id: nil format (d d n d)] .
+  
+  sort IntruderKnowledge-!inI IntruderKnowledge-inI 
+       IntruderKnowledge-!= IntruderKnowledgeElem IntruderKnowledge 
+       IntruderKnowledge-irr IntruderKnowledge-inst IntruderKnowledge-CPSA 
+       IntruderKnowledge-empty .
+  subsort IntruderKnowledge-empty < IntruderKnowledge-!inI .
+  subsort IntruderKnowledge-empty < IntruderKnowledge-inI .
+  subsort IntruderKnowledge-empty < IntruderKnowledge-!= .
+  subsort IntruderKnowledge-empty < IntruderKnowledge-irr .
+  subsort IntruderKnowledge-empty < IntruderKnowledge-inst .
+  subsort IntruderKnowledge-empty < IntruderKnowledge-CPSA .
+  subsort IntruderKnowledge-empty < IntruderKnowledge .
+  subsort IntruderKnowledge-!inI IntruderKnowledge-inI 
+          IntruderKnowledge-!= 
+          IntruderKnowledge-irr 
+          IntruderKnowledge-inst 
+          IntruderKnowledge-CPSA
+          < IntruderKnowledge .
+  subsort Knowledge-!inI < IntruderKnowledge-!inI .
+  subsort Knowledge-inI < IntruderKnowledge-inI .
+  subsort Knowledge-!= < IntruderKnowledge-!= .
+  subsort Knowledge-irr < IntruderKnowledge-irr .
+  subsort Knowledge-inst < IntruderKnowledge-inst .
+  subsort Knowledge-CPSA < IntruderKnowledge-CPSA .
+  subsort Knowledge < IntruderKnowledgeElem < IntruderKnowledge .
+  op empty : -> IntruderKnowledge-empty [ctor] .
+  op _,_ : IntruderKnowledge IntruderKnowledge -> IntruderKnowledge
+    [ctor assoc comm id: empty format (d d d d) prec 28] .
+  op _,_ : IntruderKnowledge-!inI IntruderKnowledge-!inI 
+           -> IntruderKnowledge-!inI [ditto] .
+  op _,_ : IntruderKnowledge-inI IntruderKnowledge-inI 
+           -> IntruderKnowledge-inI [ditto] .
+  op _,_ : IntruderKnowledge-!= IntruderKnowledge-!=
+           -> IntruderKnowledge-!= [ditto] .
+  op _,_ : IntruderKnowledge-irr IntruderKnowledge-irr
+           -> IntruderKnowledge-irr [ditto] .
+  op _,_ : IntruderKnowledge-inst IntruderKnowledge-inst
+           -> IntruderKnowledge-inst [ditto] .
+  op _,_ : IntruderKnowledge-CPSA IntruderKnowledge-CPSA
+           -> IntruderKnowledge-CPSA [ditto] .
+  op _,_ : IntruderKnowledge-empty IntruderKnowledge-empty
+           -> IntruderKnowledge-empty [ditto] .
+
+  sort Properties .
+  op nil : -> Properties [ctor format (ni d)] .
+
+  sort System .
+
+  ************************
+  --- Stuff for never patterns
+  sort ExclusionPattern .
+  subsort ExclusionPattern < Properties .
+
+  --- neverPattern as StrandSet + IntruderKnowledge
+  sort NeverPattern .
+  sort NeverPatternSet .
+  subsort  NeverPattern < NeverPatternSet .
+
+  op _||_ : StrandSet IntruderKnowledge -> NeverPattern .
+  op nil : -> NeverPatternSet .
+  op __ : NeverPatternSet NeverPatternSet -> NeverPatternSet  
+  [ctor assoc comm id: nil format (d n d)]  .
+
+  op never : NeverPatternSet -> ExclusionPattern .
+  ************************
+
+  op _||_||_||_||_
+    : StrandSet IntruderKnowledge SMsgList GhostList Properties -> System
+      [format (d n d n d n d n d d)] .
+
+  --- Auxiliary sorts for comparing strands in _implies_ function
+  sort SMsgSet .
+  subsort SMsg < SMsgSet .
+  op emptySMsgSet : -> SMsgSet [ctor] .
+  op _;_ : SMsgSet SMsgSet -> SMsgSet
+    [ctor assoc comm id: emptySMsgSet] .
+
+  sort SMsgList$ .
+  subsort SMsgList < SMsgList$ .
+  subsort SMsgSet < SMsgList$ .
+  subsort Synchro < SMsgList$ .
+  op _,_ : SMsgList$ SMsgList$ -> SMsgList$ [ditto] . --- assoc
+  
+  sort SMsgList-L$ SMsgList-R$ .
+  subsort SMsgList-L < SMsgList-L$ .
+  subsort SMsgList-R < SMsgList-R$ .
+  op _,_ : SMsgSet SMsgList-R$ -> SMsgList-R$ [ditto] .
+  op _,_ : Synchro SMsgList-R$ -> SMsgList-R$ [ditto] .
+  op _,_ : SMsgList-L$ SMsgSet -> SMsgList-L$ [ditto] .
+  op _,_ : SMsgList-L$ Synchro -> SMsgList-L$ [ditto] .
+    
+  sort Strand$ .
+  subsort Strand < Strand$ .
+  op ::_::[_|_] : FreshSet SMsgList-L$ SMsgList-R$ -> Strand$ [ditto] .
+
+  sort StrandSet$ .
+  subsort Strand$ < StrandSet$ .
+  subsort StrandSet < StrandSet$ .
+  op _&_ : StrandSet$ StrandSet$ -> StrandSet$ [ditto] .
+
+  *** System$ ********************************************
+  sort System$ .
+  subsort System < System$ .
+  op _||_||_||_||_
+    : StrandSet$ IntruderKnowledge SMsgList GhostList Properties 
+   -> System$ [ditto] .
+      
+  subsort SMsgSet < SMsgList .
+  op _,_ : SMsgSet SMsgList-R -> SMsgList-R [ditto] .
+  op _,_ : SMsgList-L SMsgSet -> SMsgList-L [ditto] .
+
+  sort Attack .
+  subsort SystemSet < Attack .
+
+  sort SystemSet .
+  subsort System < SystemSet .
+  op empty : -> SystemSet .
+  op __ : SystemSet SystemSet -> SystemSet
+    [ctor assoc comm id: empty format (d n d)] .
+  
+  op STRANDS-DOLEVYAO : -> StrandSet .
+  op STRANDS-PROTOCOL : -> StrandSet .
+  op ATTACK-STATE : Nat -> Attack .
+endfm
+

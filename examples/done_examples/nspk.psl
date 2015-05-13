@@ -1,0 +1,138 @@
+/*
+    The NSPK protocol is one of the default example protocols. It's nice and simple,
+    and it has a well-known attack that actually wasn't discovered for several years.
+    Therefore, it works wonderfully as an example both of what a protocol is, and of
+    the tremendous subtlety involved in crafting a secure protocol, and in verifying
+    that it is secure.
+    Andrew Cholewa
+    11/15/2013
+    Updated with comments: 12/2/2013
+*/
+spec NSPK is
+/*
+    In the Equational Theory section, we define the language of the protocol, 
+    i.e. the types, operators, as well as the equations that we need to verify the 
+    protocol with respect to.
+    It has the exact same syntax as maude, except that we include the keywords type(s) 
+    and subtype(s) as
+    synonyms for the keywords sort(s), and subsort(s) since this language is targeted
+    as much at protocol designers as it is formal specification people, and sort is
+    a rather odd word for what the rest of the computer science community refers to as
+    types.
+*/
+Theory
+    types Name Nonce Enc . 
+    subtype Name < Public .
+    op pk : Name Msg -> Enc .
+    op sk : Name Msg -> Enc .
+    op n : Name Fresh -> Nonce .
+    op _;_ : Msg Msg -> Msg [ctor gather(e E)] .
+    ops a b i : -> Name [ctor] .
+    var X : Name .
+    var Z : Msg .
+    eq pk(X, sk(X,Z)) = Z .
+    eq sk(X, pk(X,Z)) = Z .
+/*
+    The Specification section is where we define the protocol message passing sequence,
+    the intruder capabilities, and define the attacks.
+*/
+Protocol
+    vars AName BName : Name .
+    vars N1 N2 : Nonce .
+    vars r1 r2 : Fresh .
+    /*
+    Input defines the input that each role requires in order to execute the 
+    protocol. For example, some protocols require each role to already have a 
+    shared key with a trusted third party. Such a shared key would be the input
+    of the protocol. In this simple case, the only input are the people playing
+    the actual roles.
+    */
+    roles A B .
+
+    In(A) = AName, BName .
+    In(B) = AName, BName .
+    /*
+        Definition allows the user to define shorthand for certain commonly used
+        terms. This allows for two things: 
+        1. It allows the specifier to abstract away from certain
+        implementation details (such as how nonces are specified) 
+        2. It allows you to "hide" complicated terms behind a Name of some kind.
+        This way, whenever you wish to use that complicated term you only need
+        to use the Name, and if you need to modify the Name, you only need to
+        modify it in one place.
+        Note that the order in which the input and definition statements are 
+        written do not matter.
+    */
+    Def(A) = na := n(AName, r1) .//na := na1 , na1 := na, na2 := pk(BName, sk(AName, na1)) . //na := n(AName, r1) .
+    Def(B) = nb := n(BName, r2) .
+
+    1 . A -> B : pk(BName, AName ; na)  |- pk(BName, AName ; N1) .
+    2 . B -> A : pk(AName, N1 ; nb)     |- pk(AName, na    ; N2) .
+    3 . A -> B : pk(BName, N2)          |- pk(BName, nb) .
+
+    Out(A) = na, N2 .
+    Out(B) = nb, N1 .
+
+
+    /*
+        The intruder is where we specify the capabilities of the intruder. 
+        The meaning of T1, T2, ..., Tn => T1', T2', ..., Tm' is:
+        If the intruder has the terms T1, T2, ..., Tn, he can derive the terms
+        T1', T2', ..., Tm'
+        T1, T2, ..., Tn <=> T1', T2', ..., Tm' . is equivalent to the two statements:
+
+        T1,  T2,  ..., Tn  => T1', T2', ..., Tm' .
+        T1', T2', ..., Tm' => T1,  T2,  ..., Tn  .
+    */
+Intruder
+    vars X Y : Msg .
+    var A : Name .
+    var r1 : Fresh .
+
+           => n(i,r1) .
+    X ; Y <=> X, Y .
+    X      => sk(i,X) .
+    X, A   => pk(A, X) . 
+
+
+    /*
+        Here we specify the attack states that we're interested in.
+    */
+Attacks
+    0 .
+        /*This allows us to take the generic roles specified in the message 
+        passing 
+        sequence and tie them to specific principals. Furthermore, we can
+        instantiate any variables in the terms belonging to B
+        In this example, we are saying that A and B are two different
+        people, and neither is the intruder.
+        */
+        Subst(B) = AName |-> a, BName |-> b .
+        //This tells us whose point of view we're looking at, and how much of
+        //the protocol the principal believes to have executed. Here, we are
+        //saying that principal B executes the entire principal.
+        B executes protocol .
+        //The knowledge that the intruder learns as a result of the protocol
+        //execution. Typically, you write here the knowledge you'd like to
+        //keep secret from the intruder.
+        Intruder learns nb .
+    1 .
+        B executes protocol .
+        Subst(B) = AName |-> a, BName |-> b .
+        Intruder learns nb .
+        /*
+            Without statements say that we want to see if it's possible for 
+            the statements above to occur without the statements below occuring.
+            The block folowing the without: statement is exactly the same as 
+            the block above, except we don't allow Intruder learns statements.
+            What this attack asks, is  whether it is possible for B to completely
+            execute his half of  the protocol without A executing her half of
+            the protocol (and the intruder learns B's nonce to boot). Basically,
+            this asks if it's possible for B to be tricked into thinking he's
+            successfully spoken to Alice when in fact Alice hasn't been involved
+            at all.
+        */
+        without:
+            A executes protocol .
+            Subst(A) = AName |-> a, BName |-> b . 
+ends

@@ -1,0 +1,104 @@
+***(
+The informal journal-level description of this protocol is as follows:
+
+1. A -> B : {Na, A}PK(B)
+2. B -> A : {Na, Nb, B}PK(A)
+3. A -> B : {Nb}PK(B)
+
+where PK is homomorphic over concatenation.
+)***
+
+fmod PROTOCOL-EXAMPLE-SYMBOLS is
+  --- Importing sorts Msg, Fresh, Public, and GhostData
+  protecting DEFINITION-PROTOCOL-RULES .
+  
+  ----------------------------------------------------------
+  --- Overwrite this module with the syntax of your protocol
+  --- Notes:
+  --- * Sort Msg and Fresh are special and imported
+  --- * Every sort must be a subsort of Msg
+  --- * No sort can be a supersort of Msg
+  ----------------------------------------------------------
+
+  --- Sort Information 
+  sorts Name Nonce Key .
+  subsort Name Nonce Key < Msg .
+  subsort Name < Key .
+  subsort Name < Public .
+
+  --- Encoding operators for public/private encryption
+  op pk : Msg Key -> Msg [frozen] .
+
+  --- Nonce operator
+  op n : Name Fresh -> Nonce [frozen] .
+  
+  --- Principals
+  op a : -> Name . --- Alice
+  op b : -> Name . --- Bob
+  op i : -> Name . --- Intruder
+  
+ --- Associativity operator
+  op _;_ : Msg  Msg  -> Msg [gather (e E) frozen] .
+  
+endfm
+
+fmod PROTOCOL-EXAMPLE-ALGEBRAIC is
+  protecting PROTOCOL-EXAMPLE-SYMBOLS .
+  
+  ----------------------------------------------------------
+  --- Overwrite this module with the algebraic properties 
+  --- of your protocol
+  ----------------------------------------------------------
+
+  var X Y : Msg .
+  var Z : Key .
+
+  eq pk(X ; Y, Z) = pk(X, Z) ; pk(Y, Z) [nonexec label homomorphism metadata "builtin-unify"] .
+
+endfm
+
+fmod PROTOCOL-SPECIFICATION is
+  protecting PROTOCOL-EXAMPLE-SYMBOLS .
+  protecting DEFINITION-PROTOCOL-RULES .
+  protecting DEFINITION-CONSTRAINTS-INPUT .
+
+  ----------------------------------------------------------
+  --- Overwrite this module with the strands 
+  --- of your protocol
+  ----------------------------------------------------------
+  
+  var Ke : Key .
+  vars X Y Z : Msg .
+  vars r r' : Fresh .
+  vars A B : Name .
+  vars N NA NB : Nonce .
+
+  eq STRANDS-DOLEVYAO
+   = :: nil :: [ nil | -(X), -(Y), +(X ; Y), nil ] &
+     :: nil :: [ nil | -(X ; Y), +(X), nil ] &
+     :: nil :: [ nil | -(X ; Y), +(Y), nil ] &
+     :: nil :: [ nil | -(X), +(pk(X,Ke)), nil ] &
+      :: nil :: [ nil | -(pk(X,i)), +(X), nil ] &
+     :: nil :: [ nil | +(A), nil ] 
+  [nonexec] .
+
+  eq STRANDS-PROTOCOL
+   = :: r :: 
+     [ nil | +(pk(A ; n(A,r), B)), -(pk(n(A,r) ; NB ; B, A)), +(pk(NB, B)), nil ] &
+     :: r :: 
+     [ nil | -(pk(A ; NA, B)), +(pk(NA ; n(B,r) ; B, A)), -(pk(n(B,r), B)), nil ]
+  [nonexec] .
+
+  eq ATTACK-STATE(0)
+   = :: r :: 
+     [ nil, -(pk(a ; NA, b)), +(pk(NA ; n(b,r) ; b,a)), -(pk(n(b,r), b)) | nil ]
+     || n(b,r) inI, empty
+     || nil
+     || nil
+     || nil
+  [nonexec] .
+
+endfm
+
+--- THIS HAS TO BE THE LAST LOADED MODULE !!!!
+select MAUDE-NPA .

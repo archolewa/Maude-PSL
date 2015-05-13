@@ -1,0 +1,139 @@
+***(
+Lowe's fix but with an attack using exlusive or.
+The informal journal-level description [Hosc07] of this protocol is as follows:
+
+A --> B: pk(B, N_A ; A)
+B --> A: pk(A, N_A ; B * N_B)
+A --> B: pk(B, N_B)
+
+where N_A and N_B are nonces, pk(x,y) means message y encripted using public 
+key x, and sk(x,y) means message y encripted using private key x.
+Symbol * is the exclusive or operator.
+Encription/decription have the following algebraic properties:
+
+  pk(K,sk(K,M)) = M .
+  sk(K,pk(K,M)) = M .
+
+And exclusive or has the following algebraic properties:
+
+  X * X = 0 .
+  X * X * Y = Y .
+  X * 0 = X .
+)***
+
+fmod PROTOCOL-EXAMPLE-SYMBOLS is
+  --- Importing sorts Msg, Fresh, Public, and GhostData
+  protecting DEFINITION-PROTOCOL-RULES .
+  
+  ----------------------------------------------------------
+  --- Overwrite this module with the syntax of your protocol
+  --- Notes:
+  --- * Sort Msg and Fresh are special and imported
+  --- * Every sort must be a subsort of Msg
+  --- * No sort can be a supersort of Msg
+  ----------------------------------------------------------
+
+  --- Sort Information 
+  sorts Name Nonce NNSet .
+  subsort Name Nonce NNSet < Msg .
+  subsort Name < Public .
+  subsort Name Nonce < NNSet .
+
+  --- Encoding operators for public/private encryption
+  op pk : Name Msg -> Msg [frozen] .
+  op sk : Name Msg -> Msg [frozen] .
+
+  --- Concatenation operator
+  op _;_ : Msg Msg -> Msg [gather (e E) frozen] .
+
+  --- Nonce operator
+  op n : Name Fresh -> Nonce [frozen] .
+  
+  --- Principals
+  op a : -> Name . --- Alice
+  op b : -> Name . --- Bob
+  op i : -> Name . --- Intruder
+  
+ --- Exclusive or
+  op _*_ : NNSet NNSet -> NNSet [assoc comm frozen] .
+  op null : -> NNSet .
+
+endfm
+
+fmod PROTOCOL-EXAMPLE-ALGEBRAIC is
+  protecting PROTOCOL-EXAMPLE-SYMBOLS .
+  
+  ----------------------------------------------------------
+  --- Overwrite this module with the algebraic properties 
+  --- of your protocol
+  ----------------------------------------------------------
+
+  var A : Name .
+  vars X Y Z : Msg .
+  vars XN YN : NNSet .
+  
+  *** Encryption/Decryption Cancellation
+  eq pk(A,sk(A,Z)) = Z [variant] .
+  eq sk(A,pk(A,Z)) = Z [variant] .
+
+  *** Exclusive or properties
+  eq XN * XN = null    [variant] .
+  eq XN * XN * YN = YN [variant] .
+  eq XN * null = XN    [variant] .
+endfm
+
+fmod PROTOCOL-SPECIFICATION is
+  protecting PROTOCOL-EXAMPLE-SYMBOLS .
+  protecting DEFINITION-PROTOCOL-RULES .
+  protecting DEFINITION-CONSTRAINTS-INPUT .
+
+  ----------------------------------------------------------
+  --- Overwrite this module with the strands 
+  --- of your protocol
+  ----------------------------------------------------------
+  
+  vars X Y Z : Msg .
+  vars r r' : Fresh .
+  vars A B : Name .
+  vars N NA NB : Nonce .
+  vars XN YN : NNSet .
+
+  eq STRANDS-DOLEVYAO
+   = :: nil :: [ nil | -(X), -(Y), +(X ; Y), nil ] &
+     :: nil :: [ nil | -(X ; Y), +(X), nil ] &
+     :: nil :: [ nil | -(X ; Y), +(Y), nil ] &
+     :: nil :: [ nil | -(XN), -(YN), +(XN * YN), nil ] &
+     :: nil :: [ nil | -(X), +(sk(i,X)), nil ] & 
+     :: nil :: [ nil | -(X), +(pk(A,X)), nil ] &
+     :: nil :: [ nil | +(null), nil ] & 
+     :: r   :: [ nil | +(n(i,r)), nil ] & 
+     :: nil :: [ nil | +(A), nil ]
+  [nonexec] .
+
+  eq STRANDS-PROTOCOL
+  = :: r ::  *** Bob ***
+    [nil | +(pk(B, n(A,r) ; A)), 
+           -(pk(A, n(A,r) ; B * YN)), 
+           +(pk(B, YN)), nil] 
+    &
+    :: r' :: *** Alice ***
+    [nil | -(pk(B, XN ; A)), 
+           +(pk(A, XN ; B * n(B,r'))), 
+           -(pk(B,n(B,r'))), nil]
+  [nonexec] .
+
+  eq ATTACK-STATE(0)
+   = :: r' :: *** Alice ***
+     [nil, -(pk(b, XN ; a)), 
+           +(pk(a, XN ; b * n(b,r'))), 
+           -(pk(b, n(b,r'))) | nil]
+     || n(b,r') inI, empty
+     || nil
+     || nil
+     || nil
+  [nonexec] .
+
+endfm
+
+--- THIS HAS TO BE THE LAST LOADED MODULE !!!!
+select MAUDE-NPA .

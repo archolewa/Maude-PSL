@@ -1,0 +1,104 @@
+spec Otway-Rees is
+Theory
+     types UName SName Name Key Nonce Masterkey 
+        Sessionkey .
+     subtypes Masterkey Sessionkey < Key .
+     subtypes SName UName < Name < Public .
+     op n : Name Fresh -> Nonce .
+     ops a b i : -> UName .
+     op s : ->  SName . 
+     op mkey : Name Name -> Masterkey .
+     op seskey : Name Name Nonce -> Sessionkey .  
+     op e  : Key Msg -> Msg . //encryption
+     op d : Key Msg -> Msg . //decryption
+     op _;_ : Msg Msg -> Msg [gather (e E)] .
+
+     var K : Key .
+     var Z : Msg .
+     eq d(K, e(K, Z)) = Z .
+     eq e(K, d(K, Z)) = Z .
+     
+      
+Protocol
+    vars ANAME BNAME : UName .
+    var SNAME : SName .
+    vars r r' r'' rM : Fresh .
+    vars RA CB CS RB : Nonce .
+    vars M1 MA : Msg . 
+    var KCA KCB : Sessionkey . 
+
+    roles A B S .
+
+    Def(A) = c   := n(ANAME, rM), ra := n(ANAME, r), 
+             skA := mkey(ANAME, SNAME) .
+    Def(B) = rb  := n(BNAME, r'), 
+             skB := mkey(BNAME, SNAME) .
+    Def(S) = skA := mkey(ANAME, SNAME), 
+             skB := mkey(BNAME, SNAME), 
+              kc := seskey(ANAME, BNAME, 
+                                  n(SNAME, r'')) .
+              
+
+    In(A) = ANAME, BNAME, SNAME .
+    In(B) = ANAME, BNAME, SNAME .
+    In(S) = ANAME, BNAME, SNAME .
+
+    1 . A -> B :  c  ; ANAME ; BNAME ; e(skA, ra ; c ; 
+                                        ANAME ; BNAME) 
+               |- CB ; ANAME ; BNAME ; M1 .
+              
+
+    2 . B -> S :  CB ; ANAME ; BNAME ; 
+                    M1 ; 
+                    e(skB, rb ; CB ; ANAME ; BNAME)
+               |- CS ; ANAME ; BNAME ; 
+                    e(skA, RA ; CS ; ANAME ; BNAME) ;
+                    e(skB, RB ; CS ; ANAME ; BNAME) .
+              
+
+    3 . S -> B :  CS ; e(skA, RA ; kc) ; 
+                    e(skB, RB ; kc) 
+               |- CB ; MA ; 
+                    e(skB, rb ; KCB) .
+              
+
+    4 . B -> A :  CB ; MA 
+               |- c  ; e(skA, ra ; KCA) .
+
+    Out(A) = c, ra, KCA .
+    Out(B) = rb, KCB, MA, M1, CB .
+    Out(S) = kc, RA, RB, CS .
+
+Intruder 
+    vars P : UName .
+    var S : SName .
+    vars K : Key .
+    vars N M : Msg .
+
+    => s, P, mkey(i, s) .
+    M, N <=> M ; N .
+    K, M => d(K, M), e(K, M) .
+    P => mkey(P, i), mkey(i, P) .
+    
+
+Attacks
+   0 .
+         A executes protocol .
+         Subst(A) = ANAME |-> a, BNAME |-> b, 
+            SNAME |-> s .
+   1 .
+         A executes protocol .
+         Subst(A) = ANAME |-> a, BNAME |-> b, 
+            SNAME |-> s .
+         Intruder learns KCA .
+   2 .
+         A executes protocol .
+         Subst(A) = ANAME |-> a, BNAME |-> b, 
+            SNAME |-> s .
+         without:
+             B executes protocol .
+             Subst(B) = M1 |-> e(skA, c ; ra ; ANAME ; 
+                                 BNAME),  
+                        ANAME |-> a, BNAME |-> b, 
+                        SNAME |-> s .
+ends

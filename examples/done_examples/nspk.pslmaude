@@ -1,0 +1,56 @@
+mod nspk is
+protecting TRANSLATION-TO-MAUDE-NPA .
+protecting PROTOCOL-EXAMPLE-SYMBOLS .
+op pk : Msg Msg -> Enc [frozen] .
+op sk : Msg Msg -> Enc [frozen] .
+op n : Msg Msg -> Nonce [frozen] .
+op _;_ : Msg Msg -> Msg [ctor gather ( e E )  frozen ] .
+op a : -> Name [ctor] .
+op b : -> Name [ctor] .
+op c : -> Name [ctor] .
+op i : -> Name [ctor] .
+op na : -> Msg .
+op nb : -> Msg .
+endm
+rew
+(
+Specification {
+
+Protocol
+{
+In ( A:Name ) = A:Name , B:Name .[53]
+In ( B:Name ) = A:Name , B:Name .[67]
+1 . A:Name -> B:Name : pk ( B:Name , A:Name ; na ) |- pk ( B:Name , A:Name ; N1:Nonce ) .[70]
+2 . B:Name -> A:Name : pk ( A:Name , N1:Nonce ; nb ) |- pk ( A:Name , na ; N2:Nonce ) .[71]
+3 . A:Name -> B:Name : pk ( B:Name , N2:Nonce ) |- pk ( B:Name , nb ) .[72]
+Out ( A:Name ) = na , N2:Nonce .[74]
+Out ( B:Name ) = nb , N1:Nonce .[75]
+}
+Intruder
+{
+=> n ( i , r1:Fresh ) .[93]
+X:Msg ; Y:Msg <=> X:Msg , Y:Msg .[94]
+X:Msg => sk ( i , X:Msg ) .[95]
+X:Msg , A:Name => pk ( A:Name , X:Msg ) .[96]
+}
+Attacks
+{
+{ In ( B:Name ) = A:Name |-> a , B:Name |-> b .[112]
+B:Name executes protocol .[116]
+Intruder learns nb .[120]
+Out ( B:Name ) = ditto .[139]
+{ In ( B:Name ) = A:Name |-> a , B:Name |-> b .[141]
+B:Name executes protocol .[142]
+Intruder learns nb .[143]
+Out ( B:Name ) = ditto .[144]
+without: In ( A:Name ) = A:Name |-> a , B:Name |-> b .[157]
+A:Name executes protocol .[159]
+Out ( A:Name ) = ditto .[160]
+}
+}
+[na := n ( A:Name , r1:Fresh ), nb := n ( B:Name , r2:Fresh ), $noDefs]
+[(mt).StrandData]
+[(empty).StrandSet]
+{##K##:IntruderKnowledge}
+{##S##:StrandSet}) .
+q

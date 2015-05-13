@@ -1,0 +1,236 @@
+---(
+    This file contains the basic semantics of the translation from PSL syntax to Maude-NPA 
+    syntax. It does NOT contain any of the additional helper functions, nor does it contain
+    any of the sorts, memberships, functions, or conditions used in error-checking. It also
+    does not include anything involving the Definitions.
+---)
+load NPA-Syntax.maude .
+---TODO: Rewrite the error message terms so that they are easier for Python to parse.
+mod SPECIFICATION is
+    protecting DEFINITION-PROTOCOL-RULES .
+    protecting META-TERM .
+------------------------ACU Soup of transitionary data structures----------------------------------
+    sort TransData .
+    op mt : -> TransData .
+    op __ : TransData TransData -> TransData [assoc comm id: mt format(n n o)] .
+
+---------------------------------Strand transitionary data stucture-------------------------------
+    sort StrDatum StrData .
+    subsort StrDatum < StrandData .
+    op mt : -> StrData [ctor] .
+    op _&_ : StrData StrData -> StrData [assoc comm id: mt format(d d n d)] .
+    op [_] : StrData -> TransData .
+    ---First argument is the principal. Second argument are the strand input. 
+    ---Third argument is the strand. Fourth argument is the strand output.
+    op _|->{_}_{_} : Msg MsgSet Strand MsgSet -> StrDatum [ctor prec 30] .
+
+------------------------Sections------------------------------------------------------------------
+    sort Sect Sects SubSect SectName Stmt Stmts .
+    subsort Sect < TransData .
+    subsort Stmt < Stmts .
+    op mt : -> Stmts [ctor] .
+    op __ : Stmts Stmts -> Stmts [assoc id: mt format(n n o) prec 55] .
+    ops Protocol Intruder Attacks : -> SectName .
+    subsorts Sect < Sects .
+    op __ : SectName Stmts -> SubSect [format(d nt o) prec 60] .
+    op mt : -> Sects .
+    op __ : Sects Sects -> Sects [ctor assoc comm id: mt format(d n o) prec 65] .
+    op [_] : Sects -> TransData  [ctor] .
+
+----------------------Protocol Section----------------------------------------
+
+--------------------------Input and Output---------------------------------------
+    sort ProtStmt ProtStmts .
+    subsort ProtStmt < Stmt .
+    subsorts ProtStmt < ProtStmts < Stmts .
+    op mtProtocol : -> ProtocolSection .
+
+    rl [InputOutput] :
+        [
+            Protocol
+                PS1:Stmts
+                In(P) = IN .
+                PS2:Stmts
+                Out(P) = OUT . 
+                PS3:Stmts
+            SS:SubSections
+        ]
+        [SD:StrandData]
+        =>
+        [
+            Protocol
+                PS1:Stmts PS2:Stmts PS3:Stmts
+            SS:SubSections
+        ]
+        [P |-> {IN} :: nil :: [(nil).SMsgList-L | nil] 
+            {OUT} & SD:StrandData] .
+
+    rl [OutputInput] : 
+        [
+            Protocol
+                PS1:Stmts
+                Out(P) = OUT .
+                PS2:Stmts
+                In(P) = IN . 
+                PS3:Stmts
+            SS:SubSections
+        ]
+        [SD:StrandData]
+        =>
+        [
+            Protocol
+                PS1:Stmts PS2:Stmts PS3:Stmts
+            SS:SubSections
+        ]
+        [P |-> {IN} :: nil :: [(nil).SMsgList-L | nil] {OUT} & 
+         SD:StrandData] .
+
+    ---Note: This relies on statement order. Do we want to preserve that? Don't see any reason
+    ---not to. Only an idiot would write a protocol's steps out of order.
+    rl [StepsToStrands] : 
+       [
+           Protocol
+                N . A -> B : TA |- TB .[LN]
+                S:Stmts
+            SS:SubSections
+       ]
+       [A |-> {INA} :: FSA :: [nil | MSA]{OUTA} &
+        B |-> {INB} :: FSB :: [nil | MSB]{OUTB} &
+        SD:StrandData]
+       =>
+       [
+           Protocol
+                S:Stmts
+            SS:SubSections
+       ]
+       [A |-> {INA} :: FSA, fresh(TA) :: [ nil | MSA, +(TA)] {OUTA} &
+        B |-> {INB} :: FSB            :: [ nil | MSB, -(TB)] {OUTB} &
+        SD:StrandData] .
+
+    eq [ (Protocol mt) SS:SubSections ] = [ mtProtocol SS:SubSections ] [mtAttackData] .
+
+    ---------------------------------Intruder----------------------------------------- 
+    op [_] : StrSet -> TransData [ctor] .
+    op mtMsgSet : -> MsgSet .
+    op mtIntruder : -> IntrSec .
+    eq (=> MS:MsgSet .) = (mtMsgSet => MS:MsgSet .) .
+
+    eq (MS:MsgSet => M:Msg, M1:Msg, MS1:MsgSet .) =
+       (MS:MsgSet => M:Msg .) (MS:MsgSet => M1:Msg, MS1:MsgSet .)
+
+    rl [IntruderConversion] :
+        [
+            Intruder
+                MS:MsgSet => M:Msg .
+                S:Stmts
+            SS:SubSections 
+        ]
+        [SS:StrandSet]
+        =>
+        [
+            Intruder 
+                IS:Stmts 
+            SS:SubSections
+        ] 
+        [:: fresh(M:Msg) :: [ nil | buildList(MS:MsgSet), +(M:Msg)] & SS:StrandSet] .
+
+    eq [Intruder mt SS:SubSections] = [mtIntruder SS:SubSections] .
+
+    -------------------------------Attacks----------------------------------------------
+    op without:_ : CoreAttNoIntr -> WithoutBlock [ctor prec 35] .
+    sort Map Maps .
+    subsort Map < Maps .
+    op _|->_ : Msg Msg -> Map  [ctor prec 20] .
+    op _,_ : Maps Maps -> Maps [ctor assoc comm prec 25] .
+    op ditto : -> Maps [ctor] .
+    op In`(_`)  = _.[_] : Msg Map Nat -> InOutMap [ctor prec 28] .
+    op Out`(_`) = _.[_] : Msg Map Nat -> InOutMap [ctor prec 28] .
+    
+    sorts CoreAtt CoreAttNoIntr .
+    subsort CoreAttNoIntr < CoreAtt .
+    op ___ : InOutMap ExecStmt InOutMap -> CoreAttNoIntr [ctor prec 30] .
+        
+    op __ : CoreAttack CoreAttack -> CoreAttack [ctor] .
+    op ____ : InOutMap ExecStmt IntrStmt InOutMap -> CoreAtt [ctor prec 30] .
+
+    sort AttData .
+    op __ : AttData AttData -> AttData [ctor comm assoc id: mtAttData] .
+    op mtAttData : -> AttData .
+  ---Syntax for System, from NPA-Syntax.maude
+  ---op _||_||_||_||_ : StrandSet IntruderKnowledge SMsgList GhostList Properties -> System
+      [format (d n d n d n d n d d)] .
+    op [_|->_] : Nat System -> AttData .
+    op [_] : AttData -> TransData .
+
+    rl [translateAttacksWithout] :
+    [
+        Attacks
+            N . {CA:CoreAtt WA:WithoutBlocks}
+            A:AttStmts
+        SS:SubSections 
+    ]
+    [SP:StrData]
+    [AT:AttData]
+    =>
+    [SP:StrData]
+    [
+        Attacks 
+            A:Stmts 
+        SS:SubSects
+    ]
+    [ AT:AttData
+        [N:Nat |-> genAttackStrands(CA:CoreAtt, SP:StrData)  
+               ||  genIntruderKnowledge(CA:CoreAtt) 
+               ||  nil
+               ||  nil
+               ||  never(genNeverPatterns(WA:WithoutBlocks, SP:StrData))]] .
+
+    rl [translateAttack] :
+        [
+            Attacks
+                N .{CA:CoreAtt}
+                A:AttStmts
+            SS:SubSects 
+        ]
+        [SP:StrData]
+        [AT:AttData]
+        =>
+        [SP:StrData]
+        [
+            Attacks
+                A:AttStmts 
+            SS:SubSects
+        ]
+        [AT:AttData 
+            [N:Nat |->    genAttackStrands(CA:CoreAtt, SP:StrData)  
+                   || genIntruderKnowledge(CA:CoreAtt) 
+                   || nil
+                   || nil
+                   || nil]] .
+
+
+    op genAttackStrands : CoreAttack StrandData -> StrandSet .
+
+    eq genAttackStrands(In(P) = INM:Maps . 
+                 P executes protocol .
+                 Intruder learns MS:MsgSet . 
+                 Out(P) = OUTM:Maps ., 
+                 P |-> {IN} S:Strand {OUT} & SD:StrData)
+    =  applyMaps(applyMaps(S:Strand, OUTM:Maps), INM:Maps) .
+                 
+    eq genAttackStrands(In(P) = INM:Maps . 
+                         P executes protocol .
+                         Out(P) = OUTM:Maps ., 
+                         P |-> {IN} S:Strand {OUT} & SD:StrData)
+    = applyMaps(applyMaps(S:Strand, OUTM:Maps), INM:Maps) .
+
+---genIntruderKnowledge is a straightforward translation of the Intruder learns ... into the M inI ... syntax
+  
+    op genNeverPatterns : WithoutBlocks StrandData -> NeverPatternSet .
+
+    eq genNeverPatterns(without: CA:CoreAttNoIntr WB:WithoutBlocks, SP:StrData) 
+    = (genAttackStrands(CA:CoreAttNoIntr, SP:StrandData) || empty) genNeverPatterns(WB:WithoutBlocks, SP:StrData) .
+
+    eq genNeverPatterns(without: CA:CoreAttNoIntr, SP:StrData) = genAttackStrands(CA:CoreAttNoIntr, SP:StrData) || empty .
+        
+endm

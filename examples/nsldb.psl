@@ -1,0 +1,13 @@
+spec NSL;DB is
+    composing NSL ; DB .
+    A ;1 B : A |-> B,  B |-> A, N |-> n(A, r) .
+    B ;1 A : A |-> B, B |-> A1, N |-> NA1 .
+
+Attacks
+    0 .
+        B.NSL executes up to 2 .
+        Intruder learns n(B.NSL, r1) .
+        //Tells us how we should instantiate the attack strand.
+        Subst(B.NSL) = B |-> b, A1 |-> a .
+ends
+

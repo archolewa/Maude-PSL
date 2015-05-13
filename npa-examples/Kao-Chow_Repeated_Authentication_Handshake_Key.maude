@@ -1,0 +1,138 @@
+----  The Kao Chow Repeated Authentication Protocols
+
+---------------------------------------------------
+--- We modify only the relevant MAUDE-NPA modules 
+---------------------------------------------------
+
+fmod PROTOCOL-EXAMPLE-SYMBOLS is
+  --- Importing sorts Msg, Fresh, Public
+  protecting DEFINITION-PROTOCOL-RULES .
+  
+  ----------------------------------------------------------
+  --- Overwrite this module with the syntax of your protocol
+  --- Notes:
+  --- * Sort Msg and Fresh are special and imported
+  --- * Every sort must be a subsort of Msg
+  --- * No sort can be a supersort of Msg
+  ----------------------------------------------------------
+
+  --- Sort Information 
+  sorts  UName SName Name Key Nonce  Masterkey Sessionkey Enc .
+  subsort Name Nonce Enc Key < Msg .
+  subsort Masterkey  Sessionkey < Key .
+  subsort SName UName < Name .
+  subsort Name < Public . --- This is quite relevant and necessary
+
+  --- Nonce operator
+  op n : Name Fresh -> Nonce [frozen] .
+  op t : Name Fresh -> Nonce [frozen] . ---Nonce del server
+
+  --- User names
+  ops a b i : -> UName .
+
+  --- Server name
+  op s : ->  SName . 
+
+  --- MKey
+  op mkey : Name Name -> Masterkey [frozen] .
+ 
+  --- Seskey
+  op seskey : Name Name Nonce -> Sessionkey [frozen] .
+
+  ---encrypt/decrypt
+  op e : Key Msg -> Msg [frozen] .
+  op d : Key Msg -> Msg  [frozen] .
+
+  --- Concatenation
+  op _;_ : Msg Msg -> Msg [frozen gather (e E)] .
+
+endfm
+
+fmod PROTOCOL-EXAMPLE-ALGEBRAIC is
+  protecting PROTOCOL-EXAMPLE-SYMBOLS .
+  
+  ----------------------------------------------------------
+  --- Overwrite this module with the algebraic properties 
+  --- of your protocol
+  ----------------------------------------------------------
+  
+ eq d(K:Key, e(K:Key, Z:Msg)) = Z:Msg [variant] .
+ eq e(K:Key, d(K:Key, Z:Msg)) = Z:Msg [variant] .  
+
+endfm
+
+fmod PROTOCOL-SPECIFICATION is
+  protecting PROTOCOL-EXAMPLE-SYMBOLS . 
+  protecting DEFINITION-PROTOCOL-RULES .
+  protecting DEFINITION-CONSTRAINTS-INPUT .
+
+  ----------------------------------------------------------
+  --- Overwrite this module with the strands 
+  --- of your protocol
+  ----------------------------------------------------------
+  
+  var A B T : UName .  
+  var D : Name .
+  var r r' r'' r''' r# r## : Fresh . --- Comerntario chorra
+  vars TS NA NB : Nonce .
+  vars X M1 M2 M N MA MB : Msg .
+  var K Ke : Key . 
+  var SK TA Kt : Sessionkey .
+
+  eq STRANDS-DOLEVYAO
+   = :: nil :: [ nil | +(D), nil ]  & 
+     :: nil :: [ nil | -(K), -(M), +(d(K,M)), nil ] &
+     :: nil :: [ nil | -(K), -(M), +(e(K,M)), nil ] &
+     :: nil :: [ nil | -(N), -(M), +(M ; N) , nil ] &
+     :: nil :: [ nil | -(M ; N), +(M) , nil ] &
+     :: nil :: [ nil | -(M ; N), +(N) , nil ] &
+     :: nil :: [ nil | +(mkey(i,D)), nil ]  &
+     :: nil :: [ nil | +(mkey(D,i)), nil ]  
+  [nonexec] . 
+
+  eq STRANDS-PROTOCOL =
+  --- A->S : A, B, Na  --- S->B : E(Kas:A,B,Na,Kab,Kt), E(Kbs:A,B,Na,Kab,Kt)
+  --- B->A : E(Kas:A,B,Na,Kab,Kt), E(Kt:Na,Kab), Nb  --- A->B : E(Kt:Na,Kab)
+   --- Alice's Strand
+    :: r ::
+    [ nil | +(A ; B ; n(A,r)),
+            -(e(mkey(A,s), A ; B ; n(A,r) ; SK ; Kt) ; e(Kt, n(A,r) ; SK) ; NB),
+            +(e(Kt, n(A,r) ; SK)) , nil ]
+ &
+    --- Bob's Strand
+    :: r :: 
+    [ nil | -(MA ; e(mkey(B,s), A ; B ; NA ; SK ; Kt)) , 
+            +(MA ; e(Kt, NA ; SK) ; n(B,r)),
+            -(e(Kt, NA ; SK)) , nil ] 
+ &
+     :: r,r' ::
+     --- Server's Strand 
+    [ nil | -(A ; B ; NA),
+            +( e(mkey(A,s), A ; B ; NA ; seskey(A,B,n(s,r)) ; seskey(A,B,n(s,r')))
+             ; e(mkey(B,s), A ; B ; NA ; seskey(A,B,n(s,r)) ; seskey(A,B,n(s,r')))), nil ]
+
+  [nonexec] .
+  
+eq ATTACK-STATE(0) =
+    :: r :: 
+    [ nil,  -(MA ; e(mkey(B,s), A ; B ; NA ; SK ; Kt)) , 
+            +(MA ; e(Kt, NA ; SK) ; n(B,r)),
+            -(e(Kt, NA ; SK)) | nil ] 
+    || empty
+    || nil
+    || nil
+    || nil
+[nonexec] .
+  
+  
+---eq USER-GRAMMARS
+---= (grl empty => e(#1:Key, #2:Msg) inL . ! S2) 
+---[nonexec] .
+ 
+
+endfm
+
+--- THIS HAS TO BE THE LAST LOADED MODULE !!!!
+fmod MAUDE-NPA is
+  protecting GENERIC-TOOLS .
+endfm 

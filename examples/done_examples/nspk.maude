@@ -1,0 +1,90 @@
+fmod PROTOCOL-EXAMPLE-SYMBOLS is protecting DEFINITION-PROTOCOL-RULES .
+sorts Name  Nonce  Enc .
+subsorts Name < Public .
+op pk : Name  Msg -> Enc [ frozen ] .
+op sk : Name  Msg -> Enc [ frozen ] .
+op n : Name  Fresh -> Nonce [ frozen ] .
+op _;_ : Msg  Msg -> Msg [ ctor  gather  (  e  E  )  frozen ] .
+ops a  b  i : -> Name [ ctor ] .
+subsorts Name  Nonce  Enc < Msg .
+op _$;_ : Msg Msg -> Msg [ctor gather(e E) frozen].
+endfm
+
+fmod PROTOCOL-EXAMPLE-ALGEBRAIC is protecting PROTOCOL-EXAMPLE-SYMBOLS .
+eq sk(X:Name, pk(X:Name, Z:Msg)) = Z:Msg [ variant ] .
+eq pk(X:Name, sk(X:Name, Z:Msg)) = Z:Msg [ variant ] .
+endfm
+fmod PROTOCOL-SPECIFICATION is protecting PROTOCOL-EXAMPLE-SYMBOLS .
+protecting DEFINITION-PROTOCOL-RULES .
+protecting DEFINITION-CONSTRAINTS-INPUT .
+eq STRANDS-DOLEVYAO = 
+:: nil ::
+[ nil | 
+   -(X:Msg), 
+   +(sk(i, X:Msg)), nil]  & 
+:: nil ::
+[ nil | 
+   -(Y:Msg), 
+   -(X:Msg), 
+   +(X:Msg ; Y:Msg), nil]  & 
+:: nil ::
+[ nil | 
+   -(A:Name), 
+   -(X:Msg), 
+   +(pk(A:Name, X:Msg)), nil]  & 
+:: nil ::
+[ nil | 
+   -(X:Msg ; Y:Msg), 
+   +(X:Msg), nil]  & 
+:: nil ::
+[ nil | 
+   -(X:Msg ; Y:Msg), 
+   +(Y:Msg), nil]  & 
+:: r1:Fresh ::
+[ nil | 
+   +(n(i, r1:Fresh)), nil] [nonexec].
+eq STRANDS-PROTOCOL = 
+:: r1:Fresh ::
+[ nil | 
+   +(pk(BName:Name, AName:Name ; n(AName:Name, r1:Fresh))), 
+   -(pk(AName:Name, n(AName:Name, r1:Fresh) ; N2:Nonce)), 
+   +(pk(BName:Name, N2:Nonce)), nil]  & 
+:: r2:Fresh ::
+[ nil | 
+   -(pk(BName:Name, AName:Name ; N1:Nonce)), 
+   +(pk(AName:Name, N1:Nonce ; n(BName:Name, r2:Fresh))), 
+   -(pk(BName:Name, n(BName:Name, r2:Fresh))), nil] [nonexec].
+var LIST : SMsgList-R . var K : IntruderKnowledge . var S : StrandSet . eq ATTACK-STATE(0)= 
+:: r2:Fresh ::
+[ nil, 
+   -(pk(b, a ; N1:Nonce)), 
+   +(pk(a, N1:Nonce ; n(b, r2:Fresh))), 
+   -(pk(b, n(b, r2:Fresh))) | nil] 
+|| 
+n(b, r2:Fresh) inI
+|| 
+nil
+|| 
+nil
+|| 
+nil[nonexec].
+ eq ATTACK-STATE(1)= 
+:: r2:Fresh ::
+[ nil, 
+   -(pk(b, a ; N1:Nonce)), 
+   +(pk(a, N1:Nonce ; n(b, r2:Fresh))), 
+   -(pk(b, n(b, r2:Fresh))) | nil] 
+|| 
+n(b, r2:Fresh) inI
+|| 
+nil
+|| 
+nil
+|| never((S & 
+:: r1:Fresh ::
+[ nil, 
+   +(pk(b, a ; n(a, r1:Fresh))), 
+   -(pk(a, n(a, r1:Fresh) ; N2:Nonce)), 
+   +(pk(b, N2:Nonce)) | nil] ) || K)[nonexec].
+ endfm
+select MAUDE-NPA .

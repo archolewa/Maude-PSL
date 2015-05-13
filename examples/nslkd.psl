@@ -1,0 +1,9 @@
+spec NSL;KD is
+    composing NSL ; KD .
+
+    //nsl-A ;* kd-B kd-A
+    nsl-init ;* kd-resp : A |-> B,  B |-> A, K |-> h(n(A, r) ; NB), K2 |-> key . 
+    nsl-init ;* kd-init : A |-> A,  B |-> B, K |-> key, K2 |-> h(n(A, r) ; NB) .     
+    nsl-B ;* kd-A : A |-> B, B |-> A1, K |-> h(NA1 ; n(B, r1)) .
+    nsl-B ;* kd-B : A |-> A1, B |-> B, K |-> h(NA1 ; n(B, r1)) .
+ends

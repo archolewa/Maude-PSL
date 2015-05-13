@@ -1,0 +1,1408 @@
+---(
+This file contains the second stage of the translation from a Maude-PSL specification to a Maude-NPA specification. To use this code, load it into
+Maude and call red T ., where T is an AC soup containing the following:
+**********************
+The Protocol, Intruder, and Attack sections as a term of the form:
+    Specification
+    {
+        Protocol
+        {
+        ...
+        }
+        Intruder
+        {
+        ...
+        }
+        Attacks
+        {
+        ...
+        }
+    }
+    Note the addition of the "Specification" section heading, and the brackets
+    at the beginning and end of each section.
+**********************
+[<DEFS>] - set of user-provided definitions. <DEFS> = $noDefs if we have no 
+              definitions 
+**********************
+[mt] - Starting Strand data for protocols.
+**********************
+[empty] - Starting Strand Set for the Intruder.
+**********************(Optional)**********************
+[mt] - Another strand data if we're rewriting a composition term (and ONLY
+if we're rewriting a composition term). This should be included
+at the top level (i.e. same level as the [comp] structure and 
+the translate terms).
+
+If there are any problems, then the term will be lifted up to the kind, and
+somewhere in the soup will be a term prefixed by a triple dollar sign: $$$
+---)
+
+---Contains the syntax for each the following translation.
+load PSL-Syntax.maude
+---Following one to one and one to many modules should only be used for
+---debugging.
+---One to One
+---load nsldb.maude
+---One to many
+---load nslkd.maude
+---TODO: Rewrite the error message terms so that they are easier for Python to parse.
+---(
+    Because of weird pregularity problems when trying to make Knowledge-!=  
+    [from NPA-Syntax] a subsort of Disequalities, I've had to use the operator
+    $!= in the Maude code. So Python needs to convert != to $!=.
+---)
+
+fmod SECTION-SEMANTICS is
+    protecting SECTION-SYNTAX .
+    *************************Section*********************************
+    op _ in _ : SectionName SubSection -> Bool .
+    eq SN:SectionName in SN:SectionName {S:Stmts} SS:SubSection = true .
+    eq SN:SectionName in SS:SubSection = false [owise] .
+
+endfm
+
+fmod DEFINITION-SEMANTICS is
+    protecting DEFINITION-SYNTAX .
+    eq D:Definition, D:Definition, DS:Definitions = 
+        D:Definition, DS:Definitions .
+
+    ---This exists because it's required by downTerm. Checks performed both by
+    ---the Python and by Maude should catch any errors before ever
+    ---invoking $applyDefs. So, if $errorDefs shows up, it's because of an
+    ---error in my code, not the user's.
+    op $errorDefs : -> MsgSet .
+    op $applyDefs : MsgSet Definitions -> MsgSet .
+    ---This variant of applyDefs exists at the meta level, and is where we 
+    ---actually apply the definitions.
+    ---The other variants all reduce to this case.
+    op $applyDefs : TermList Definitions -> TermList .
+
+    eq $applyDefs(MS:MsgSet, $noDefs) = MS:MsgSet .
+
+    eq $applyDefs(MS:MsgSet, D:NeDefinitions) = 
+        downTerm($applyDefs(upTerm(MS:MsgSet), D:NeDefinitions), $errorDefs) .
+
+    eq $applyDefs((empty).TermList, D:Definitions) = empty .   
+
+    ceq $applyDefs((T:Term, TL:TermList), (M1:Msg := M2:Msg, D:Definitions)) 
+    = upTerm(M2:Msg), $applyDefs(TL:TermList, (M1:Msg := M2:Msg, D:Definitions))
+    if downTerm(T:Term, $errorDefs) == M1:Msg .
+
+    eq $applyDefs((V:Variable, TL:TermList), D:Definitions) 
+    = V:Variable, $applyDefs(TL:TermList, D:Definitions) [owise] .
+
+    eq $applyDefs((C:Constant, TL:TermList), D:Definitions) 
+    = C:Constant, $applyDefs(TL:TermList, D:Definitions) [owise] .
+
+    eq $applyDefs((F:Qid[TL:TermList], TL1:TermList), D:Definitions) = 
+        F:Qid[$applyDefs(TL:TermList, D:Definitions)], 
+        $applyDefs(TL1:TermList, D:Definitions) [owise] .
+
+    op $applyDefs : Strand Definitions -> Strand .
+    var L : SMsgList-L .
+    var R : SMsgList-R .
+    op $errorStrand : -> Strand .
+    eq $applyDefs(S:Strand, D:Definitions) = 
+        downTerm($applyDefs(upTerm(S:Strand), D:Definitions), $errorStrand) .
+
+    eq numIterations = 100 .
+
+    eq $makeIdem($noDefs) = $noDefs .
+    eq $makeIdem((P:Msg := M:Msg, DS:Definitions)) = 
+        $makeIdem(P:Msg := M:Msg, P:Msg := downTerm($applyDefs(upTerm(M:Msg), DS:Definitions), $errorDefs), DS:Definitions, 
+            P:Msg := M:Msg, 0) .
+    eq $makeIdem(D:Definition, D:Definition, DS:Definitions, DORIG:Definition, N:Nat) = D:Definition, $makeIdem(DS:Definitions) .
+    eq $makeIdem(D:Definition, D':Definition, DS:Definitions, DORIG:Definition, numIterations) = 
+        $cantMakeDefsIdempotent((DORIG:Definition, DS:Definitions), numIterations) .
+    eq $makeIdem(P:Msg := M:Msg, P:Msg := M':Msg, DS:Definitions, DORIG:Definition, N:Nat) = 
+        $makeIdem(P:Msg := M':Msg, P:Msg := downTerm($applyDefs(upTerm(M':Msg), DS:Definitions), $errorDefs), DS:Definitions, 
+            DORIG:Definition, s(N:Nat)) [owise] .
+
+    eq $checkWellFormed(((K:Msg, N:Nat) := T:Msg), DS:Definitions) = K:Msg := T:Msg, $checkWellFormed(DS:Definitions) .
+    eq $checkWellFormed($noDefs) = $noDefs .
+    ceq $checkWellFormed((DS:Definitions, DSK:[Definitions])) = $checkWellFormed(DSK:[Definitions])
+        if DS:Definitions =/= $noDefs .
+    eq $checkWellFormed(DSK:[Definitions]) = $$$malformedDefs($moveLineNum(DSK:[Definitions])) [owise] .
+
+    eq $moveLineNum(((K:[Msg], N:Nat) := T:[Msg], DS:[Definitions])) = (K:[Msg] := T:[Msg] $$,$$ N:Nat) $$;;;$$
+        $moveLineNum(DS:[Definitions]) . 
+    eq $moveLineNum($noDefs) = $noDefs .
+
+endfm
+
+mod PROTOCOL-SEMANTICS is
+    protecting SECTION-SEMANTICS .
+    protecting DEFINITION-SEMANTICS .
+    protecting PROTOCOL-SYNTAX .
+
+    vars N LN N1 : Nat . 
+    var P : Role .
+    vars IN OUT : MsgSet .
+
+    ---mb Protocol {PS:ProtStmts} : ProtocolSection .
+
+    var DEFS : Definitions .
+
+    ---(
+    The following two rules process the input and output for each role.
+    The rules are identical, except for the order in which the Input and
+    Output statements appear.
+    Note that these two rules create the strand for each role. Therefore,
+    these rules must fire before any of the rules that populate the strands.
+    ---)
+    crl Specification
+        {
+        Protocol{
+            PS1:Stmts
+            In(P) = IN .[N]
+            PS2:Stmts
+            Out(P) = OUT .[N1] 
+            PS3:Stmts
+        }
+        SS:SubSection
+        }
+        [STR:StrandData]
+        [DEFS]
+        =>
+        Specification
+        {
+            Protocol
+            {
+                PS1:Stmts PS2:Stmts PS3:Stmts
+            }
+            SS:SubSection
+        }
+        [P |-> {IN} :: nil :: [(nil).SMsgList-L | nil] 
+            {$applyDefs(OUT, DEFS)} & STR:StrandData] 
+        [DEFS]
+        if IN are variables .
+
+    crl Specification
+        {
+        Protocol{
+            PS1:Stmts
+            Out(P) = OUT .[N]
+            PS2:Stmts
+            In(P) = IN .[N1] 
+            PS3:Stmts
+        }
+        SS:SubSection
+        }
+        [STR:StrandData]
+        [DEFS]
+        =>
+        Specification
+        {
+            Protocol
+            {
+                PS1:Stmts PS2:Stmts PS3:Stmts
+            }
+            SS:SubSection
+        }
+        [P |-> {IN} :: nil :: [(nil).SMsgList-L | nil] 
+            {$applyDefs(OUT, DEFS)} & STR:StrandData] 
+        [DEFS]
+        if IN are variables .
+
+
+    ---(
+        The next few rules handle ways in which the input and output can
+        fail: the input contains something other than variables, or the 
+        input and output statements are missing.
+        Note that these checks will be pushed to Python, except possibly
+        for the check that the input is variables. That depends on what
+        I manage to accomplish with the parser. I'll probably keep the variable
+        checking in Maude, because that requires distinguishing between
+        user-defined terms, and high level syntax, which Maude is better at
+        than Python.
+
+        However, checking if the input and output statements exist should
+        be easily done in Python, regardless of the power of the parser.
+    ---)
+    crl Specification
+        {
+        Protocol{
+            PS1:Stmts
+            In(P) = IN .[N]
+            PS2:Stmts
+            Out(P) = OUT .[N1]
+            PS3:Stmts 
+        }
+        SS:SubSection
+        }
+        [STR:StrandData]
+        =>
+        $invalidInput(P, $errorInput(IN), N) 
+        Specification
+        {
+        Protocol{
+            PS1:Stmts
+            PS2:Stmts
+            PS3:Stmts
+        }
+        SS:SubSection
+        }
+        [STR:StrandData]
+        if not IN are variables .
+
+    crl Specification
+        {
+        Protocol{
+            PS1:Stmts
+            Out(P) = OUT .[N]
+            PS2:Stmts
+            In(P) = IN .[N1]
+            PS3:Stmts 
+        }
+        SS:SubSection
+
+        }
+        [STR:StrandData]
+        $invalidInput(P, $errorInput(IN), N1) 
+        =>
+        Specification
+        {
+        Protocol{
+            PS1:Stmts
+            PS2:Stmts
+            PS3:Stmts
+        }
+        SS:SubSection
+        }
+        [STR:StrandData]
+        if not IN are variables .
+
+    crl Specification
+        {
+            Protocol
+            {
+                PS1:Stmts
+                In(P) = IN .[N]
+                PS2:Stmts
+            }
+            SS:SubSection
+        }
+        =>
+        $missingOutput(P, N)
+        Specification
+        {
+            Protocol
+            {
+                PS1:Stmts
+                PS2:Stmts
+            }
+            SS:SubSection
+        }
+           if not $out P listed in (PS1:Stmts PS2:Stmts) .
+
+       op $out_listed in_ : Role Stmts -> Bool .
+       eq $out P listed in (Out(P) = OUT .[N] SS:Stmts) = true .
+       eq $out P listed in pass = false .
+       eq $out P listed in (S:Stmt SS:Stmts) = $out P listed in SS:Stmts [owise] .
+
+       ---Indicates that the first argument is missing an output statement.
+       op $missingOutput : Role Nat -> [TranslationData] .
+
+    crl [missingInput] : Specification
+        {
+            Protocol
+            {
+                PS1:Stmts
+                Out(P) = OUT .[N]
+                PS2:Stmts
+            }
+            SS:SubSection
+        }
+        =>
+        $missingInput(P, N)
+        Specification
+        {
+            Protocol
+            {
+                PS1:Stmts
+                PS2:Stmts
+            }
+            SS:SubSection
+        }
+       if not $in P listed in (PS1:Stmts PS2:Stmts) .
+
+       op $in _ listed in _ : Role Stmts -> Bool .
+       eq [in1] : $in P listed in (In(P) = IN .[N] SS:Stmts) = true .
+       eq [in2] : $in P listed in pass = false .
+       eq [in3] : $in P listed in (S:Stmt SS:Stmts) = 
+        $in P listed in SS:Stmts [owise] .
+
+       ---Indicates that we're missing an input statement for the first argument. 
+       op $missingInput : Role Nat -> [TranslationData] .
+
+    ---An error indicating that one of the inputs was not a variable. Lifts the 
+    ---entire term to the kind, so that we can check if there is an error by checking
+    ---if the result sort is at the kind. If it is, we look through the output for
+    ---the appropriate error.
+    ---Arguments:
+     ---   1. The Principal with the invalid input
+     ---   2. The first invalid input.
+     ---   3. The line number on which the error occured.
+    op $invalidInput : Role Msg Nat -> [TranslationData] .
+
+    ---Gives us the first input that is not a variable.
+    op $errorInput : MsgSet -> Msg .
+    eq $errorInput(V:Msg, IN) = if V:Msg are variables then $errorInput(IN) else V:Msg fi .
+
+    op _are variables : MsgSet -> Bool .
+    ceq (V:Msg, IN) are variables = IN are variables if UPV:Term := upTerm(V:Msg) /\ 
+        UPV:Term :: Variable .
+    eq emptyMsgSet are variables = true .
+    ceq (V:Msg, IN) are variables = false if UPV:Term := upTerm(V:Msg) /\ 
+        not UPV:Term :: Variable .
+
+    **************************Protocol Steps***************************
+    ---1 . A -> B : T |- T .[LN] where LN is the current line number.
+    vars TA TB : Msg .
+    vars A B : Role .
+    vars INA OUTA INB OUTB : MsgSet .
+    var MSA MSB : SMsgList-L .
+    var FSA FSB : FreshSet .
+    ---(
+    The following  rule populates strands of A and B with the appropriate
+    term, and extracts the fresh variables from TA.
+    Observe that this rule requires both A's and B's strands to already
+    exist.
+    Note that the messages are to the left of |. This is
+    because the message list to the left is left associative, so we can append
+    messages to the end. Also, we'll need the messages to be in front of the 
+    bar for the attacks anyway, so this just eases implementation of the
+    attack states. We'll move the
+    bars to the end when we actually build the maude module.
+    ---)
+    rl Specification
+       {
+           Protocol
+            {
+                N . A -> B : TA |- TB .[LN]
+                S:Stmts
+            }
+            SS:SubSection
+       }
+       [DEFS]
+       [A |-> {INA} :: FSA :: [MSA | nil]{OUTA} &
+        B |-> {INB} :: FSB :: [MSB | nil]{OUTB} &
+        SP:StrandData]
+       =>
+       Specification
+       {
+           Protocol
+            {
+                S:Stmts
+            }
+            SS:SubSection
+       }
+       [DEFS]
+       [A |-> {INA} :: FSA, $fresh($applyDefs(TA, DEFS)) :: 
+            [MSA, +($applyDefs(TA, DEFS)) | nil] {OUTA} &
+        B |-> {INB} :: FSB :: [MSB, -($applyDefs(TB, DEFS)) | nil]{OUTB} &
+        SP:StrandData] .
+
+
+        ---(
+            $fresh extracts the variables of sort fresh from the passed 
+            term [note that all terms passed to this function are user-defined
+            terms, which must all be a subsort of Msg].
+        ---)
+        op $fresh : Msg -> FreshSet .
+        eq $fresh(T:Msg) = $fresh(upTerm(T:Msg), empty) .
+
+        ---(
+        The first argument represents the list of terms that need to be 
+        searched through for fresh variables, while the second argument 
+        accumulates any found fresh variables.
+        ---)
+        op $fresh : TermList TermList -> FreshSet .
+
+        ---These three rules are the base cases: a single variable, or a 
+        ---single constant.
+        ceq $fresh(T:Variable, TL:TermList) = $downFresh((T:Variable, TL:TermList)) 
+        if getType(T:Variable) == 'Fresh .
+        ceq $fresh(T:Variable, TL:TermList) = $downFresh(TL:TermList) 
+        if getType(T:Variable) =/= 'Fresh .
+        eq $fresh(T:Constant, TL:TermList) = $downFresh(TL:TermList) .
+
+        ---The first equation deals with the case where the termlist to
+        ---be checked for Fresh variables contains a single term of the
+        ---form f(t_1, t_2, ..., t_n) (which is not a base case, because we 
+        ---need to check t_1, t_2, ..., t_n).
+        eq $fresh(F:Qid[TL:TermList], TL1:TermList) = 
+           $fresh(TL:TermList, TL1:TermList) .
+        eq $fresh((F:Qid[TL:TermList], TL2:TermList), TL1:TermList) = 
+           $fresh((TL:TermList, TL2:TermList), TL1:TermList) .
+
+        ceq $fresh((T:Variable, TL:TermList), TL1:TermList) = 
+           $fresh(TL:TermList, (T:Variable, TL1:TermList)) 
+           if getType(T:Variable) == 'Fresh /\ TL:TermList =/= empty .
+        ceq $fresh((T:Variable, TL:TermList), TL1:TermList) = 
+           $fresh(TL:TermList, TL1:TermList) 
+           if getType(T:Variable) =/= 'Fresh /\ TL:TermList =/= empty .
+        ceq $fresh((T:Constant, TL:TermList), TL1:TermList) = 
+            $fresh(TL:TermList, TL1:TermList) 
+            if TL:TermList =/= empty .
+
+        ---(
+            Given a list of terms representing variables of sort Fresh, 
+            calls downterm on each variable, allowing us to then add them 
+            to a role's strand.
+        ---)
+        op $downFresh : TermList -> FreshSet .
+        ---This should never appear in the output, even if the user writes
+        ---something incorrectly.
+        op $error : -> Fresh .
+        eq $downFresh((T:Variable, TL:TermList)) = downTerm(T:Variable, $error), 
+            $downFresh(TL:TermList) .
+        eq $downFresh(empty) = nil .
+
+        eq F:Fresh, F:Fresh, FS:FreshSet = F:Fresh, FS:FreshSet .
+
+endm
+
+mod INTRUDER-SEMANTICS is
+    protecting INTRUDER-SYNTAX .
+    protecting SECTION-SEMANTICS .
+    protecting PROTOCOL-SEMANTICS .
+
+    var DEFS : Definitions .
+
+    ---mb Intruder {IS:IntStmts} : IntruderSection .
+
+    ---(
+        Syntactic desugaring. The standard form of an intruder rule is
+        MS => M where MS is a [possibly empty] set of messages, and M is a 
+        single message.
+        These equations put every intruder capability into that form.
+    ---)
+    eq => MS:MsgSet .[N:Nat] = emptyMsgSet => MS:MsgSet .[N:Nat] .
+    eq MS:MsgSet => M:Msg, M1:Msg, MS1:MsgSet .[N:Nat] 
+       = 
+       MS:MsgSet => M:Msg .[N:Nat] 
+       MS:MsgSet => M1:Msg, MS1:MsgSet .[N:Nat] .
+    eq MS:MsgSet => emptyMsgSet .[N:Nat] = pass . 
+    eq MS1:MsgSet <=> MS2:MsgSet .[N:Nat] = (MS1:MsgSet => MS2:MsgSet .[N:Nat]
+                                             MS2:MsgSet => MS1:MsgSet .[N:Nat]) . 
+
+    ---(
+        Generates the intruder strand from a single intruder capability. 
+        The function signedList constructs a list of signed messages in 
+        the structure demanded by a strand [a strand's structure is a bit
+        more complicated than you would expect, because the use of narrowing
+        keeps us from making the list of messages in a strand associative].
+    ---)
+    rl [IntruderConversion] :
+        Specification
+        {
+            Intruder
+            {
+                MS:MsgSet => M:Msg .[N:Nat]
+                IS:Stmts
+            }
+            SS:SubSection 
+        }
+        [SS:StrandSet]
+        [DEFS]
+        =>
+        [DEFS]
+        [:: $fresh(M:Msg) :: 
+            [ (nil).SMsgList-L | $signedList($applyDefs(MS:MsgSet, DEFS), 
+                $applyDefs(M:Msg, DEFS))] & SS:StrandSet]
+        Specification
+        {
+            Intruder{ IS:Stmts }
+            SS:SubSection
+        } .
+
+        ---(
+        Given a set of messages, m_1, m_2, ..., m_n and a single message, m,
+        returns a signed list of messages: -[m_1], -[m_2], ..., -[m_n], +[m].
+        Note this function is technically not a function, because the same
+        set can generate different functions depending on the order in which
+        elements are removed from the set. However, the order of received
+        messages does not matter for intruder strands, so this nondeterminism 
+        doesn't affect the semantics of the specification.
+
+        Note that a SMsgList-R list is considered right associative for parsing
+        purposes, meaning you can only extract and append messages from the 
+        front of the list, not the back.
+        ---)
+        op $signedList : MsgSet Msg -> SMsgList-R .
+        op $signedList : MsgSet SMsgList-R -> SMsgList-R .
+        eq $signedList(MS:MsgSet, M:Msg) = $signedList(MS:MsgSet, (+(M:Msg), nil)) .
+        eq $signedList((M:Msg, MS:MsgSet), SMR:SMsgList-R) =
+            $signedList(MS:MsgSet, (-(M:Msg), SMR:SMsgList-R)) .
+        eq $signedList(emptyMsgSet, SMR:SMsgList-R) = SMR:SMsgList-R .
+
+    eq S:Strand & S:Strand = S:Strand .
+
+    eq Specification{Intruder{pass} SS:SubSection} = 
+        Specification{$emptyIntruder SS:SubSection} .
+
+endm
+
+
+mod ATTACK-SEMANTICS is
+    protecting SECTION-SEMANTICS .
+    protecting META-TERM .
+    protecting ATTACK-SYNTAX .
+    protecting PROTOCOL-SEMANTICS .
+
+    var P : Role .
+
+    ---This equation builds the set of attack data that the translation
+    ---rules depended on. By waiting until the Protocol section has been
+    ---translated before creating the empty set of attack data, we can
+    ---guarantee that the Attack section won't be processed, until the 
+    ---Protocol section has been fully translated.
+    eq Specification { Protocol { pass } SS:SubSection } = 
+        [$emptyAttackData] Specification { $emptyProtocol SS:SubSection }  .
+
+            
+    var DEFS : Definitions .
+    var N : Nat .
+
+    ---(
+    Builds attacks that have at least one without block.
+    The variable declarations in brackets are actually terms that allow us to 
+    add variables to the attack states, without forcing the user to provide
+    to the original term to be translated.
+    These declarations will be added to the Maude module when constructing
+    the module.
+    ---)
+    rl [translateAttacksWithNeverPattern] :
+    Specification
+    {
+        Attacks{
+            N .{CA:CoreAttack WA:WithoutBlocks}
+            A:Stmts
+        }
+        SS:SubSection 
+    }
+    [DEFS]
+    [SP:StrandData]
+    [AT:AttackData]
+    =>
+    [DEFS]
+    [SP:StrandData]
+    Specification {Attacks{ A:Stmts} SS:SubSection}
+    [var S : StrandSet .] 
+    [var K : IntruderKnowledge .]
+    [var LIST : SMsgList-R .]
+    [ AT:AttackData
+        [N:Nat |-> $genAttackStrands(CA:CoreAttack, $subst(CA:CoreAttack, DEFS),  SP:StrandData, DEFS)
+               ||  $genIntruderKnowledge(CA:CoreAttack, $subst(CA:CoreAttack, DEFS), DEFS)
+               ||  nil
+               ||  nil
+               ||  never($genNeverPatterns(WA:WithoutBlocks, SP:StrandData, DEFS))]] .
+    
+
+---(
+Builds attacks that don't have any without blocks. Other than the processing
+of without blocks, this and the previous rule are identical.
+---)
+rl [translateAttackWithoutNever] :
+    Specification
+    {
+        Attacks{
+            N .{CA:CoreAttack}
+            A:Stmts
+        }
+        SS:SubSection 
+    }
+    [SP:StrandData]
+    [DEFS]
+    [AT:AttackData]
+    =>
+    [var S : StrandSet .] 
+    [var K : IntruderKnowledge .]
+    [var LIST : SMsgList-R .]
+    [SP:StrandData]
+    [DEFS]
+    Specification {Attacks{A:Stmts} SS:SubSection}
+    [AT:AttackData 
+        [N:Nat |->    $genAttackStrands(CA:CoreAttack, $subst(CA:CoreAttack, DEFS), SP:StrandData, DEFS)
+               || $genIntruderKnowledge(CA:CoreAttack, $subst(CA:CoreAttack, DEFS), DEFS)
+               || nil
+               || nil
+               || nil]] .
+
+    eq [V:VarDecl] [V:VarDecl] = [V:VarDecl] .
+
+    ---(
+    Given a set of core attack statements (intruder knowledge, execution
+    statements, substitutions, and constraints), a substitution, the set of
+    strands computed while translating the Protocol section, and the user-defined
+    definitions, returns a set of strands [instantiated by the second argument]
+    that correspond to the execution statements in the first argument.
+    So if we have the following execution statements:
+    A executes protocol .
+    B executes protocol .
+    and the substitution theta, then
+    we get the set of strands 
+    s_A\theta & s_B\theta
+    where s_A is A's strand, and s_B is B's strand.
+    ---)
+    op $genAttackStrands : CoreAttack Mappings StrandData Definitions ~> StrandSet .
+    vars IN OUT : MsgSet .
+    eq $genAttackStrands(R:Role executes protocol .[N] CA:CoreAttack, 
+        M:Mappings, R:Role |-> {IN}S:Strand{OUT} & SD:StrandData, DEFS)
+    = 
+      $applyMapping($applyDefs(S:Strand, DEFS), M:Mappings) &  
+       $genAttackStrands(CA:CoreAttack, M:Mappings, SD:StrandData, DEFS) .
+
+    eq $genAttackStrands(R:Role executes up to N1:Nat .[N] CA:CoreAttack,
+        M:Mappings, R:Role |-> {IN}S:Strand{OUT} & SD:StrandData, DEFS)
+    =
+        $applyMapping($applyDefs($prefix(S:Strand, N1:Nat), DEFS), M:Mappings) &
+        $genAttackStrands(CA:CoreAttack, M:Mappings, SD:StrandData, DEFS) .
+
+    ceq $genAttackStrands(CA:CoreAttack, M:Mappings, SD:StrandData, DEFS) = empty 
+    if  not $hasExecutionStmt(CA:CoreAttack) .
+
+    eq $genAttackStrands(CA:CoreAttack, M:Mappings, SD:StrandData, DEFS) = empty [owise] .
+
+
+    op $hasExecutionStmt : CoreAttack -> Bool .
+    eq $hasExecutionStmt(R:Role executes protocol .[N] CA:CoreAttack) = true .
+    eq $hasExecutionStmt(R:Role executes up to N1:Nat . [N] CA:CoreAttack) = true .
+    eq $hasExecutionStmt(CA:CoreAttack) = false [owise] .
+        
+
+    ---(
+        Given a Strand, :: r1 :: [m_1, m_2, ..., m_l] and a natural number
+        n < l, returns a prefix of the strand of the form:
+            :: r1 :: [m_1, m_2, ..., m_n | L] where L is a variable 
+            representing a list of signed messages.
+    ---)
+    op $prefix : Strand Nat -> Strand .
+    op $prefixList : SMsgList-L Nat -> SMsgList-L .
+    eq $prefix(:: r1:FreshSet :: [L:SMsgList-L | nil], N) = :: r1:FreshSet :: [$prefixList(L:SMsgList-L, N) | LIST] .
+
+    ---All of this "makeAssoc" and "makeRightAssoc" is necessary because
+    ---strand lists aren't associative (because associative lists have 
+    ---infinitary unification algorithms). In fact, an SMsgList-L is 
+    ---considered left associative, meaning that you can only pluck 
+    ---messages off the end. Not exactly useful when you need the FIRST 
+    ---n messages in the list.
+    eq $prefixList(L:SMsgList-L, N:Nat) = $makeLeftAssoc($prefix($makeAssoc(L:SMsgList-L), N:Nat)) .
+
+        
+    sort $SMsgList .
+    subsort SMsg < $SMsgList .
+    op $makeAssoc : SMsgList-L -> $SMsgList .
+    op _$;$_ : SMsg SMsg -> $SMsgList [assoc id: $nil] .
+    op $nil : -> $SMsgList .
+    eq $makeAssoc((L:SMsgList-L, M:SMsg)) = $makeAssoc(L:SMsgList-L) $;$ M:SMsg .
+    eq $makeAssoc(nil) = $nil .
+
+    op $prefix : $SMsgList Nat -> $SMsgList .
+    eq $prefix(M:SMsg $;$ L:$SMsgList, s(N)) = M:SMsg $;$ $prefix(L:$SMsgList, N) .
+    eq $prefix(L:SMsgList, 0) = $nil .
+
+    op $makeLeftAssoc : $SMsgList -> SMsgList-L .
+    eq $makeLeftAssoc(L:$SMsgList $;$ M:SMsg) = 
+        $makeLeftAssoc(L:$SMsgList), M:SMsg .
+    eq $makeLeftAssoc($nil) = nil .  
+
+    vars N1 N2 N3 N4 : Nat .
+
+    ---(
+    Given a set of core attack statements, and a set of definitions, returns
+    an idempotent substitution that has been built from the substitution 
+    statements in 
+    argument 1, and has had the definitions applied to its range. 
+
+    Third argument is the list of line numbers on which the first substitution appears.
+
+    This function, also checks to make sure that the generated substitution
+    is a valid order-sorted substitution.
+    ---)
+    op $subst : CoreAttack Definitions -> Mapping .
+    eq $subst(CA:CoreAttack, DEFS) = $makeIdem($isValid($extractMappings(CA:CoreAttack, DEFS)), 
+        $mappingLineNums(CA:CoreAttack)) .
+
+    ---(
+    Given a set of core attack statements, extracts all of the substitution
+    statements Subst(A) = v_1 |-> t_1, v_2 |-> t_2, ... , v_m |-> t_m .[n], and
+    constructs a set of mappings
+    v_1 |-> ${t_1 ; n}$, v_2 |-> ${t_2 ; n}$, ... , v_m |-> ${t_m ; v_m}$ that
+    associates to each range message t_i the line on which v_i |-> t_i is
+    defined. This information will be needed when printing error messages
+    about poorly formed substitutions.
+    ---)
+    op $extractMappings : CoreAttack Definitions -> MsgPairs .
+    
+    eq $extractMappings(Subst(R:Role) = M:Mappings .[N] CA:CoreAttack, DEFS) = 
+        $buildMsgPairs(M:Mappings, N, DEFS) $extractMappings(CA:CoreAttack, DEFS) .
+    eq $extractMappings(CA:CoreAttack, DEFS) = $none [owise] .
+
+    ---(
+    Given a core attack, returns the list of line numbers on which the substitutions appear.
+    ---)
+    op $mappingLineNums : CoreAttack -> MyNatList .
+    eq $mappingLineNums(Subst(R:Role) = M:Mappings .[N] CA:CoreAttack) = N : $mappingLineNums(CA:CoreAttack) .
+    eq $mappingLineNums(CA:CoreAttack) = mt [owise] .
+
+
+    ---(
+    Given a set of mappings, a natural number representing the line number on
+    which the mappings were defined, and the user-defined definitions, this
+    function appends the passed line number to the range of each mapping, 
+    encoding the line number on which that particular pair was declared. It
+    also applies the definitions to the range of each pair.
+    ---)
+    op $buildMsgPairs : Mappings Nat Definitions -> MsgPairs .
+    eq $buildMsgPairs((M:Msg |-> M1:Msg, MS:Mappings), N:Nat, DEFS) = 
+        M:Msg |-> ${$applyDefs(M1:Msg, DEFS) ; N:Nat}$ $buildMsgPairs(MS:Mappings, N:Nat, DEFS) .
+    eq $buildMsgPairs(M:Msg |-> M1:Msg, N:Nat, DEFS) = M:Msg |-> ${$applyDefs(M1:Msg, DEFS) ; N:Nat}$ .
+    eq $buildMsgPairs(id, N:Nat, DEFS) = $none .
+
+    var L : MyNatList .
+  
+    ---(
+    First argument is the list of mappings to be validated. Note that the line numbers are already encoded inside the MsgPairs, so
+    we don't need to separately track the line numbers.
+    ---)
+    op $isValid : MsgPairs -> Mappings .
+    eq $isValid(M:MsgPairs) = $checkSorts($isFunction(M:MsgPairs)) .
+
+    ---(
+    Line numbers are already encoded in the $$$notAFunction error term, so we don't need to encode them separately.
+    ---)
+    op $isFunction : MsgPairs -> MsgPairs .
+    eq $isFunction(M:Msg |-> ${M1:Msg ; N1:Nat}$ M:Msg |-> ${M2:Msg ; N2:Nat}$ 
+        MS:MsgPairs) 
+    = 
+        if M1:Msg == M2:Msg 
+        then 
+            $isFunction(M:Msg |-> ${M1:Msg ; N1:Nat}$ MS:MsgPairs) 
+        else
+            $$$notAFunction(M:Msg |-> ${M1:Msg ; N1:Nat}$ ${M2:Msg ; N2:Nat}$
+                $isFunction(M:Msg |-> ${M1:Msg ; N1:Nat}$ MS:MsgPairs)) 
+        fi .
+    eq $isFunction(MS:MsgPairs) = MS:MsgPairs [owise] .
+    
+    ---We only care about those mappings that have more than mapping. Anything
+    ---with a single result term is not ambiguous, and is left over from how
+    ---we implemented $isFunction.
+    eq $$$notAFunction(M:Msg |-> ${M1:Msg ; N1:Nat}$ MS:MsgPairs) =
+        $$$notAFunction(MS:MsgPairs) .
+    eq $$$notAFunction($$$notAFunction(MS1:MsgPairs) MS2:MsgPairs) = 
+        $$$notAFunction(MS1:MsgPairs MS2:MsgPairs) .
+    eq $$$notAFunction(M:Msg |-> MN1:MsgNumSet M:Msg |-> MN2:MsgNumSet 
+        MS:MsgPairs) 
+    =
+        $$$notAFunction(M:Msg |-> MN1:MsgNumSet MN2:MsgNumSet MS:MsgPairs) .
+        
+        
+    
+    ---Checks to make sure each mapping is a valid order-sorted substitution.
+    op $checkSorts : MsgPairs -> Mappings .
+    eq $checkSorts(M:Msg |-> ${M1:Msg ; N}$ MS:MsgPairs) = 
+        $isValidPair(M:Msg, M1:Msg, N), $checkSorts(MS:MsgPairs) .
+
+    eq $checkSorts($none) = id .
+
+    ---Checks if the sort of the first argument is a supersort of the sort of
+    ---the second arugment.
+    op $isValidPair : Msg Msg Nat -> Mapping .
+    ceq $isValidPair(D:Msg, R:Msg, N) = 
+        if sortLeq(META-MOD:Module, getType(metaReduce(META-MOD:Module, upTerm(R:Msg))), getType(metaReduce(META-MOD:Module, upTerm(D:Msg))))
+        then
+            D:Msg |-> R:Msg
+        else
+            $$$invalidSorting(D:Msg |-> ${R:Msg ; N}$)
+        fi 
+    if META-MOD:Module := upModule('PROTOCOL-EXAMPLE-SYMBOLS, false) .
+
+    ---Given a mapping, returns the idempotent version, by applying the
+    ---mapping to itself until we reach a fixed point.
+    ---Second argument is the line number on which the mapping appears
+    op $makeIdem : Mappings MyNatList -> Mappings .      
+    eq $makeIdem(id, L) = id .
+    eq $makeIdem(M:Mappings, L) = $makeIdem(M:Mappings, M:Mappings, false, 0, L) [owise] .
+
+    ---First argument is the original mapping
+    ---Second argument is the partially idempotenized mapping
+    ---Third argument is how many times we've applied the original mapping
+    ---to the idempotenized mapping.
+    ---Fourth argument indicates whether or not we've reached the fixpoint.
+    ---Fifth argument is the list of line numbers on which the substituions that make up the mapping appear.
+    ---Result is the idempotenized mapping.
+    op $makeIdem : Mappings Mappings Bool Nat MyNatList -> Mappings .
+    eq $makeIdem(M:Mappings, M1:Mappings, true, N, L:MyNatList) = M1:Mappings .
+    eq $makeIdem(M:Mappings, M1:Mappings, false, 101, L:MyNatList) = 
+        $$$infiniteIdem(M:Mappings, L:MyNatList) .
+    ceq $makeIdem(M:Mappings, M1:Mappings, false, N:Nat, L:MyNatList) = 
+        $makeIdem(M:Mappings, M2:Mappings, M1:Mappings == M2:Mappings, s(N:Nat), L:MyNatList)
+    if  M2:Mappings := $applyMapping(M:Mappings, M1:Mappings) /\ N:Nat < 101 .
+
+---(
+    op _===_ : Mappings Mappings -> Bool .
+    eq M:Mappings === M:Mappings = true .
+    eq M:Mappings === M1:Mappings = false [owise] .
+---)
+    ---Applies the first mapping to the range of the second mapping, and
+    ---returns the resultant mapping.
+    op $applyMapping : Mappings Mappings -> Mappings .
+    op $msgError : -> [Msg] .
+    eq $applyMapping(M2:Mappings, (N:Msg |-> N1:Msg, M:Mappings)) = 
+        N:Msg |-> downTerm($applyMapping1(upTerm(N1:Msg), M2:Mappings), $msgError), 
+        $applyMapping(M2:Mappings, M:Mappings) .
+    ---Here we are treating id as the base case of the recursion, not as 
+    ---an empty substitution. Technically, idM should be M, not id. However,
+    ---the equation $applyMapping(M, id) = M would have the effect of copying
+    ---M into the composed substitution, which is most definitely not what
+    ---we want, because this would end up duplicating some mappings, and
+    ---creating ambiguity for others.
+    eq $applyMapping(M:Mappings, id) = id .
+
+    ---If we go too many iterations of self-application without hitting
+    ---idempotency, then this error gets added to the TranslationData pool.
+    op $$$infiniteIdem : Mappings MyNatList -> [Mappings] .
+
+    ---op $$$missingSubstitution : MsgSet Mappings Nat -> [Strand] .   
+
+    ---(
+    The following are a group of very messy functions that instantiate the 
+    passed strand with the passed mapping. 
+
+    Here be dragons. 
+    ---)
+    op $applyMapping : Strand Mappings ~> Strand .
+    eq $applyMapping(S:Strand, id) = S:Strand .
+    eq $applyMapping(S:Strand, M:Mappings) = 
+        $applyMapping(upTerm(S:Strand), M:Mappings) [owise] .
+
+    op $applyMapping : Term Mappings ~> Strand .
+    op $error : Term -> Strand .
+    eq $applyMapping(T:Term, id) = downTerm(T:Term, $error(T:Term)) [print "Strand meta: " T:Term] .
+    eq $applyMapping('::_::`[_|_`][F:Term, ML:Term, 'nil.SMsgList-R], M:Mappings) =
+        downTerm('::_::`[_|_`][F:Term, $applyMapping1(ML:Term, M:Mappings), 
+            'nil.SMsgList-R], 
+            $error('::_::`[_|_`][F:Term, $applyMapping1(ML:Term, M:Mappings), 
+            'nil.SMsgList-R])) [owise print "Strand meta term list: " ML:Term] .
+
+    op $applyMapping1 : TermList Mappings ~> TermList .
+    var M : Mappings .
+    var T : Term .
+    var TL TL1 : TermList .
+    var F : Qid .
+    vars M1 M2 : Msg .
+    op $error : -> Msg .
+    ---op $applyMapping2 : TermList Mappings -> TermList .
+    var T1 : Term .
+    eq $applyMapping1(TL:TermList, id) = TL:TermList .
+    ceq $applyMapping1((T, TL), (M1 |-> M2, M)) = T1, 
+        $applyMapping1(TL, (M1 |-> M2, M)) 
+    if downTerm(T, $error) == M1 /\ 
+       T1 := upTerm(M2) /\ 
+       M3:Msg := downTerm(T, $error) [print "Downterm: " M3:Msg] .
+    eq $applyMapping1((F[TL], TL1), M) = 
+        F[$applyMapping1(TL, M)], $applyMapping1(TL1, M) [owise] .
+    eq $applyMapping1((C:Constant, TL), M) = 
+        C:Constant, $applyMapping1(TL, M) [owise] .
+    eq $applyMapping1((V:Variable, TL), M) = 
+        V:Variable, $applyMapping1(TL, M) [owise] .
+    eq $applyMapping1(empty, M) = empty .
+
+    op $applyDefs : Mappings Definitions -> Mappings .
+    eq $applyDefs(M:Mappings, $noDefs) = M:Mappings .
+    eq $applyDefs(id, D:Definitions) = id .
+    eq $applyDefs((M1:Msg |-> M2:Msg, MP:Mappings), D:NeDefinitions) = 
+        $applyDefs(M1:Msg, D:NeDefinitions) |-> $applyDefs(M2:Msg, D:NeDefinitions), 
+        $applyDefs(MP:Mappings, D:NeDefinitions) .
+    eq $applyDefs(M1:Msg |-> M2:Msg, D:NeDefinitions) = 
+        $applyDefs(M1:Msg, D:NeDefinitions) |-> $applyDefs(M2:Msg, D:NeDefinitions) .
+
+    ---(
+    Given a set of core attack statements, a set of mappings, and a set of 
+    definitions, returns a sequence of disequality constraints and inI 
+    statements to use as an attack's intruder knowledge.
+    ---)
+    op $genIntruderKnowledge : CoreAttack Mappings Definitions -> IntruderKnowledge .
+    eq $genIntruderKnowledge((Intruder learns MS:MsgSet .[N]) CA:CoreAttack, M:Mappings, DEFS)
+    =
+        $msgSetToInI($applyMapping($applyDefs(MS:MsgSet, DEFS), M:Mappings)),
+        $genIntruderKnowledge(CA:CoreAttack, M:Mappings, DEFS) .
+
+    eq $genIntruderKnowledge(With constraints I:Disequalities .[N] CA:CoreAttack,
+        M:Mappings, DEFS)
+    =
+       $ineqToKnow-!=($applyMapping($applyDefs(I:Disequalities, DEFS), M:Mappings)),
+       $genIntruderKnowledge(CA:CoreAttack, M:Mappings, DEFS) .
+    eq $genIntruderKnowledge(CA:CoreAttack, M:Mappings, DEFS) = empty .
+
+    ---(
+    Converts disequalities into disequalities in Maude-NPA. We don't use
+    IntruderKnowledge-!= directly because of issues with pre-regularity and
+    garbage and stuff. I are eloquent!
+    ---)
+    op $ineqToKnow-!= : Disequalities -> IntruderKnowledge-!= .
+
+    eq $ineqToKnow-!=(M1:Msg $!= M2:Msg, I:Disequalities) = M1:Msg != M2:Msg, $ineqToKnow-!=(I:Disequalities) .
+    eq $ineqToKnow-!=($noIneq) = empty .
+
+    op $applyMapping : Disequalities Mappings -> Disequalities .
+    eq $applyMapping((M1:Msg $!= M2:Msg, I:Disequalities), M:Mappings) 
+    = 
+        $applyMapping(M1:Msg, M:Mappings) $!= $applyMapping(M2:Msg, M:Mappings), 
+        $applyMapping(I:Disequalities, M:Mappings) .
+    eq $applyMapping($noIneq, M:Mappings) = $noIneq .
+
+        
+
+    op $applyDefs : Disequalities Definitions -> Disequalities .
+    eq $applyDefs((M1:Msg $!= M2:Msg, I:Disequalities), D:Definitions) = 
+        $msgToDisEq($applyDefs($disEqToMsg(M1:Msg $!= M2:Msg), D:Definitions)),
+        $applyDefs(I:Disequalities, D:Definitions) .
+
+    eq $applyDefs(M1:Msg $!= M2:Msg, D:Definitions) = 
+        $msgToDisEq($applyDefs($disEqToMsg(M1:Msg $!= M2:Msg), D:Definitions)) .
+
+    ---(
+    Converts a set of disequalities to MsgSets, which allows us to use the 
+    applyDefs defined for sets of messages.
+
+    Note that I could have defined an applyDefs function that actually
+    handled disequalities directly instead of defining the following two
+    (partial) functions, but I'm a lazy bum.
+    ---)
+    op $disEqToMsg : Disequality -> MsgSet .
+    eq $disEqToMsg(M1:Msg $!= M2:Msg) = M1:Msg, M2:Msg .
+
+    ---(
+    Converts a pair of messages into a Disequality. Note that this operator
+    is only defined for message sets of size 2. This partial function is 
+    invoked after we've finished applying definitions to the messages in the
+    Disequality.
+    ---)
+    op $msgToDisEq : MsgSet ~> Disequality .
+    eq $msgToDisEq((M1:Msg, M2:Msg)) = M1:Msg $!= M2:Msg .
+
+    ---(
+    Pretty sure this was implemented as part of instantiating the inI 
+    statements (which started out as a set of messages), and we're leveraging
+    it for the Disequalities as well.
+    ---)
+    op $applyMapping : MsgSet Mappings ~> MsgSet .
+    op $errorMsgSet : -> MsgSet .
+    eq $applyMapping(MS:MsgSet, MP:Mappings) = 
+        downTerm($applyMapping1(upTerm(MS:MsgSet), MP:Mappings), $errorMsgSet) .
+
+    op $msgSetToInI : MsgSet -> IntruderKnowledge .
+    eq $msgSetToInI((M:Msg, MS:MsgSet)) = M:Msg inI, $msgSetToInI(MS:MsgSet) .
+    eq $msgSetToInI(emptyMsgSet) = empty .
+
+    ---(
+        &&&
+        Given a set of without blocks, the strand data computed by processing
+        the Protocol section, and a set of user-provided definitions, generates
+        a set of never patterns.
+    ---)
+    op $genNeverPatterns : WithoutBlocks StrandData Definitions ~> NeverPatternSet .
+    eq $genNeverPatterns(without: CA:CoreAttack WB:WithoutBlocks,
+        SD:StrandData, DEFS)
+    =
+       $neverPattern(CA:CoreAttack, $subst(CA:CoreAttack, DEFS), SD:StrandData, DEFS)
+       $genNeverPatterns(WB:WithoutBlocks, SD:StrandData, DEFS) .
+    eq $genNeverPatterns(without: CA:CoreAttack, SD:StrandData, DEFS)
+    =
+       $neverPattern(CA:CoreAttack, $subst(CA:CoreAttack, DEFS), SD:StrandData, DEFS) .
+
+    ---(
+        Given a core attack (hopefully extracted from a without block), a 
+        substitution, the strand data computed from the Protocol section, and
+        the user provided definitions, returns a never pattern.
+    ---)
+    op $neverPattern : CoreAttack Mappings StrandData Definitions ~> NeverPattern  .
+    eq $neverPattern(CA:CoreAttack, M:Mappings, SD:StrandData, DEFS) 
+    =
+       $genAttackStrands(CA:CoreAttack, M:Mappings, SD:StrandData, DEFS) & S
+       || $genIntruderKnowledge(CA:CoreAttack, M:Mappings, DEFS), K .
+
+    ---This is used to indicate that we can begin converting the parsed data into
+    ---the Maude-NPA modules.
+    eq Specification{Attacks{pass} SS:SubSection} = 
+        Specification{$emptyAttacks SS:SubSection} .
+
+endm
+
+mod SPECIFICATION-SEMANTICS is
+    protecting SECTION-SEMANTICS .
+    protecting PROTOCOL-SEMANTICS .
+    protecting INTRUDER-SEMANTICS .
+    protecting ATTACK-SEMANTICS .
+endm
+
+mod PSL-SEMANTICS is
+    protecting PSL-SYNTAX .
+    protecting SPECIFICATION-SEMANTICS .
+endm
+
+---Translates the Translated Data into a Maude-NPA module .
+fmod TRANSLATION-TO-MAUDE-NPA-HELPER-FUNCTIONS-SEMANTICS is
+    protecting TRANSLATION-TO-MAUDE-NPA-SYNTAX .
+
+    ---(
+        Transforms Strand Data into sets of strand suitable for use as
+        a protocol specification.
+    ---)
+    op convert : StrandData -> StrandSet .
+
+    eq convert(A:Role |-> {IN:MsgSet} S:Strand {OUT:MsgSet} & SP:StrandData)
+        = shiftBarLeft(S:Strand) & convert(SP:StrandData) .
+    eq convert(mt) = empty .
+
+    eq shiftBarLeft(:: F:FreshSet :: [L:SMsgList-L, M:SMsg | R:SMsgList-R ]) = 
+        shiftBarLeft(:: F:FreshSet :: [L:SMsgList-L | M:SMsg, R:SMsgList-R]) .
+    eq shiftBarLeft(:: F:FreshSet :: [nil | R:SMsgList-R]) = 
+        :: F:FreshSet :: [nil | R:SMsgList-R] .
+
+    eq shiftBarLeft(:: F:FreshSet :: [L:SMsgList-L, S:Synchro | R:SMsgList-R ]) =
+        shiftBarLeft(:: F:FreshSet :: [L:SMsgList-L | S:Synchro, R:SMsgList-R]) .
+
+    ---(
+    Converts translated attack data into a list of attack states.
+    ---)
+    op convert : AttackData -> AttackList .
+    eq convert([N:Nat |-> A:System] AD:AttackData) = 
+        (eq ATTACK-STATE(N:Nat) = A:System [nonexec] .) 
+        convert(AD:AttackData) .
+    eq convert($emptyAttackData) = $emptyAttackList .
+
+    ---Once we've finished building the Maude-NPA module, we eliminate 
+    ---everything else. Including YOUR FACE!!!! 
+    ops D-X NOTHING! : -> TranslationData .
+    eq D-X = NOTHING! .
+    
+    ceq M:ModuleNPA TD:TranslationData = M:ModuleNPA 
+    if TD:TranslationData =/= mt .
+        
+endfm
+
+
+
+mod TRANSLATION-TO-MAUDE-NPA is 
+    protecting PSL-SEMANTICS .
+    protecting TRANSLATION-TO-MAUDE-NPA-HELPER-FUNCTIONS-SEMANTICS .
+    protecting TRANSLATION-TO-MAUDE-NPA-SYNTAX .
+
+    ---(
+    Wraps all the variable declarations that need to be part of the 
+    Maude-NPA module inside a single operator, for ease of access 
+    later.
+    ---)
+    op $varList : VarDecls -> TranslationData .
+
+    eq Specification{$emptyProtocol $emptyIntruder $emptyAttacks} 
+    = $translate $varList($emptyAttackList) .
+
+    eq [V:VarDecl] $varList($emptyAttackList) = $varList(V:VarDecl) .
+    eq [V:VarDecl] $varList(VL:VarDecls) = $varList(V:VarDecl VL:VarDecls) . 
+        
+
+    ---The presence of the $translate constant (added by the equation above) 
+    ---ensures that we don't try to construct the Maude-NPA module until
+    ---the PSL specification has been fully translated.
+    rl [TranslationDataToMaudeNPASyntax] : 
+        $translate [SP:StrandData] [SS:StrandSet] 
+        $varList(V:VarDecls) 
+        [[N:Nat |-> S:System] AT:AttackData]
+    =>
+    (fmod PROTOCOL-SPECIFICATION is 
+        protecting PROTOCOL-EXAMPLE-SYMBOLS .
+        protecting DEFINITION-PROTOCOL-RULES .
+        protecting DEFINITION-CONSTRAINTS-INPUT .
+        eq STRANDS-DOLEVYAO = SS:StrandSet [nonexec] .
+        eq STRANDS-PROTOCOL =  convert(SP:StrandData) [nonexec] .
+        (V:VarDecls 
+        convert([N:Nat |-> S:System] AT:AttackData))
+    endfm) .
+
+    rl [TranslationDataToMaudeNPANoAttacks] : 
+        $translate [SP:StrandData] [SS:StrandSet] [$emptyAttackData]
+        $varList(V:VarDecls)
+    =>
+    (fmod PROTOCOL-SPECIFICATION is 
+        protecting PROTOCOL-EXAMPLE-SYMBOLS .
+        protecting DEFINITION-PROTOCOL-RULES .
+        protecting DEFINITION-CONSTRAINTS-INPUT .
+        eq STRANDS-DOLEVYAO = SS:StrandSet [nonexec] .
+        eq STRANDS-PROTOCOL =  convert(SP:StrandData) [nonexec] .
+        V:VarDecls
+    endfm) .
+
+    vars A B : Name .
+    vars N1 N2 : Nonce .
+    vars r1 r2 : Fresh .
+    vars X Y : Msg .
+endm
+
+---(
+This module handles protocol composition. Note that this module, and the
+one above are NOT compatible. One or the other needs to be chosen for
+rewriting in, depending on whether we're translating a standard PSL 
+specification, or a composition.
+---)
+mod COMPOSITION is
+    protecting COMPOSITION-SYNTAX .
+    protecting PSL-SEMANTICS .
+
+    ---(
+    translate wraps a copy of the specification of each protocol being
+    composed. Then, each specification is translated independently of 
+    the others. Once the translation is complete, we wrap the translated 
+    data in "translated" to mark that we're done.
+    ---)
+    eq $translate(N:Nat, Specification{$emptyProtocol $emptyIntruder $emptyAttacks} T:TranslationData) 
+    = $translated(N:Nat, T:TranslationData) .
+
+
+    vars RO1 RO2 : Role .
+    vars N M P : Nat .
+    vars IN1 IN2 OUT1 OUT2 : MsgSet .
+    vars r1 r2 : FreshSet .
+    vars L1 L2 : SMsgList-L .
+    vars R1 R2 : SMsgList-R .
+    vars T1 T2 : TranslationData .
+    vars SD1 SD2 : StrandData .
+
+    ---(
+    ceq $translated(N, [RO1 |-> {IN1} :: r1 :: [L1 | R1]{OUT1} & SD1] T1) 
+        [SD:StrandData]
+    =  
+       $translated(N, [RO1 |-> {IN1} :: r1 :: [L1 | R1]{OUT1} & SD1] T1) 
+       [RO1 |-> {IN1} :: r1 :: [L1 | R1]{OUT1} & SD:StrandData]
+    if not RO1 in SD:StrandData .
+    ---)
+    
+    vars CHILDMSG PARENTMSG : Msg .
+
+    op compose : How Role Role -> CompType . 
+
+    vars L3 L4 : SMsgList-L .
+    vars R3 R4 : SMsgList-R .
+    ---eq RO1 ;1 RO2 = compose(1-1, RO1, RO2) .
+    ---eq RO1 ;* RO2 = compose(1-*, RO1, RO2) .
+
+    ---One to one
+    ---Note that if we're composing more than two protocols, it may be the
+    ---case that a parent strand already exists, because it's the child of
+    ---a previous composition. The child strand will always
+    ---be created, however.
+    ---(
+        These rules don't handle the following case:
+        P_1-init ;1 P_2-init
+        P_1-init ;1 P2-resp
+        which say that P_1 may compose with either P_2-init or P_2-resp, but
+        only one at a time. 
+        So, we need to distinguish between adding a second potential child, and 
+        adding your first child.
+    ---)
+    crl $translated(N, [RO1 |-> {IN1} :: r1 :: [L1 | R1]{OUT1} & SD1] T1)
+        $translated(M, [RO2 |-> {IN2} :: r2 :: [L2 | R2]{OUT2} & SD2] T2)
+        [comp(N, M) |-> RO1 ;1 RO2 : M:Mappings .[P] C:Composition
+         CM:CompList] 
+        [SD:StrandData]
+        =>
+        [comp(N, M) |-> C:Composition CM:CompList]
+        $translated(N, [RO1 |-> {IN1} :: r1 :: [L1 | R1]{OUT1} & SD1] T1)
+        $translated(M, [RO2 |-> {IN2} :: r2 :: [L2 | R2]{OUT2} & SD2] T2)
+        [RO1 |-> {IN1} :: r1 :: [L1, {RO1 -> RO2 ;; 1-1 ;; PARENTMSG} | R1] {OUT1} &
+         RO2 |-> {IN2} :: r2 :: [$concat({RO1 -> RO2 ;; 1-1 ;; CHILDMSG}, L2) | R2] {OUT2} &
+         SD:StrandData]
+    if not RO1 in SD:StrandData  /\                         
+       (CHILDMSG, PARENTMSG) := $synchroMsgs(M:Mappings) .
+
+    crl $translated(N, [RO1 |-> {IN1} :: r1 :: [L1 | R1]{OUT1} & SD1] T1)
+        $translated(M, [RO2 |-> {IN2} :: r2 :: [L2 | R2]{OUT2} & SD2] T2)
+        [comp(N, M) |-> RO1 ;1 RO2 : M:Mappings .[P] C:Composition
+         CM:CompList] 
+        [RO1 |-> {IN1} :: r1 :: [L3 | R3] {OUT1} &
+        SD:StrandData]
+        =>
+        [comp(N, M) |-> C:Composition CM:CompList]
+        $translated(N, [RO1 |-> {IN1} :: r1 :: [L1 | R1]{OUT1} & SD1] T1)
+        $translated(M, [RO2 |-> {IN2} :: r2 :: [L2 | R2]{OUT2} & SD2] T2)
+        [RO1 |-> {IN1} :: r1 :: [L3, {RO1 -> RO2 ;; 1-1 ;; PARENTMSG} | R3] {OUT1} &
+         RO2 |-> {IN2} :: r2 :: [$concat({RO1 -> RO2 ;; 1-1 ;; CHILDMSG}, L2) | R2] {OUT2} &
+         SD:StrandData]
+    if (CHILDMSG, PARENTMSG) := $synchroMsgs(M:Mappings) .
+
+    ---One to many
+    ---Initial generation of strands.
+    crl $translated(N, [RO1 |-> {IN1} :: r1 :: [L1 | R1]{OUT1} & SD1] T1)
+        $translated(M, [RO2 |-> {IN2} :: r2 :: [L2 | R2]{OUT2} & SD2] T2)
+        [comp(N, M) |-> RO1 ;* RO2 : M:Mappings .[P] C:Composition
+         CM:CompList] 
+        [SD:StrandData]
+    => $translated(N, [RO1 |-> {IN1} :: r1 :: [L1 | R1]{OUT1} & SD1] T1)
+       $translated(M, [RO2 |-> {IN2} :: r2 :: [L2 | R2]{OUT2} & SD2] T2)
+       [comp(N, M) |-> C:Composition CM:CompList]
+       [RO1 |-> {IN1} :: r1 :: [L1, {RO1 -> ROLE ;; 1-* ;; PARENTMSG} | R1] {OUT1} &
+        RO2 |-> {IN2} :: r2 :: [$concat({RO1 -> RO2 ;; 1-* ;; CHILDMSG}, L2) | R2] {OUT2} &
+       SD:StrandData]
+    if (CHILDMSG, PARENTMSG) := $synchroMsgs(M:Mappings) /\
+        not RO1 in SD:StrandData .
+
+    ---This covers the case where one parent is connecting to multiple children.
+    crl $translated(N, [RO1 |-> {IN1} :: r1 :: [L1 | R1]{OUT1} & SD1] T1)
+        $translated(M, [RO2 |-> {IN2} :: r2 :: [L2 | R2]{OUT2} & SD2] T2)
+        [comp(N, M) |-> RO1 ;* RO2 : M:Mappings .[P] C:Composition
+         CM:CompList] 
+        [RO1 |-> {IN1} :: r1 :: [L3, S:Synchro | R3] {OUT1} &
+        SD:StrandData]
+    => $translated(N, [RO1 |-> {IN1} :: r1 :: [L1 | R1]{OUT1} & SD1] T1)
+       $translated(M, [RO2 |-> {IN2} :: r2 :: [L2 | R2]{OUT2} & SD2] T2)
+       [comp(N, M) |-> C:Composition CM:CompList]
+       [RO1 |-> {IN1} :: r1 :: [L3, S:Synchro | R1] {OUT1} &
+        RO2 |-> {IN2} :: r2 :: [$concat({RO1 -> RO2 ;; 1-* ;; CHILDMSG}, L2) | R2] {OUT2} &
+       SD:StrandData]
+    if CHILDMSG := $synchroMsgs(S:Synchro, M:Mappings) .
+
+    ---This covers the case where a child from a previous composition is being
+    ---used as a parent in the next composition.
+    crl $translated(N, [RO1 |-> {IN1} :: r1 :: [L1 | R1]{OUT1} & SD1] T1)
+        $translated(M, [RO2 |-> {IN2} :: r2 :: [L2 | R2]{OUT2} & SD2] T2)
+        [comp(N, M) |-> RO1 ;* RO2 : M:Mappings .[P] C:Composition
+         CM:CompList] 
+        [RO1 |-> {IN1} :: r1 :: [L3 | R3] {OUT1} &
+        SD:StrandData]
+    => $translated(N, [RO1 |-> {IN1} :: r1 :: [L1 | R1]{OUT1} & SD1] T1)
+       $translated(M, [RO2 |-> {IN2} :: r2 :: [L2 | R2]{OUT2} & SD2] T2)
+       [comp(N, M) |-> C:Composition CM:CompList]
+       [RO1 |-> {IN1} :: r1 :: [L3, {RO1 -> ROLE ;; 1-* ;; PARENTMSG} | R1] {OUT1} &
+        RO2 |-> {IN2} :: r2 :: [$concat({RO1 -> RO2 ;; 1-* ;; CHILDMSG}, L2) | R2] {OUT2} &
+       SD:StrandData]
+    if not $synchroIn(L3) /\
+       (PARENTMSG, CHILDMSG) := $synchroMsgs(M:Mappings) .
+
+    op _in_ : Role StrandData -> Bool .
+
+    eq R:Role in R:Role |-> {IN1} S:Strand {OUT1} & SD:StrandData = true .
+    eq R:Role in SD:StrandData = false [owise]. 
+
+    op $synchroIn : SMsgList-L -> Bool .
+    eq $synchroIn((L1, {R1:Role -> R2:Role ;; H:How ;; M:Msg})) = true  [print "Matching true L1:" L1] .
+    eq $synchroIn(L1) = false [owise print "Matching false L1:" L1] .
+
+    eq comp(N, M) |-> emptyComp CM:CompList = CM:CompList .
+
+    ops $compTranslateAttacks $compositionDone : -> TranslationData .
+    eq [$noCM] = $compTranslateAttacks .
+    ----TODO: Implement translating the attacks.
+    eq $compTranslateAttacks = $compositionDone .
+
+    op _in_ : Role StrandData -> Bool .
+    eq RO1 in RO1 |-> {IN:MsgSet} S:Strand {OUT:MsgSet} & SD:StrandData 
+    = true .
+    eq RO1 in SD:StrandData = false [owise] .
+
+    op $concat : Synchro SMsgList-L -> SMsgList-L .
+    eq $concat(S:Synchro, (R:SMsgList-L, M:SMsg)) = 
+        $concat(S:Synchro, R:SMsgList-L), M:SMsg .
+    eq $concat(S:Synchro, nil) = nil, S:Synchro .
+  
+    sort SynchroTuple .
+    op ((_,_)) : Msg Msg -> SynchroTuple .
+    ---Parent msg is derived from the second element in each mapping pair,
+    ---child msg from the first.
+    op $synchroMsgs : Mappings -> SynchroTuple .
+    op $synchroMsgs : Mappings SynchroTuple -> SynchroTuple .
+    vars MC MP : Msg .
+    eq $synchroMsgs((MC |-> MP, M:Mappings)) = 
+       $synchroMsgs(M:Mappings, (MC, MP)) .
+    vars MCS MPS : Msg .
+    eq $synchroMsgs((MC |-> MP, M:Mappings), (MCS, MPS)) = 
+       $synchroMsgs(M:Mappings, (MCS $; MC, MPS $; MP)) . 
+    eq $synchroMsgs(MC |-> MP, (MCS, MPS)) = (MCS $; MC, MPS $; MP) . 
+
+    op $synchroMsgs : Synchro Mappings -> Msg .
+    eq $synchroMsgs({R1:Role -> R2:Role ;; H:How ;; PARENTMSG:Msg $; MR1:Msg}, 
+       (MR2:Msg |-> MR1:Msg, M:Mappings))
+    =   
+       $synchroMsgs({R1:Role -> R2:Role ;; H:How ;; PARENTMSG}, M:Mappings) $;
+       MR2:Msg .
+    eq $synchroMsgs({R1:Role -> R2:Role ;; H:How ;; MR1:Msg}, 
+       (MR2:Msg |-> MR1:Msg, M:Mappings)) 
+    =  MR2:Msg [owise] .
+    eq $synchroMsgs({R1:Role -> R2:Role ;; H:How ;; MR1:Msg}, 
+       (MR2:Msg |-> MR1:Msg)) 
+    =  MR2:Msg [owise] .
+    
+        
+
+endm
+
+mod COMP-TRANSLATION-TO-MAUDE-NPA is
+    protecting COMPOSITION .
+    protecting TRANSLATION-TO-MAUDE-NPA-SYNTAX .
+    protecting TRANSLATION-TO-MAUDE-NPA-HELPER-FUNCTIONS-SEMANTICS .
+
+    op $createModule : -> TranslationData .
+
+    eq $compositionDone = [empty] $createModule .
+    eq  [S:StrandSet] $translated(N:Nat, [S1:StrandSet] TD:TranslationData) = 
+        [S:StrandSet & S1:StrandSet] .
+
+    rl  $createModule
+        [SD:StrandData] 
+        [SS:StrandSet]
+        [[N:Nat |-> S:System] A:AttackData]
+    =>
+    (fmod PROTOCOL-SPECIFICATION is
+        protecting PROTOCOL-EXAMPLE-SYMBOLS .
+        protecting DEFINITION-PROTOCOL-RULES .
+        protecting DEFINITION-CONSTRAINTS-INPUT .
+        eq STRANDS-DOLEVYAO = SS:StrandSet [nonexec] .
+        eq STRANDS-PROTOCOL = convert(SD:StrandData) [nonexec] .
+        convert([N:Nat |-> S:System] A:AttackData)
+    endfm) .
+
+    rl   
+        [SD:StrandData] 
+        [$emptyAttackData]
+        [SS:StrandSet]
+    =>
+    (fmod PROTOCOL-SPECIFICATION is
+        protecting PROTOCOL-EXAMPLE-SYMBOLS .
+        protecting DEFINITION-PROTOCOL-RULES .
+        protecting DEFINITION-CONSTRAINTS-INPUT .
+        eq STRANDS-DOLEVYAO = SS:StrandSet [nonexec] .
+        eq STRANDS-PROTOCOL = convert(SD:StrandData) [nonexec] .
+    endfm) [print SD:StrandData] .
+
+    vars A B A1 : Name .
+    vars NA1 NB : Nonce .
+
+    var C    : Name .
+    vars X Y : Msg .
+    ---var K    : Key .
+    var NA : Nonce .
+    var NO : Nonce .
+    vars r r1 r2 r3 : Fresh .
+    ---var SK : Key .
+endm
+
+
+---red $makeIdem((AName:Msg |-> BName:Msg, BName:Msg |-> AName:Msg)) .
+---Note: To successfully rewrite the PSL term, we need the following:
+---[<DEFS>] - definitions. <DEFS> = $noDefs if we have no 
+              ---definitions
+---[mt] - Starting Strand data for protocols.
+--- [empty] - Starting Strand Set for the Intruder.
+--- {S:StrandSet} - A silly thing that ensures that a variable
+                  ---S appears in the attack patterns.
+---{K:IntruderKnowledge} - Another silly thing needed by the
+                         ---attack patterns
+---[mt] - Another strand data if we're rewriting a composition term (and ONLY
+---         if we're rewriting a composition term). This should be included
+---         at the top level (i.e. same level as the [comp] structure and 
+---         the translate terms).
+---Note: Make sure to have python select the correct module 
+---[TRANSLATION-TO-MAUDE-NPA or COMP-TRANSLATION-TO-MAUDE-NPA] 

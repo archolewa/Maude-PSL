@@ -1,0 +1,61 @@
+spec KD is
+Theory
+    type Name Key Nonce .
+    subtype Name < Public .
+
+    op skey : Name Fresh -> Key .
+    op n    : Name Fresh -> Nonce .
+
+    ops a b i : -> Name .
+
+    op _;_ : Msg Msg -> Msg [gather(e E)] .
+
+    ops e d : Msg -> Msg .
+    
+    var K : Key .
+    var M : Msg .
+    eq e(K, d(K, M)) = M .
+    eq d(K, e(K, M)) = M .
+
+
+Protocol
+    vars A B  : Name .
+    vars K SK : Key .
+    var NB : Nonce .
+    vars r r1 : Fresh .
+
+    In(A) = A, B, K .
+    In(B) = A, B, K .
+
+    1 . A -> B : e(K, skey(A, r)) |- 
+                 e(K, SK)         .
+
+    2 . B -> A : e(K, SK         ; n(B, r1)) |-
+                 e(K, skey(A, r) ; NB)       .
+
+    3 . A -> B : e(K, NB)       |- 
+                 e(K, n(B, r1)) .
+
+    Out(A) = K, skey(A, r), NB .
+    Out(B) = A, B, K, SK, n(B, r1) .
+
+
+Intruder
+    var C : Name .
+    var r : Fresh .
+    vars X Y : Msg .
+    var  K : Key .
+
+         => C, n(i, r), skey(i, r) .
+    K, X => e(K, X), d(K, X) .
+    X, Y <=> X ; Y .
+
+
+Attacks
+    vars A B : Name .
+    0 .
+        B executes protocol .
+        Subst(B) = A |-> a, B |-> b .
+
+
+ends

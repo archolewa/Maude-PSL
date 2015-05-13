@@ -1,0 +1,23 @@
+date
+#!/bin/bash
+maude <<EOF
+load maude-npa.maude
+load examples/Kao-Chow_Repeated_Authentication_Handshake_Key.maude
+red genGrammars .
+red run(0) .
+red summary(1) .
+red summary(2) .
+red summary(3) .
+red summary(4) .
+red summary(5) .
+red summary(6) .
+red summary(7) .
+red run(1) .
+red run(2) .
+red run(3) .
+red run(4) .
+red run(5) .
+red run(6) .
+red run(7) .
+EOF
+date

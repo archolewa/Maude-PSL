@@ -1,0 +1,103 @@
+/*
+    The Wide Mouthed Frog protocol is a common example protocol created by Michael
+    Burrows in his 1989 technical report:
+    Michael Burrows, Martin Abadi, and Roger Needham. A logic of authentication. 
+    Technical Report 39, Digital Systems Research Center, Feb 1989.
+*/
+spec WMF is 
+Theory
+  types  UName SName Name Key Nonce  Masterkey Sessionkey .
+  subtype Masterkey  Sessionkey < Key .
+  subtype SName UName < Name .
+  subtype Name < Public . // This is quite relevant and necessary
+
+  // Nonce operator
+  op n  : Name Fresh -> Nonce  .
+
+  // User names
+  ops a b i : -> UName .
+
+  // Server name
+  op s : ->  SName . 
+
+// MKey
+  op mkey : Name Name -> Masterkey  .
+ 
+// Seskey
+ op seskey : Name Name Nonce -> Sessionkey  .
+
+ //encrypt
+  op e : Key Msg -> Msg  .
+  op d : Key Msg -> Msg   .
+
+// successor
+
+ op p : Msg -> Msg  .
+
+
+// Concatenation
+  op _;_ : Msg Msg -> Msg [gather (e E)] .
+
+ eq d(K:Key, e(K:Key, Z:Msg )) = Z:Msg .
+ eq e(K:Key, d(K:Key, Z:Msg )) = Z:Msg . 
+
+
+Protocol
+    vars A B S : Name .
+    vars KAS KBS KAB : Key .
+    vars r1 r2 r3 : Fresh .
+    vars TA TS : TimeStamp .
+
+    Def(A) = KeyAS := mkey(A, S), KeyAB := seskey(A, B, n(A, r2)) . 
+    Def(S) = KeyAS := mkey(A, S), KeyBS := mkey(B, S) .
+    Def(B) = KeyBS := mkey(B, S) .
+
+    In(A) = A, B, S .
+    In(B) = A, B, S .
+    In(S) = A, B, S .
+
+    1 . A -> S : A ; e(KeyAS, B ; KeyAB) 
+               - A ; e(KeyAS, B ; KAB) .
+
+    2 . S -> B : e(KeyBS, A ; KAB)  
+              |- e(KeyBS, A ; KAB) .
+
+    3 . A -> B : A ; e(KeyAB, M) 
+              |- A ; e(KAB,   M) .
+
+    Out(A) = KeyAB .
+    Out(S) = KAB .
+    Out(B) = KAB .
+
+
+Intruder
+    => N:Name, t(i, r:Fresh), k(i, r:Fresh) .
+    X:Msg, Y:Msg <=> X:Msg ; Y:Msg .
+    K:Key, X:Msg => enc(K:Key, X:Msg), dec(K:Key, X:Msg) .
+
+
+Attacks
+    vars A B S : Name .
+    vars KAS KBS : Key .
+
+    //An empty attack for debugging purposes.
+    0 .
+        In(A) = A |-> a, B |-> b, S |-> s, KAS |-> KAS .
+        A executes protocol .
+        Out(A) = ditto .
+
+    1 .
+        In(A) = A |-> a, B |-> b, S |-> s, KAS |-> KAS .
+        A executes protocol .
+        Intruder learns KeyAB .
+        Out(A) = ditto .
+
+    2 .
+        In(A) = A |-> a, B |-> b, S |-> s, KAS |-> KAS .
+        A executes protocol .
+        Out(A) = ditto .
+        without:
+            In(B) = A |-> a, B |-> b, S |-> s, KBS |-> KBS .
+            B executes protocol .
+            Out(B) = ditto .
+ends

@@ -1,0 +1,83 @@
+spec Danning-Sacco is
+Theory
+  types  UName SName Name Key Nonce Masterkey Sessionkey .
+  subtype Masterkey Sessionkey < Key .
+  subtype SName UName < Name .
+  subtype Name < Public . 
+
+  op n : Name Fresh -> Nonce .
+  op t : Name Fresh -> Nonce . 
+  ops a b i : -> UName [ctor] .
+  op s : ->  SName [ctor] . 
+  op mkey : Name Name -> Masterkey .
+  op seskey : Name Name Nonce -> Sessionkey .
+  op e : Key Msg -> Msg .
+  op d : Key Msg -> Msg .
+  op _;_ : Msg Msg -> Msg [gather (e E)] .
+  
+  eq d(K:Key, e(K:Key, Z:Msg)) = Z:Msg .
+  eq e(K:Key, d(K:Key, Z:Msg)) = Z:Msg . 
+
+    
+
+Protocol
+    vars A B AS BS AB : UName .
+    var S : SName .
+    var D : Name .
+    vars r r' : Fresh .
+    vars TS TSB : Nonce .
+    var K : Key .
+    vars SK SK1 SKA SKB : Sessionkey .
+    vars M N X Y : Msg .
+
+    Def(A) = kas := mkey(A, S) .
+    In(A) = A, B, S .
+
+    Def(B) = kbs := mkey(B, S) .
+    In(B) = B, S .
+
+    Def(S) = kab := seskey(A, B, n(S,r)), ts := t(S, r'),
+             ksa := mkey(AS, S),         ksb := mkey(BS, S) .
+    In(S) = S .
+
+    1 . A -> S : A ; B |- AS ; BS .
+
+    2 . S -> A : e(ksa, BS ; kab ; ts ; e(ksb, AS ; kab ; ts))
+              |- e(kas, B  ; SKA  ; TS ; M) .
+
+    3 . A -> B : M |- e(kbs, AB ; SKB ; TSB) .
+              
+
+    Out(A) = SKA, TSA .
+    Out(B) = SKB, TSB .
+    Out(S) = kab, ts  .
+
+Intruder
+    var D : Name .
+    var r : Fresh .
+    var K : Key .
+    vars M N : Msg .
+
+    => D, n(i, r), t(i, r), mkey(i, D), mkey(D, i) .
+    K, M => d(K, M), e(K, M) .
+    M, N <=> M ; N .
+
+Attacks
+  vars A B : UName .
+  var S : SName .
+  var SK : Sessionkey .
+
+  0 . 
+       A executes protocol .
+       Subst(A) = A |-> a , B |-> b, S |-> s . 
+
+  1 .
+      A executes protocol .
+      Subst(A) = A |-> a , B |-> b, S |-> s . 
+      Intruder learns SKA .
+
+  2 .
+      S executes protocol .
+      Subst(S)  = AS |-> a, BS |-> b, S |-> s .
+      Intruder learns kab .
+ends

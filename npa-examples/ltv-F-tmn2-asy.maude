@@ -1,0 +1,147 @@
+***(
+LTV09 paper - protocol F - TMN
+Notations: 
+A, B, S : principals
+KA,KB: fresh symmetric keys 
+PKS: public key of the server
+Protocol scheme:
+1. A −-> S : B,{KA}PKS
+2. S −-> B : A
+3. B −-> S : A,{KB}PKS
+4. S −-> A : B, KB * KA
+
+----
+the attack:
+1. A −-> S : B,{KA}PKS 
+2. S −-> I : A
+3. I(B) −-> S : A,{KI}PKS
+4. S −-> I : B, KI * KA
+In the first step, A starts a normal session with B. In the second step, I intercepts the message sent by S and then, in step 3, he impersonates B and sends his own symmetric key to the server. Finally, the intruder intercepts B and KI ⊕ KA and as he knows KI, he can find KA by computing (KI ⊕ KA) ⊕ KI . Finally, I can transmit B, KI ⊕ KA to A.
+
+CODE BELOW IS FROM ANOTHER FILE AS TEMPLATE!!! CHANGE everything!
+)***
+
+fmod PROTOCOL-EXAMPLE-SYMBOLS is
+  --- Importing sorts Msg, Fresh, Public, and GhostData
+  protecting DEFINITION-PROTOCOL-RULES .
+  
+  ----------------------------------------------------------
+  --- Overwrite this module with the syntax of your protocol
+  --- Notes:
+  --- * Sort Msg and Fresh are special and imported
+  --- * Every sort must be a subsort of Msg
+  --- * No sort can be a supersort of Msg
+  ----------------------------------------------------------
+
+  --- Sort Information 
+  sorts Name Nonce Null .
+  subsort Name Nonce Null < Msg .
+  subsort Name < Public .
+  subsort Null < Msg .
+
+  op pair : Msg Msg -> Msg [frozen] .
+  *** encryption here is thus that only the server can decrypt it!
+  op enc : Msg -> Msg [frozen] .
+
+  --- Nonce operator
+  op n : Name Fresh -> Nonce [frozen] .
+  
+  --- Principals
+  op a : -> Name . --- Alice
+  op b : -> Name . --- Bob
+  op i : -> Name . --- Intruder
+  
+  --- XOR operator
+  op _*_ : Msg Msg -> Msg [frozen assoc comm] .
+  op null : -> Null .
+
+endfm
+
+fmod PROTOCOL-EXAMPLE-ALGEBRAIC is
+  protecting PROTOCOL-EXAMPLE-SYMBOLS .
+  
+  ----------------------------------------------------------
+  --- Overwrite this module with the algebraic properties 
+  --- of your protocol
+  ----------------------------------------------------------
+
+  *** Exclusive or properties
+  eq null * X:Msg = X:Msg [nonexec label XOR-UNITY metadata "builtin-unify"] .
+  eq X:Msg * X:Msg = null [nonexec label XOR-NilPotent metadata "builtin-unify"] .
+
+
+endfm
+
+fmod PROTOCOL-SPECIFICATION is
+  protecting PROTOCOL-EXAMPLE-SYMBOLS .
+  protecting DEFINITION-PROTOCOL-RULES .
+  protecting DEFINITION-CONSTRAINTS-INPUT .
+
+  ----------------------------------------------------------
+  --- Overwrite this module with the strands 
+  --- of your protocol
+  ----------------------------------------------------------
+  
+  vars X Y : Msg .
+  vars r r' : Fresh .
+  vars N N' NA NB : Nonce .
+  vars A B C : Name .
+
+  eq STRANDS-DOLEVYAO
+   = :: nil :: [ nil | -(X), -(Y), +(X * Y), nil ] &
+     :: nil :: [ nil | -(pair(X,Y)), +(X), nil ] &
+     :: nil :: [ nil | -(pair(X,Y)), +(Y), nil ] &
+     :: nil :: [ nil | -(X), -(Y), +(pair(X,Y)), nil ] &
+     :: r   :: [ nil | +(n(i, r)), nil ] &
+     :: nil :: [ nil | -(N), +(enc(N)), nil ] &
+     :: nil :: [ nil | +(A), nil ]  &
+     :: nil :: [ nil | +(null), nil ]
+  [nonexec] .
+
+  eq STRANDS-PROTOCOL
+  = *** A
+    :: r :: 
+    [nil | +(pair(B, enc(n(A,r)))),
+           -(pair(B, n(A,r) * NB)), 
+           nil] 
+    &
+    *** B
+    :: r' :: 
+    [nil | -(A),
+           +(pair(A, enc(n(B,r')))),
+           nil] 
+    &
+    *** S
+    :: nil ::
+    [nil | -(pair(B, enc(NA))),
+           +(A),
+           -(pair(A, enc(NB))),
+           +(pair(B, NA * NB)), 
+           nil] 
+    
+  [nonexec] .
+
+  eq ATTACK-STATE(0)
+   = 
+    :: r :: 
+    [nil,  +(pair(b, enc(n(a,r)))),
+           -(pair(b, n(a,r) * NB)) | nil]
+     || n(a,r) inI, empty
+     || nil
+     || nil
+     || nil
+  [nonexec] .
+
+  ----------------------------------------------------------
+  --- Grammars for co-invariant generation
+  --- Keyword GENERATED-GRAMMARS -> seed terms for grammar generation 
+  --- (if not, use automaticly generated seed terms)
+  --- Keyword EXTRA-GRAMMARS -> seed terms for grammar generation 
+  --- apart of automaticly generated ones
+  --- Format of seed terms (grl Conditions => Term inL .) ! S1/S2
+  ----------------------------------------------------------
+
+endfm
+
+--- THIS HAS TO BE THE LAST LOADED MODULE !!!!
+select MAUDE-NPA .

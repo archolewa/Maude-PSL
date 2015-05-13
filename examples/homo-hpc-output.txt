@@ -1,0 +1,1600 @@
+localhost:prototype-20110914 santiago$ examples/homo-hpc-command 
+Wed Sep 14 16:13:46 CEST 2011
+		     \||||||||||||||||||/
+		   --- Welcome to Maude ---
+		     /||||||||||||||||||\
+	    Maude 2.6 built: Dec 10 2010 11:12:39
+	    Copyright 1997-2010 SRI International
+		   Wed Sep 14 16:13:46 2011
+Maude> 
+	    Maude-NPA Version: 09/14/2011
+	    Copyright (c) 2011, University of Illinois
+	    All rights reserved.
+
+==========================================
+reduce in MAUDE-NPA : genGrammars .
+rewrites: 40506820 in 83098ms cpu (84075ms real) (487456 rewrites/second)
+result GrammarList: (
+grl #0:Msg inL => (#1:Msg ; #0:Msg) inL . ; 
+grl #0:Msg inL => (#0:Msg ; #1:Msg) inL . ; 
+grl #0:Msg inL => pke(#0:Msg, i) inL . ; 
+grl #0:Msg inL => hpke(#0:Msg, pkey(i, #1:Name)) inL . ; 
+grl #0:Msg inL => hpke(#0:Msg, pkey(#1:Name, i)) inL . ; 
+grl #0:Msg inL => sign(#0:Msg, #1:Name) inL . ; 
+grl #0:Msg notInI, (#0:Msg notLeq n(#1:Name, #2:Fresh)), #0:Msg notLeq pke(hpke(data(#3:Name, #4:Fresh), pkey(#3:Name, #5:Name)), s) => (#0:Msg ; #6:Msg) inL .)
+| (
+grl #0:Msg inL => (#1:Msg ; #0:Msg) inL . ; 
+grl #0:Msg inL => (#0:Msg ; #1:Msg) inL . ; 
+grl #0:Msg inL => pke(#0:Msg, i) inL . ; 
+grl #0:Msg inL => hpke(#0:Msg, pkey(i, #1:Name)) inL . ; 
+grl #0:Msg inL => hpke(#0:Msg, pkey(#1:Name, i)) inL . ; 
+grl #0:Msg inL => sign(#0:Msg, #1:Name) inL . ; 
+grl #0:Msg notInI, (#0:Msg notLeq #1:Name ; #2:Nonce ; #3:Nonce ; f(#4:HEnc, #5:HEnc)), (#0:Msg notLeq #6:Name ; n(#7:Name, #8:Fresh) ; #9:Nonce ; pke(hpke(data(#7:Name, #10:Fresh), pkey(#7:Name, #6:Name)),
+    s) ; #11:Enc), (#0:Msg notLeq #12:Nonce ; #13:Nonce ; f(#14:HEnc, #15:HEnc)), (#0:Msg notLeq #16:Nonce ; pke(hpke(data(#17:Name, #18:Fresh), pkey(#17:Name, #19:Name)), s) ; #20:Enc), (#0:Msg notLeq
+    #21:Nonce ; f(#22:HEnc, #23:HEnc)), (#0:Msg notLeq n(#24:Name, #25:Fresh) ; pke(hpke(data(#24:Name, #26:Fresh), pkey(#24:Name, #27:Name)), s)), (#0:Msg notLeq n(#28:Name, #29:Fresh) ; #30:Nonce ; pke(
+    hpke(data(#28:Name, #31:Fresh), pkey(#28:Name, #32:Name)), s) ; #33:Enc), (#0:Msg notLeq n(#34:Name, #35:Fresh) ; pke(hpke(data(#34:Name, #36:Fresh), pkey(#37:Name, #34:Name)), s)), (#0:Msg notLeq pke(
+    hpke(data(#38:Name, #39:Fresh), pkey(#38:Name, #40:Name)), s) ; #41:Enc), (#0:Msg notLeq f(#42:HEnc, #43:HEnc)), (#0:Msg notLeq pke(hpke(data(#44:Name, #45:Fresh), pkey(#46:Name, #44:Name)), s)), #0:Msg
+    notLeq pke(hpke(data(#47:Name, #48:Fresh), pkey(#47:Name, #49:Name)), s) => (#50:Msg ; #0:Msg) inL .)
+| (errorNoHeuristicApplied {
+grl empty => (#1:Msg ; #2:Msg) inL .,none,
+grl empty => (#1:Msg,#2:Msg) inL .,none,
+grl empty => (#1:Msg,#2:Msg) inL .} usingGrammar 
+grl empty => (#1:Msg ; #2:Msg) inL .)
+| (
+grl empty => data(#0:Name, #1:Fresh) inL . ; 
+grl #0:Msg inL => (#1:Msg ; #0:Msg) inL . ; 
+grl #0:Msg inL => (#0:Msg ; #1:Msg) inL . ; 
+grl #0:Msg inL => pke(#0:Msg, i) inL . ; 
+grl #0:Msg inL => hpke(#0:Msg, pkey(i, #1:Name)) inL . ; 
+grl #0:Msg inL => hpke(#0:Msg, pkey(#1:Name, i)) inL . ; 
+grl #0:Msg inL => sign(#0:Msg, #1:Name) inL .)
+| (
+grl #0:Msg inL => (#1:Msg ; #0:Msg) inL . ; 
+grl #0:Msg inL => (#0:Msg ; #1:Msg) inL . ; 
+grl #0:Msg inL => pke(#0:Msg, i) inL . ; 
+grl #0:Msg inL => hpke(#0:Msg, pkey(i, #1:Name)) inL . ; 
+grl #0:Msg inL => hpke(#0:Msg, pkey(#1:Name, i)) inL . ; 
+grl #0:Msg inL => sign(#0:Msg, #1:Name) inL . ; 
+grl #0:Msg notInI, (#0:Msg notLeq hpke(data(#1:Name, #2:Fresh), pkey(#1:Name, #3:Name))), #0:Msg notLeq hpke(data(#4:Name, #5:Fresh), pkey(#6:Name, #4:Name)) => f(#0:Msg, #7:Msg) inL . ; 
+grl #0:Msg notInI, (#0:Msg notLeq hpke(data(#1:Name, #2:Fresh), pkey(#1:Name, #3:Name))), #0:Msg notLeq hpke(data(#4:Name, #5:Fresh), pkey(#6:Name, #4:Name)) => pke(#0:Msg, s) inL .)
+| (
+grl #0:Msg inL => (#1:Msg ; #0:Msg) inL . ; 
+grl #0:Msg inL => (#0:Msg ; #1:Msg) inL . ; 
+grl #0:Msg inL => pke(#0:Msg, i) inL . ; 
+grl #0:Msg inL => hpke(#0:Msg, pkey(i, #1:Name)) inL . ; 
+grl #0:Msg inL => hpke(#0:Msg, pkey(#1:Name, i)) inL . ; 
+grl #0:Msg inL => sign(#0:Msg, #1:Name) inL . ; 
+grl #0:Msg notInI, (#0:Msg notLeq hpke(data(#1:Name, #2:Fresh), pkey(#1:Name, #3:Name))), #0:Msg notLeq hpke(data(#4:Name, #5:Fresh), pkey(#6:Name, #4:Name)) => f(#7:Msg, #0:Msg) inL . ; 
+grl #0:Msg notInI, (#0:Msg notLeq hpke(data(#1:Name, #2:Fresh), pkey(#1:Name, #3:Name))), #0:Msg notLeq hpke(data(#4:Name, #5:Fresh), pkey(#6:Name, #4:Name)) => pke(#0:Msg, s) inL .)
+| (
+grl #0:Msg inL => (#1:Msg ; #0:Msg) inL . ; 
+grl #0:Msg inL => (#0:Msg ; #1:Msg) inL . ; 
+grl #0:Msg inL => pke(#0:Msg, i) inL . ; 
+grl #0:Msg inL => hpke(#0:Msg, pkey(i, #1:Name)) inL . ; 
+grl #0:Msg inL => hpke(#0:Msg, pkey(#1:Name, i)) inL . ; 
+grl #0:Msg inL => sign(#0:Msg, #1:Name) inL . ; 
+grl f(#0:Msg, #1:Msg) notLeq f(#2:HEnc, #3:HEnc) => f(#0:Msg, #1:Msg) inL .)
+| (
+grl #0:Msg inL => (#1:Msg ; #0:Msg) inL . ; 
+grl #0:Msg inL => (#0:Msg ; #1:Msg) inL . ; 
+grl #0:Msg inL => pke(#0:Msg, i) inL . ; 
+grl #0:Msg inL => hpke(#0:Msg, pkey(i, #1:Name)) inL . ; 
+grl #0:Msg inL => hpke(#0:Msg, pkey(#1:Name, i)) inL . ; 
+grl #0:Msg inL => sign(#0:Msg, #1:Name) inL . ; 
+grl #0:Msg notInI => hpke(#0:Msg, #1:Pkey) inL .)
+| (
+grl #0:Msg inL => (#1:Msg ; #0:Msg) inL . ; 
+grl #0:Msg inL => (#0:Msg ; #1:Msg) inL . ; 
+grl #0:Msg inL => pke(#0:Msg, i) inL . ; 
+grl #0:Msg inL => hpke(#0:Msg, pkey(i, #1:Name)) inL . ; 
+grl #0:Msg inL => hpke(#0:Msg, pkey(#1:Name, i)) inL . ; 
+grl #0:Msg inL => sign(#0:Msg, #1:Name) inL . ; 
+grl #0:Pkey notInI, #0:Pkey notLeq pkey(#1:Name, #2:Name) => hpke(#3:Msg, #0:Pkey) inL .)
+| (
+grl #0:Msg inL => (#1:Msg ; #0:Msg) inL . ; 
+grl #0:Msg inL => (#0:Msg ; #1:Msg) inL . ; 
+grl #0:Msg inL => pke(#0:Msg, i) inL . ; 
+grl #0:Msg inL => hpke(#0:Msg, pkey(i, #1:Name)) inL . ; 
+grl #0:Msg inL => hpke(#0:Msg, pkey(#1:Name, i)) inL . ; 
+grl #0:Msg inL => sign(#0:Msg, #1:Name) inL . ; 
+grl hpke(#0:Msg, #1:Pkey) notLeq hpke(#2:Msg, pkey(#3:Name, #4:Name)) => hpke(#0:Msg, #1:Pkey) inL .)
+| (errorInconsistentExceptionsInGrammarRule 
+grl n(#0:Name, #1:Fresh) notLeq #4:Nonce => n(#0:Name, #1:Fresh) inL . inGrammar 
+grl #0:Msg inL => (#1:Msg ; #0:Msg) inL . ; 
+grl #0:Msg inL => (#0:Msg ; #1:Msg) inL . ; 
+grl #0:Msg inL => pke(#0:Msg, i) inL . ; 
+grl #0:Msg inL => hpke(#0:Msg, pkey(i, #1:Name)) inL . ; 
+grl #0:Msg inL => hpke(#0:Msg, pkey(#1:Name, i)) inL . ; 
+grl #0:Msg inL => sign(#0:Msg, #1:Name) inL . ; 
+grl n(#0:Name, #1:Fresh) notLeq #4:Nonce => n(#0:Name, #1:Fresh) inL .)
+| (
+grl #0:Msg inL => (#1:Msg ; #0:Msg) inL . ; 
+grl #0:Msg inL => (#0:Msg ; #1:Msg) inL . ; 
+grl #0:Msg inL => pke(#0:Msg, i) inL . ; 
+grl #0:Msg inL => hpke(#0:Msg, pkey(i, #1:Name)) inL . ; 
+grl #0:Msg inL => hpke(#0:Msg, pkey(#1:Name, i)) inL . ; 
+grl #0:Msg inL => sign(#0:Msg, #1:Name) inL . ; 
+grl #0:Msg notInI, (#0:Msg notLeq hpke(data(#1:Name, #2:Fresh), pkey(#1:Name, #3:Name))), #0:Msg notLeq hpke(data(#4:Name, #5:Fresh), pkey(#6:Name, #4:Name)) => pke(#0:Msg, #7:Name) inL .)
+| (errorNoHeuristicApplied {
+grl empty => pke(#1:Msg, #2:Name) inL .,none,
+grl empty => (#1:Msg,#2:Name) inL .,none,
+grl empty => (#1:Msg,#2:Name) inL .} usingGrammar 
+grl empty => pke(#1:Msg, #2:Name) inL .)
+| (errorInconsistentExceptionsInGrammarRule 
+grl pkey(#0:Name, #1:Name) notLeq pkey(#5:Name, #6:Name) => pkey(#0:Name, #1:Name) inL . inGrammar 
+grl #0:Msg inL => (#1:Msg ; #0:Msg) inL . ; 
+grl #0:Msg inL => (#0:Msg ; #1:Msg) inL . ; 
+grl #0:Msg inL => pke(#0:Msg, i) inL . ; 
+grl #0:Msg inL => sign(#0:Msg, #1:Name) inL . ; 
+grl #4:Msg inL => hpke(#4:Msg, #3:Pkey) inL . ; 
+grl #0:Pkey inL => hpke(#1:Msg ; #2:Msg, #0:Pkey) inL . ; 
+grl #0:Pkey inL => hpke(pkey(#1:Name, #2:Name), #0:Pkey) inL . ; 
+grl #0:Pkey inL => hpke(pke(#1:Msg, i), #0:Pkey) inL . ; 
+grl #0:Pkey inL => hpke(hpke(pkey(#1:Name, #2:Name), #3:Pkey), #0:Pkey) inL . ; 
+grl #0:Pkey inL => hpke(sign(#1:Msg, #2:Name), #0:Pkey) inL . ; 
+grl #5:Pkey inL => hpke(hpke(#1:Msg ; #2:Msg, #0:Pkey), #5:Pkey) inL . ; 
+grl #5:Pkey inL => hpke(hpke(sign(#1:Msg, #2:Name), #0:Pkey), #5:Pkey) inL . ; 
+grl #6:Pkey inL => hpke(hpke(hpke(pkey(#1:Name, #2:Name), #3:Pkey), #0:Pkey), #6:Pkey) inL . ; 
+grl #4:Pkey inL => hpke(hpke(pke(#1:Msg, i), #0:Pkey), #4:Pkey) inL . ; 
+grl pkey(#0:Name, #1:Name) notLeq pkey(#5:Name, #6:Name) => pkey(#0:Name, #1:Name) inL .)
+| (
+grl #0:Msg inL => (#1:Msg ; #0:Msg) inL . ; 
+grl #0:Msg inL => (#0:Msg ; #1:Msg) inL . ; 
+grl #0:Msg inL => pke(#0:Msg, i) inL . ; 
+grl #0:Msg inL => hpke(#0:Msg, pkey(i, #1:Name)) inL . ; 
+grl #0:Msg inL => hpke(#0:Msg, pkey(#1:Name, i)) inL . ; 
+grl #0:Msg inL => sign(#0:Msg, #1:Name) inL . ; 
+grl #0:Msg notInI, (#0:Msg notLeq #1:Name ; #2:Name ; #3:Nonce ; #4:Nonce ; f(#5:HEnc, #6:HEnc)), (#0:Msg notLeq #7:Name ; n(#8:Name, #9:Fresh) ; pke(hpke(data(#8:Name, #10:Fresh), pkey(#8:Name, #7:Name)),
+    s)), (#0:Msg notLeq #11:Name ; #12:Name ; n(#11:Name, #13:Fresh) ; #14:Nonce ; pke(hpke(data(#11:Name, #15:Fresh), pkey(#11:Name, #12:Name)), s) ; #16:Enc), #0:Msg notLeq #17:Nonce ; n(#18:Name,
+    #19:Fresh) ; pke(hpke(data(#18:Name, #20:Fresh), pkey(#21:Name, #18:Name)), s) => sign(#0:Msg, #22:Name) inL .)
+| 
+grl #0:Msg inL => (#1:Msg ; #0:Msg) inL . ; 
+grl #0:Msg inL => (#0:Msg ; #1:Msg) inL . ; 
+grl #0:Msg inL => pke(#0:Msg, i) inL . ; 
+grl #0:Msg inL => hpke(#0:Msg, pkey(i, #1:Name)) inL . ; 
+grl #0:Msg inL => hpke(#0:Msg, pkey(#1:Name, i)) inL . ; 
+grl #0:Msg inL => sign(#0:Msg, #1:Name) inL . ; 
+grl (sign(#0:Msg, #1:Name) notLeq sign(#2:Msg, i)), (sign(#0:Msg, #1:Name) notLeq sign(#3:Name ; #4:Name ; #5:Nonce ; #6:Nonce ; f(#7:HEnc, #8:HEnc), s)), (sign(#0:Msg, #1:Name) notLeq sign(#9:Name ;
+    #10:Name ; n(#9:Name, #11:Fresh) ; #12:Nonce ; pke(hpke(data(#9:Name, #13:Fresh), pkey(#9:Name, #10:Name)), s) ; #14:Enc, #9:Name)), (sign(#0:Msg, #1:Name) notLeq sign(#15:Name ; n(#16:Name, #17:Fresh) ;
+    pke(hpke(data(#16:Name, #18:Fresh), pkey(#16:Name, #15:Name)), s), #16:Name)), sign(#0:Msg, #1:Name) notLeq sign(#19:Nonce ; n(#20:Name, #21:Fresh) ; pke(hpke(data(#20:Name, #22:Fresh), pkey(#23:Name,
+    #20:Name)), s), #20:Name) => sign(#0:Msg, #1:Name) inL .
+==========================================
+reduce in MAUDE-NPA : run(0) .
+rewrites: 3949 in 46ms cpu (52ms real) (84626 rewrites/second)
+result IdSystem: < 1 > 
+:: r:Fresh,r':Fresh ::
+[ nil, 
+   +(sign(b ; n(a, r:Fresh) ; pke(hpke(data(a, r':Fresh), pkey(a, b)), s), a)), 
+   -(sign(n(a, r:Fresh) ; N:Nonce ; Y1:Enc, b)), 
+   +(sign(a ; b ; n(a, r:Fresh) ; N:Nonce ; pke(hpke(data(a, r':Fresh), pkey(a, b)), s) ; Y1:Enc, a)), 
+   -(sign(a ; b ; n(a, r:Fresh) ; N:Nonce ; X1:HEnc, s)) | nil] 
+|| empty
+|| 
+nil
+|| 
+nil
+|| never((S:StrandSet & 
+:: r1:Fresh,r2:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, r:Fresh) ; pke(hpke(data(a, r':Fresh), pkey(a, b)), s), a)), 
+   +(sign(n(a, r:Fresh) ; n(b, r1:Fresh) ; pke(hpke(data(b, r2:Fresh), pkey(a, b)), s), b)), nil] ) || IK:IntruderKnowledge)
+==========================================
+reduce in MAUDE-NPA : summary(1) .
+rewrites: 7933445 in 27383ms cpu (27451ms real) (289720 rewrites/second)
+result Summary: States>> 2 Solutions>> 0
+==========================================
+reduce in MAUDE-NPA : summary(2) .
+rewrites: 8500571 in 40255ms cpu (40358ms real) (211163 rewrites/second)
+result Summary: States>> 2 Solutions>> 0
+==========================================
+reduce in MAUDE-NPA : summary(3) .
+rewrites: 6848165 in 44143ms cpu (44241ms real) (155132 rewrites/second)
+result Summary: States>> 1 Solutions>> 0
+==========================================
+reduce in MAUDE-NPA : summary(4) .
+rewrites: 3212470 in 23214ms cpu (23260ms real) (138379 rewrites/second)
+result Summary: States>> 1 Solutions>> 0
+==========================================
+reduce in MAUDE-NPA : summary(5) .
+rewrites: 2496436 in 21748ms cpu (21774ms real) (114784 rewrites/second)
+result Summary: States>> 1 Solutions>> 0
+==========================================
+reduce in MAUDE-NPA : summary(6) .
+rewrites: 2768139 in 29203ms cpu (29234ms real) (94786 rewrites/second)
+result Summary: States>> 2 Solutions>> 0
+==========================================
+reduce in MAUDE-NPA : summary(7) .
+rewrites: 5715766 in 54864ms cpu (54913ms real) (104179 rewrites/second)
+result Summary: States>> 2 Solutions>> 0
+==========================================
+reduce in MAUDE-NPA : summary(8) .
+rewrites: 6807670 in 63529ms cpu (63588ms real) (107157 rewrites/second)
+result Summary: States>> 2 Solutions>> 0
+==========================================
+reduce in MAUDE-NPA : summary(9) .
+rewrites: 8375162 in 81392ms cpu (81450ms real) (102898 rewrites/second)
+result Summary: States>> 2 Solutions>> 0
+==========================================
+reduce in MAUDE-NPA : summary(10) .
+rewrites: 9705831 in 93758ms cpu (93826ms real) (103519 rewrites/second)
+result Summary: States>> 3 Solutions>> 1
+==========================================
+reduce in MAUDE-NPA : summary(11) .
+rewrites: 12376064 in 111738ms cpu (111822ms real) (110759 rewrites/second)
+result Summary: States>> 2 Solutions>> 1
+==========================================
+reduce in MAUDE-NPA : summary(12) .
+rewrites: 8030165 in 77293ms cpu (77361ms real) (103892 rewrites/second)
+result Summary: States>> 1 Solutions>> 1
+==========================================
+reduce in MAUDE-NPA : run(1) .
+rewrites: 18 in 0ms cpu (0ms real) (18000000 rewrites/second)
+result IdSystemSet: (< 1 . 6 > (
+:: nil ::
+[ nil | 
+   -(sign(a ; b ; n(a, #0:Fresh) ; #1:Nonce ; pke(#2:HEnc, s) ; pke(#3:HEnc, s), a)), 
+   +(sign(a ; b ; n(a, #0:Fresh) ; #1:Nonce ; f(#2:HEnc, #3:HEnc), s)), nil]  & 
+:: #0:Fresh,#4:Fresh ::
+[ nil, 
+   +(sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #4:Fresh), pkey(a, b)), s), a)), 
+   -(sign(n(a, #0:Fresh) ; #1:Nonce ; #5:Enc, b)), 
+   +(sign(a ; b ; n(a, #0:Fresh) ; #1:Nonce ; pke(hpke(data(a, #4:Fresh), pkey(a, b)), s) ; #5:Enc, a)) | 
+   -(sign(a ; b ; n(a, #0:Fresh) ; #1:Nonce ; f(#2:HEnc, #3:HEnc), s)), nil] )
+|| 
+sign(a ; b ; n(a, #0:Fresh) ; #1:Nonce ; f(#2:HEnc, #3:HEnc), s) !inI,
+sign(a ; b ; n(a, #0:Fresh) ; #1:Nonce ; pke(#2:HEnc, s) ; pke(#3:HEnc, s), a) inI
+|| 
+-(sign(a ; b ; n(a, #0:Fresh) ; #1:Nonce ; pke(#2:HEnc, s) ; pke(#3:HEnc, s), a)), 
++(sign(a ; b ; n(a, #0:Fresh) ; #1:Nonce ; f(#2:HEnc, #3:HEnc), s)), 
+-(sign(a ; b ; n(a, #0:Fresh) ; #1:Nonce ; f(#2:HEnc, #3:HEnc), s))
+|| 
+nil
+|| never((#6:StrandSet & 
+:: #7:Fresh,#8:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #4:Fresh), pkey(a, b)), s), a)), 
+   +(sign(n(a, #0:Fresh) ; n(b, #7:Fresh) ; pke(hpke(data(b, #8:Fresh), pkey(a, b)), s), b)), nil] ) || #9:IntruderKnowledge))
+< 1 . 8 > 
+:: #1:Fresh,#0:Fresh ::
+[ nil, 
+   +(sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s), a)) | 
+   -(sign(n(a, #0:Fresh) ; #2:Nonce ; #3:Enc, b)), 
+   +(sign(a ; b ; n(a, #0:Fresh) ; #2:Nonce ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s) ; #3:Enc, a)), 
+   -(sign(a ; b ; n(a, #0:Fresh) ; #2:Nonce ; #4:HEnc, s)), nil] 
+|| 
+sign(a ; b ; n(a, #0:Fresh) ; #2:Nonce ; #4:HEnc, s) inI,
+sign(n(a, #0:Fresh) ; #2:Nonce ; #3:Enc, b) inI
+|| 
+-(sign(n(a, #0:Fresh) ; #2:Nonce ; #3:Enc, b)), 
++(sign(a ; b ; n(a, #0:Fresh) ; #2:Nonce ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s) ; #3:Enc, a)), 
+-(sign(a ; b ; n(a, #0:Fresh) ; #2:Nonce ; #4:HEnc, s))
+|| 
+nil
+|| never((#5:StrandSet & 
+:: #6:Fresh,#7:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s), a)), 
+   +(sign(n(a, #0:Fresh) ; n(b, #6:Fresh) ; pke(hpke(data(b, #7:Fresh), pkey(a, b)), s), b)), nil] ) || #8:IntruderKnowledge)
+==========================================
+reduce in MAUDE-NPA : run(2) .
+rewrites: 18 in 0ms cpu (0ms real) (18000000 rewrites/second)
+result IdSystemSet: (< 1 . 6 . 1 > (
+:: nil ::
+[ nil | 
+   -(sign(a ; b ; n(a, #0:Fresh) ; #2:Nonce ; pke(#4:HEnc, s) ; pke(#5:HEnc, s), a)), 
+   +(sign(a ; b ; n(a, #0:Fresh) ; #2:Nonce ; f(#4:HEnc, #5:HEnc), s)), nil]  & 
+:: #1:Fresh,#0:Fresh ::
+[ nil, 
+   +(sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s), a)) | 
+   -(sign(n(a, #0:Fresh) ; #2:Nonce ; #3:Enc, b)), 
+   +(sign(a ; b ; n(a, #0:Fresh) ; #2:Nonce ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s) ; #3:Enc, a)), 
+   -(sign(a ; b ; n(a, #0:Fresh) ; #2:Nonce ; f(#4:HEnc, #5:HEnc), s)), nil] )
+|| 
+sign(a ; b ; n(a, #0:Fresh) ; #2:Nonce ; f(#4:HEnc, #5:HEnc), s) !inI,
+sign(a ; b ; n(a, #0:Fresh) ; #2:Nonce ; pke(#4:HEnc, s) ; pke(#5:HEnc, s), a) inI,
+sign(n(a, #0:Fresh) ; #2:Nonce ; #3:Enc, b) inI
+|| 
+-(sign(n(a, #0:Fresh) ; #2:Nonce ; #3:Enc, b)), 
++(sign(a ; b ; n(a, #0:Fresh) ; #2:Nonce ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s) ; #3:Enc, a)), 
+-(sign(a ; b ; n(a, #0:Fresh) ; #2:Nonce ; pke(#4:HEnc, s) ; pke(#5:HEnc, s), a)), 
++(sign(a ; b ; n(a, #0:Fresh) ; #2:Nonce ; f(#4:HEnc, #5:HEnc), s)), 
+-(sign(a ; b ; n(a, #0:Fresh) ; #2:Nonce ; f(#4:HEnc, #5:HEnc), s))
+|| 
+nil
+|| never((#6:StrandSet & 
+:: #7:Fresh,#8:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s), a)), 
+   +(sign(n(a, #0:Fresh) ; n(b, #7:Fresh) ; pke(hpke(data(b, #8:Fresh), pkey(a, b)), s), b)), nil] ) || #9:IntruderKnowledge))
+< 1 . 6 . 2 > (
+:: nil ::
+[ nil | 
+   -(sign(a ; b ; n(a, #0:Fresh) ; #2:Nonce ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s) ; pke(#3:HEnc, s), a)), 
+   +(sign(a ; b ; n(a, #0:Fresh) ; #2:Nonce ; f(hpke(data(a, #1:Fresh), pkey(a, b)), #3:HEnc), s)), nil]  & 
+:: #1:Fresh,#0:Fresh ::
+[ nil, 
+   +(sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s), a)) | 
+   -(sign(n(a, #0:Fresh) ; #2:Nonce ; pke(#3:HEnc, s), b)), 
+   +(sign(a ; b ; n(a, #0:Fresh) ; #2:Nonce ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s) ; pke(#3:HEnc, s), a)), 
+   -(sign(a ; b ; n(a, #0:Fresh) ; #2:Nonce ; f(hpke(data(a, #1:Fresh), pkey(a, b)), #3:HEnc), s)), nil] )
+|| 
+sign(a ; b ; n(a, #0:Fresh) ; #2:Nonce ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s) ; pke(#3:HEnc, s), a) !inI,
+sign(a ; b ; n(a, #0:Fresh) ; #2:Nonce ; f(hpke(data(a, #1:Fresh), pkey(a, b)), #3:HEnc), s) !inI,
+sign(n(a, #0:Fresh) ; #2:Nonce ; pke(#3:HEnc, s), b) inI,
+inst(#3:HEnc)
+|| 
+-(sign(n(a, #0:Fresh) ; #2:Nonce ; pke(#3:HEnc, s), b)), 
++(sign(a ; b ; n(a, #0:Fresh) ; #2:Nonce ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s) ; pke(#3:HEnc, s), a)), 
+-(sign(a ; b ; n(a, #0:Fresh) ; #2:Nonce ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s) ; pke(#3:HEnc, s), a)), 
++(sign(a ; b ; n(a, #0:Fresh) ; #2:Nonce ; f(hpke(data(a, #1:Fresh), pkey(a, b)), #3:HEnc), s)), 
+-(sign(a ; b ; n(a, #0:Fresh) ; #2:Nonce ; f(hpke(data(a, #1:Fresh), pkey(a, b)), #3:HEnc), s))
+|| 
+nil
+|| never((#4:StrandSet & 
+:: #5:Fresh,#6:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s), a)), 
+   +(sign(n(a, #0:Fresh) ; n(b, #5:Fresh) ; pke(hpke(data(b, #6:Fresh), pkey(a, b)), s), b)), nil] ) || #7:IntruderKnowledge)
+==========================================
+reduce in MAUDE-NPA : run(3) .
+rewrites: 18 in 0ms cpu (0ms real) (18000000 rewrites/second)
+result IdSystem: < 1 . 6 . 2 . 7 > (
+:: nil ::
+[ nil | 
+   -(sign(a ; b ; n(a, #1:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(a, #0:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #3:Fresh), pkey(#4:Name, b)), s), a)), 
+   +(sign(a ; b ; n(a, #1:Fresh) ; n(b, #2:Fresh) ; f(hpke(data(a, #0:Fresh), pkey(a, b)), hpke(data(b, #3:Fresh), pkey(#4:Name, b))), s)), nil]  & 
+:: #1:Fresh,#0:Fresh ::
+[ nil, 
+   +(sign(b ; n(a, #1:Fresh) ; pke(hpke(data(a, #0:Fresh), pkey(a, b)), s), a)) | 
+   -(sign(n(a, #1:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(b, #3:Fresh), pkey(#4:Name, b)), s), b)), 
+   +(sign(a ; b ; n(a, #1:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(a, #0:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #3:Fresh), pkey(#4:Name, b)), s), a)), 
+   -(sign(a ; b ; n(a, #1:Fresh) ; n(b, #2:Fresh) ; f(hpke(data(a, #0:Fresh), pkey(a, b)), hpke(data(b, #3:Fresh), pkey(#4:Name, b))), s)), nil]  & 
+:: #2:Fresh,#3:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #1:Fresh) ; #5:Enc, #4:Name)), 
+   +(sign(n(a, #1:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(b, #3:Fresh), pkey(#4:Name, b)), s), b)), nil] )
+|| 
+sign(a ; b ; n(a, #1:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(a, #0:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #3:Fresh), pkey(#4:Name, b)), s), a) !inI,
+sign(a ; b ; n(a, #1:Fresh) ; n(b, #2:Fresh) ; f(hpke(data(a, #0:Fresh), pkey(a, b)), hpke(data(b, #3:Fresh), pkey(#4:Name, b))), s) !inI,
+sign(n(a, #1:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(b, #3:Fresh), pkey(#4:Name, b)), s), b) !inI,
+sign(b ; n(a, #1:Fresh) ; #5:Enc, #4:Name) inI,
+inst(#4:Name)
+|| 
+-(sign(b ; n(a, #1:Fresh) ; #5:Enc, #4:Name)), 
++(sign(n(a, #1:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(b, #3:Fresh), pkey(#4:Name, b)), s), b)), 
+-(sign(n(a, #1:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(b, #3:Fresh), pkey(#4:Name, b)), s), b)), 
++(sign(a ; b ; n(a, #1:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(a, #0:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #3:Fresh), pkey(#4:Name, b)), s), a)), 
+-(sign(a ; b ; n(a, #1:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(a, #0:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #3:Fresh), pkey(#4:Name, b)), s), a)), 
++(sign(a ; b ; n(a, #1:Fresh) ; n(b, #2:Fresh) ; f(hpke(data(a, #0:Fresh), pkey(a, b)), hpke(data(b, #3:Fresh), pkey(#4:Name, b))), s)), 
+-(sign(a ; b ; n(a, #1:Fresh) ; n(b, #2:Fresh) ; f(hpke(data(a, #0:Fresh), pkey(a, b)), hpke(data(b, #3:Fresh), pkey(#4:Name, b))), s))
+|| 
+nil
+|| never((#6:StrandSet & 
+:: #7:Fresh,#8:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #1:Fresh) ; pke(hpke(data(a, #0:Fresh), pkey(a, b)), s), a)), 
+   +(sign(n(a, #1:Fresh) ; n(b, #7:Fresh) ; pke(hpke(data(b, #8:Fresh), pkey(a, b)), s), b)), nil] ) || #9:IntruderKnowledge)
+==========================================
+reduce in MAUDE-NPA : run(4) .
+rewrites: 18 in 0ms cpu (0ms real) (18000000 rewrites/second)
+result IdSystem: < 1 . 6 . 2 . 7 . 3 > (
+:: nil ::
+[ nil | 
+   -(b ; n(a, #0:Fresh) ; #1:Enc), 
+   +(sign(b ; n(a, #0:Fresh) ; #1:Enc, i)), nil]  & 
+:: nil ::
+[ nil | 
+   -(sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(a, #2:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), a)), 
+   +(sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; f(hpke(data(a, #2:Fresh), pkey(a, b)), hpke(data(b, #4:Fresh), pkey(i, b))), s)), nil]  & 
+:: #2:Fresh,#0:Fresh ::
+[ nil, 
+   +(sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #2:Fresh), pkey(a, b)), s), a)) | 
+   -(sign(n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), b)), 
+   +(sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(a, #2:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), a)), 
+   -(sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; f(hpke(data(a, #2:Fresh), pkey(a, b)), hpke(data(b, #4:Fresh), pkey(i, b))), s)), nil]  & 
+:: #3:Fresh,#4:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #0:Fresh) ; #1:Enc, i)), 
+   +(sign(n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), b)), nil] )
+|| 
+sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(a, #2:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), a) !inI,
+sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; f(hpke(data(a, #2:Fresh), pkey(a, b)), hpke(data(b, #4:Fresh), pkey(i, b))), s) !inI,
+sign(b ; n(a, #0:Fresh) ; #1:Enc, i) !inI,
+sign(n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), b) !inI,
+(b ; n(a, #0:Fresh) ; #1:Enc) inI
+|| 
+-(b ; n(a, #0:Fresh) ; #1:Enc), 
++(sign(b ; n(a, #0:Fresh) ; #1:Enc, i)), 
+-(sign(b ; n(a, #0:Fresh) ; #1:Enc, i)), 
++(sign(n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), b)), 
+-(sign(n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), b)), 
++(sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(a, #2:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), a)), 
+-(sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(a, #2:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), a)), 
++(sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; f(hpke(data(a, #2:Fresh), pkey(a, b)), hpke(data(b, #4:Fresh), pkey(i, b))), s)), 
+-(sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; f(hpke(data(a, #2:Fresh), pkey(a, b)), hpke(data(b, #4:Fresh), pkey(i, b))), s))
+|| 
+nil
+|| never((#5:StrandSet & 
+:: #6:Fresh,#7:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #2:Fresh), pkey(a, b)), s), a)), 
+   +(sign(n(a, #0:Fresh) ; n(b, #6:Fresh) ; pke(hpke(data(b, #7:Fresh), pkey(a, b)), s), b)), nil] ) || #8:IntruderKnowledge)
+==========================================
+reduce in MAUDE-NPA : run(5) .
+rewrites: 18 in 0ms cpu (0ms real) (18000000 rewrites/second)
+result IdSystem: < 1 . 6 . 2 . 7 . 3 . 2 > (
+:: nil ::
+[ nil | 
+   -(b), 
+   -(n(a, #0:Fresh) ; #1:Enc), 
+   +(b ; n(a, #0:Fresh) ; #1:Enc), nil]  & 
+:: nil ::
+[ nil | 
+   -(b ; n(a, #0:Fresh) ; #1:Enc), 
+   +(sign(b ; n(a, #0:Fresh) ; #1:Enc, i)), nil]  & 
+:: nil ::
+[ nil | 
+   -(sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(a, #2:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), a)), 
+   +(sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; f(hpke(data(a, #2:Fresh), pkey(a, b)), hpke(data(b, #4:Fresh), pkey(i, b))), s)), nil]  & 
+:: #2:Fresh,#0:Fresh ::
+[ nil, 
+   +(sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #2:Fresh), pkey(a, b)), s), a)) | 
+   -(sign(n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), b)), 
+   +(sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(a, #2:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), a)), 
+   -(sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; f(hpke(data(a, #2:Fresh), pkey(a, b)), hpke(data(b, #4:Fresh), pkey(i, b))), s)), nil]  & 
+:: #3:Fresh,#4:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #0:Fresh) ; #1:Enc, i)), 
+   +(sign(n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), b)), nil] )
+|| 
+(b ; n(a, #0:Fresh) ; #1:Enc) !inI,
+sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(a, #2:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), a) !inI,
+sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; f(hpke(data(a, #2:Fresh), pkey(a, b)), hpke(data(b, #4:Fresh), pkey(i, b))), s) !inI,
+sign(b ; n(a, #0:Fresh) ; #1:Enc, i) !inI,
+sign(n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), b) !inI,
+(n(a, #0:Fresh) ; #1:Enc) inI
+|| 
+-(b), 
+-(n(a, #0:Fresh) ; #1:Enc), 
++(b ; n(a, #0:Fresh) ; #1:Enc), 
+-(b ; n(a, #0:Fresh) ; #1:Enc), 
++(sign(b ; n(a, #0:Fresh) ; #1:Enc, i)), 
+-(sign(b ; n(a, #0:Fresh) ; #1:Enc, i)), 
++(sign(n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), b)), 
+-(sign(n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), b)), 
++(sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(a, #2:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), a)), 
+-(sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(a, #2:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), a)), 
++(sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; f(hpke(data(a, #2:Fresh), pkey(a, b)), hpke(data(b, #4:Fresh), pkey(i, b))), s)), 
+-(sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; f(hpke(data(a, #2:Fresh), pkey(a, b)), hpke(data(b, #4:Fresh), pkey(i, b))), s))
+|| 
+nil
+|| never((#5:StrandSet & 
+:: #6:Fresh,#7:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #2:Fresh), pkey(a, b)), s), a)), 
+   +(sign(n(a, #0:Fresh) ; n(b, #6:Fresh) ; pke(hpke(data(b, #7:Fresh), pkey(a, b)), s), b)), nil] ) || #8:IntruderKnowledge)
+==========================================
+reduce in MAUDE-NPA : run(6) .
+rewrites: 18 in 0ms cpu (0ms real) (18000000 rewrites/second)
+result IdSystemSet: (< 1 . 6 . 2 . 7 . 3 . 2 . 2 > (
+:: nil ::
+[ nil | 
+   -(b), 
+   -(n(a, #1:Fresh) ; #2:Enc), 
+   +(b ; n(a, #1:Fresh) ; #2:Enc), nil]  & 
+:: nil ::
+[ nil | 
+   -(b ; n(a, #1:Fresh) ; #2:Enc), 
+   +(sign(b ; n(a, #1:Fresh) ; #2:Enc, i)), nil]  & 
+:: nil ::
+[ nil | 
+   -(#0:Msg ; n(a, #1:Fresh) ; #2:Enc), 
+   +(n(a, #1:Fresh) ; #2:Enc), nil]  & 
+:: nil ::
+[ nil | 
+   -(sign(a ; b ; n(a, #1:Fresh) ; n(b, #4:Fresh) ; pke(hpke(data(a, #3:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #5:Fresh), pkey(i, b)), s), a)), 
+   +(sign(a ; b ; n(a, #1:Fresh) ; n(b, #4:Fresh) ; f(hpke(data(a, #3:Fresh), pkey(a, b)), hpke(data(b, #5:Fresh), pkey(i, b))), s)), nil]  & 
+:: #1:Fresh,#3:Fresh ::
+[ nil, 
+   +(sign(b ; n(a, #1:Fresh) ; pke(hpke(data(a, #3:Fresh), pkey(a, b)), s), a)) | 
+   -(sign(n(a, #1:Fresh) ; n(b, #4:Fresh) ; pke(hpke(data(b, #5:Fresh), pkey(i, b)), s), b)), 
+   +(sign(a ; b ; n(a, #1:Fresh) ; n(b, #4:Fresh) ; pke(hpke(data(a, #3:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #5:Fresh), pkey(i, b)), s), a)), 
+   -(sign(a ; b ; n(a, #1:Fresh) ; n(b, #4:Fresh) ; f(hpke(data(a, #3:Fresh), pkey(a, b)), hpke(data(b, #5:Fresh), pkey(i, b))), s)), nil]  & 
+:: #5:Fresh,#4:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #1:Fresh) ; #2:Enc, i)), 
+   +(sign(n(a, #1:Fresh) ; n(b, #4:Fresh) ; pke(hpke(data(b, #5:Fresh), pkey(i, b)), s), b)), nil] )
+|| 
+(b ; n(a, #1:Fresh) ; #2:Enc) !inI,
+(n(a, #1:Fresh) ; #2:Enc) !inI,
+sign(a ; b ; n(a, #1:Fresh) ; n(b, #4:Fresh) ; pke(hpke(data(a, #3:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #5:Fresh), pkey(i, b)), s), a) !inI,
+sign(a ; b ; n(a, #1:Fresh) ; n(b, #4:Fresh) ; f(hpke(data(a, #3:Fresh), pkey(a, b)), hpke(data(b, #5:Fresh), pkey(i, b))), s) !inI,
+sign(b ; n(a, #1:Fresh) ; #2:Enc, i) !inI,
+sign(n(a, #1:Fresh) ; n(b, #4:Fresh) ; pke(hpke(data(b, #5:Fresh), pkey(i, b)), s), b) !inI,
+(#0:Msg ; n(a, #1:Fresh) ; #2:Enc) inI
+|| 
+-(#0:Msg ; n(a, #1:Fresh) ; #2:Enc), 
++(n(a, #1:Fresh) ; #2:Enc), 
+-(b), 
+-(n(a, #1:Fresh) ; #2:Enc), 
++(b ; n(a, #1:Fresh) ; #2:Enc), 
+-(b ; n(a, #1:Fresh) ; #2:Enc), 
++(sign(b ; n(a, #1:Fresh) ; #2:Enc, i)), 
+-(sign(b ; n(a, #1:Fresh) ; #2:Enc, i)), 
++(sign(n(a, #1:Fresh) ; n(b, #4:Fresh) ; pke(hpke(data(b, #5:Fresh), pkey(i, b)), s), b)), 
+-(sign(n(a, #1:Fresh) ; n(b, #4:Fresh) ; pke(hpke(data(b, #5:Fresh), pkey(i, b)), s), b)), 
++(sign(a ; b ; n(a, #1:Fresh) ; n(b, #4:Fresh) ; pke(hpke(data(a, #3:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #5:Fresh), pkey(i, b)), s), a)), 
+-(sign(a ; b ; n(a, #1:Fresh) ; n(b, #4:Fresh) ; pke(hpke(data(a, #3:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #5:Fresh), pkey(i, b)), s), a)), 
++(sign(a ; b ; n(a, #1:Fresh) ; n(b, #4:Fresh) ; f(hpke(data(a, #3:Fresh), pkey(a, b)), hpke(data(b, #5:Fresh), pkey(i, b))), s)), 
+-(sign(a ; b ; n(a, #1:Fresh) ; n(b, #4:Fresh) ; f(hpke(data(a, #3:Fresh), pkey(a, b)), hpke(data(b, #5:Fresh), pkey(i, b))), s))
+|| 
+nil
+|| never((#6:StrandSet & 
+:: #7:Fresh,#8:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #1:Fresh) ; pke(hpke(data(a, #3:Fresh), pkey(a, b)), s), a)), 
+   +(sign(n(a, #1:Fresh) ; n(b, #7:Fresh) ; pke(hpke(data(b, #8:Fresh), pkey(a, b)), s), b)), nil] ) || #9:IntruderKnowledge))
+< 1 . 6 . 2 . 7 . 3 . 2 . 3 > (
+:: nil ::
+[ nil | 
+   -(b), 
+   -(n(a, #0:Fresh) ; #1:Enc), 
+   +(b ; n(a, #0:Fresh) ; #1:Enc), nil]  & 
+:: nil ::
+[ nil | 
+   -(n(a, #0:Fresh)), 
+   -(#1:Enc), 
+   +(n(a, #0:Fresh) ; #1:Enc), nil]  & 
+:: nil ::
+[ nil | 
+   -(b ; n(a, #0:Fresh) ; #1:Enc), 
+   +(sign(b ; n(a, #0:Fresh) ; #1:Enc, i)), nil]  & 
+:: nil ::
+[ nil | 
+   -(sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(a, #2:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), a)), 
+   +(sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; f(hpke(data(a, #2:Fresh), pkey(a, b)), hpke(data(b, #4:Fresh), pkey(i, b))), s)), nil]  & 
+:: #2:Fresh,#0:Fresh ::
+[ nil, 
+   +(sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #2:Fresh), pkey(a, b)), s), a)) | 
+   -(sign(n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), b)), 
+   +(sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(a, #2:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), a)), 
+   -(sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; f(hpke(data(a, #2:Fresh), pkey(a, b)), hpke(data(b, #4:Fresh), pkey(i, b))), s)), nil]  & 
+:: #3:Fresh,#4:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #0:Fresh) ; #1:Enc, i)), 
+   +(sign(n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), b)), nil] )
+|| 
+#1:Enc !inI,
+(b ; n(a, #0:Fresh) ; #1:Enc) !inI,
+(n(a, #0:Fresh) ; #1:Enc) !inI,
+sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(a, #2:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), a) !inI,
+sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; f(hpke(data(a, #2:Fresh), pkey(a, b)), hpke(data(b, #4:Fresh), pkey(i, b))), s) !inI,
+sign(b ; n(a, #0:Fresh) ; #1:Enc, i) !inI,
+sign(n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), b) !inI,
+n(a, #0:Fresh) inI
+|| 
+generatedByIntruder(#1:Enc), 
+-(n(a, #0:Fresh)), 
+-(#1:Enc), 
++(n(a, #0:Fresh) ; #1:Enc), 
+-(b), 
+-(n(a, #0:Fresh) ; #1:Enc), 
++(b ; n(a, #0:Fresh) ; #1:Enc), 
+-(b ; n(a, #0:Fresh) ; #1:Enc), 
++(sign(b ; n(a, #0:Fresh) ; #1:Enc, i)), 
+-(sign(b ; n(a, #0:Fresh) ; #1:Enc, i)), 
++(sign(n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), b)), 
+-(sign(n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), b)), 
++(sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(a, #2:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), a)), 
+-(sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(a, #2:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), a)), 
++(sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; f(hpke(data(a, #2:Fresh), pkey(a, b)), hpke(data(b, #4:Fresh), pkey(i, b))), s)), 
+-(sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; f(hpke(data(a, #2:Fresh), pkey(a, b)), hpke(data(b, #4:Fresh), pkey(i, b))), s))
+|| 
+nil
+|| never((#5:StrandSet & 
+:: #6:Fresh,#7:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #2:Fresh), pkey(a, b)), s), a)), 
+   +(sign(n(a, #0:Fresh) ; n(b, #6:Fresh) ; pke(hpke(data(b, #7:Fresh), pkey(a, b)), s), b)), nil] ) || #8:IntruderKnowledge)
+==========================================
+reduce in MAUDE-NPA : run(7) .
+rewrites: 18 in 0ms cpu (0ms real) (18000000 rewrites/second)
+result IdSystemSet: (< 1 . 6 . 2 . 7 . 3 . 2 . 2 . 7 > (
+:: nil ::
+[ nil | 
+   -(b), 
+   -(n(a, #1:Fresh) ; #2:Enc), 
+   +(b ; n(a, #1:Fresh) ; #2:Enc), nil]  & 
+:: nil ::
+[ nil | 
+   -(b ; n(a, #1:Fresh) ; #2:Enc), 
+   +(sign(b ; n(a, #1:Fresh) ; #2:Enc, i)), nil]  & 
+:: nil ::
+[ nil | 
+   -(#0:Msg ; n(a, #1:Fresh) ; #2:Enc), 
+   +(n(a, #1:Fresh) ; #2:Enc), nil]  & 
+:: nil ::
+[ nil | 
+   -(sign(a ; b ; n(a, #1:Fresh) ; n(b, #5:Fresh) ; pke(hpke(data(a, #4:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #6:Fresh), pkey(i, b)), s), a)), 
+   +(sign(a ; b ; n(a, #1:Fresh) ; n(b, #5:Fresh) ; f(hpke(data(a, #4:Fresh), pkey(a, b)), hpke(data(b, #6:Fresh), pkey(i, b))), s)), nil]  & 
+:: nil ::
+[ nil | 
+   -(sign(#0:Msg ; n(a, #1:Fresh) ; #2:Enc, #3:Name)), 
+   +(#0:Msg ; n(a, #1:Fresh) ; #2:Enc), nil]  & 
+:: #1:Fresh,#4:Fresh ::
+[ nil, 
+   +(sign(b ; n(a, #1:Fresh) ; pke(hpke(data(a, #4:Fresh), pkey(a, b)), s), a)) | 
+   -(sign(n(a, #1:Fresh) ; n(b, #5:Fresh) ; pke(hpke(data(b, #6:Fresh), pkey(i, b)), s), b)), 
+   +(sign(a ; b ; n(a, #1:Fresh) ; n(b, #5:Fresh) ; pke(hpke(data(a, #4:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #6:Fresh), pkey(i, b)), s), a)), 
+   -(sign(a ; b ; n(a, #1:Fresh) ; n(b, #5:Fresh) ; f(hpke(data(a, #4:Fresh), pkey(a, b)), hpke(data(b, #6:Fresh), pkey(i, b))), s)), nil]  & 
+:: #5:Fresh,#6:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #1:Fresh) ; #2:Enc, i)), 
+   +(sign(n(a, #1:Fresh) ; n(b, #5:Fresh) ; pke(hpke(data(b, #6:Fresh), pkey(i, b)), s), b)), nil] )
+|| 
+(b ; n(a, #1:Fresh) ; #2:Enc) !inI,
+(#0:Msg ; n(a, #1:Fresh) ; #2:Enc) !inI,
+(n(a, #1:Fresh) ; #2:Enc) !inI,
+sign(a ; b ; n(a, #1:Fresh) ; n(b, #5:Fresh) ; pke(hpke(data(a, #4:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #6:Fresh), pkey(i, b)), s), a) !inI,
+sign(a ; b ; n(a, #1:Fresh) ; n(b, #5:Fresh) ; f(hpke(data(a, #4:Fresh), pkey(a, b)), hpke(data(b, #6:Fresh), pkey(i, b))), s) !inI,
+sign(b ; n(a, #1:Fresh) ; #2:Enc, i) !inI,
+sign(n(a, #1:Fresh) ; n(b, #5:Fresh) ; pke(hpke(data(b, #6:Fresh), pkey(i, b)), s), b) !inI,
+sign(#0:Msg ; n(a, #1:Fresh) ; #2:Enc, #3:Name) inI
+|| 
+-(sign(#0:Msg ; n(a, #1:Fresh) ; #2:Enc, #3:Name)), 
++(#0:Msg ; n(a, #1:Fresh) ; #2:Enc), 
+-(#0:Msg ; n(a, #1:Fresh) ; #2:Enc), 
++(n(a, #1:Fresh) ; #2:Enc), 
+-(b), 
+-(n(a, #1:Fresh) ; #2:Enc), 
++(b ; n(a, #1:Fresh) ; #2:Enc), 
+-(b ; n(a, #1:Fresh) ; #2:Enc), 
++(sign(b ; n(a, #1:Fresh) ; #2:Enc, i)), 
+-(sign(b ; n(a, #1:Fresh) ; #2:Enc, i)), 
++(sign(n(a, #1:Fresh) ; n(b, #5:Fresh) ; pke(hpke(data(b, #6:Fresh), pkey(i, b)), s), b)), 
+-(sign(n(a, #1:Fresh) ; n(b, #5:Fresh) ; pke(hpke(data(b, #6:Fresh), pkey(i, b)), s), b)), 
++(sign(a ; b ; n(a, #1:Fresh) ; n(b, #5:Fresh) ; pke(hpke(data(a, #4:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #6:Fresh), pkey(i, b)), s), a)), 
+-(sign(a ; b ; n(a, #1:Fresh) ; n(b, #5:Fresh) ; pke(hpke(data(a, #4:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #6:Fresh), pkey(i, b)), s), a)), 
++(sign(a ; b ; n(a, #1:Fresh) ; n(b, #5:Fresh) ; f(hpke(data(a, #4:Fresh), pkey(a, b)), hpke(data(b, #6:Fresh), pkey(i, b))), s)), 
+-(sign(a ; b ; n(a, #1:Fresh) ; n(b, #5:Fresh) ; f(hpke(data(a, #4:Fresh), pkey(a, b)), hpke(data(b, #6:Fresh), pkey(i, b))), s))
+|| 
+nil
+|| never((#7:StrandSet & 
+:: #8:Fresh,#9:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #1:Fresh) ; pke(hpke(data(a, #4:Fresh), pkey(a, b)), s), a)), 
+   +(sign(n(a, #1:Fresh) ; n(b, #8:Fresh) ; pke(hpke(data(b, #9:Fresh), pkey(a, b)), s), b)), nil] ) || #10:IntruderKnowledge))
+< 1 . 6 . 2 . 7 . 3 . 2 . 3 . 3 > (
+:: nil ::
+[ nil | 
+   -(b), 
+   -(n(a, #0:Fresh) ; #5:Enc), 
+   +(b ; n(a, #0:Fresh) ; #5:Enc), nil]  & 
+:: nil ::
+[ nil | 
+   -(n(a, #0:Fresh)), 
+   -(#5:Enc), 
+   +(n(a, #0:Fresh) ; #5:Enc), nil]  & 
+:: nil ::
+[ nil | 
+   -(b ; n(a, #0:Fresh) ; #5:Enc), 
+   +(sign(b ; n(a, #0:Fresh) ; #5:Enc, i)), nil]  & 
+:: nil ::
+[ nil | 
+   -(n(a, #0:Fresh) ; #1:Msg), 
+   +(n(a, #0:Fresh)), nil]  & 
+:: nil ::
+[ nil | 
+   -(sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(a, #2:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), a)), 
+   +(sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; f(hpke(data(a, #2:Fresh), pkey(a, b)), hpke(data(b, #4:Fresh), pkey(i, b))), s)), nil]  & 
+:: #2:Fresh,#0:Fresh ::
+[ nil, 
+   +(sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #2:Fresh), pkey(a, b)), s), a)) | 
+   -(sign(n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), b)), 
+   +(sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(a, #2:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), a)), 
+   -(sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; f(hpke(data(a, #2:Fresh), pkey(a, b)), hpke(data(b, #4:Fresh), pkey(i, b))), s)), nil]  & 
+:: #3:Fresh,#4:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #0:Fresh) ; #5:Enc, i)), 
+   +(sign(n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), b)), nil] )
+|| 
+#5:Enc !inI,
+n(a, #0:Fresh) !inI,
+(b ; n(a, #0:Fresh) ; #5:Enc) !inI,
+(n(a, #0:Fresh) ; #5:Enc) !inI,
+sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(a, #2:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), a) !inI,
+sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; f(hpke(data(a, #2:Fresh), pkey(a, b)), hpke(data(b, #4:Fresh), pkey(i, b))), s) !inI,
+sign(b ; n(a, #0:Fresh) ; #5:Enc, i) !inI,
+sign(n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), b) !inI,
+(n(a, #0:Fresh) ; #1:Msg) inI
+|| 
+-(n(a, #0:Fresh) ; #1:Msg), 
++(n(a, #0:Fresh)), 
+generatedByIntruder(#5:Enc), 
+-(n(a, #0:Fresh)), 
+-(#5:Enc), 
++(n(a, #0:Fresh) ; #5:Enc), 
+-(b), 
+-(n(a, #0:Fresh) ; #5:Enc), 
++(b ; n(a, #0:Fresh) ; #5:Enc), 
+-(b ; n(a, #0:Fresh) ; #5:Enc), 
++(sign(b ; n(a, #0:Fresh) ; #5:Enc, i)), 
+-(sign(b ; n(a, #0:Fresh) ; #5:Enc, i)), 
++(sign(n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), b)), 
+-(sign(n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), b)), 
++(sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(a, #2:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), a)), 
+-(sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; pke(hpke(data(a, #2:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #4:Fresh), pkey(i, b)), s), a)), 
++(sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; f(hpke(data(a, #2:Fresh), pkey(a, b)), hpke(data(b, #4:Fresh), pkey(i, b))), s)), 
+-(sign(a ; b ; n(a, #0:Fresh) ; n(b, #3:Fresh) ; f(hpke(data(a, #2:Fresh), pkey(a, b)), hpke(data(b, #4:Fresh), pkey(i, b))), s))
+|| 
+nil
+|| never((#6:StrandSet & 
+:: #7:Fresh,#8:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #2:Fresh), pkey(a, b)), s), a)), 
+   +(sign(n(a, #0:Fresh) ; n(b, #7:Fresh) ; pke(hpke(data(b, #8:Fresh), pkey(a, b)), s), b)), nil] ) || #9:IntruderKnowledge)
+==========================================
+reduce in MAUDE-NPA : run(8) .
+rewrites: 18 in 0ms cpu (0ms real) (18000000 rewrites/second)
+result IdSystemSet: (< 1 . 6 . 2 . 7 . 3 . 2 . 3 . 3 . 2 > (
+:: nil ::
+[ nil | 
+   -(b), 
+   -(n(a, #1:Fresh) ; #6:Enc), 
+   +(b ; n(a, #1:Fresh) ; #6:Enc), nil]  & 
+:: nil ::
+[ nil | 
+   -(n(a, #1:Fresh)), 
+   -(#6:Enc), 
+   +(n(a, #1:Fresh) ; #6:Enc), nil]  & 
+:: nil ::
+[ nil | 
+   -(b ; n(a, #1:Fresh) ; #6:Enc), 
+   +(sign(b ; n(a, #1:Fresh) ; #6:Enc, i)), nil]  & 
+:: nil ::
+[ nil | 
+   -(#0:Msg ; n(a, #1:Fresh) ; #2:Msg), 
+   +(n(a, #1:Fresh) ; #2:Msg), nil]  & 
+:: nil ::
+[ nil | 
+   -(n(a, #1:Fresh) ; #2:Msg), 
+   +(n(a, #1:Fresh)), nil]  & 
+:: nil ::
+[ nil | 
+   -(sign(a ; b ; n(a, #1:Fresh) ; n(b, #4:Fresh) ; pke(hpke(data(a, #3:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #5:Fresh), pkey(i, b)), s), a)), 
+   +(sign(a ; b ; n(a, #1:Fresh) ; n(b, #4:Fresh) ; f(hpke(data(a, #3:Fresh), pkey(a, b)), hpke(data(b, #5:Fresh), pkey(i, b))), s)), nil]  & 
+:: #1:Fresh,#3:Fresh ::
+[ nil, 
+   +(sign(b ; n(a, #1:Fresh) ; pke(hpke(data(a, #3:Fresh), pkey(a, b)), s), a)) | 
+   -(sign(n(a, #1:Fresh) ; n(b, #4:Fresh) ; pke(hpke(data(b, #5:Fresh), pkey(i, b)), s), b)), 
+   +(sign(a ; b ; n(a, #1:Fresh) ; n(b, #4:Fresh) ; pke(hpke(data(a, #3:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #5:Fresh), pkey(i, b)), s), a)), 
+   -(sign(a ; b ; n(a, #1:Fresh) ; n(b, #4:Fresh) ; f(hpke(data(a, #3:Fresh), pkey(a, b)), hpke(data(b, #5:Fresh), pkey(i, b))), s)), nil]  & 
+:: #5:Fresh,#4:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #1:Fresh) ; #6:Enc, i)), 
+   +(sign(n(a, #1:Fresh) ; n(b, #4:Fresh) ; pke(hpke(data(b, #5:Fresh), pkey(i, b)), s), b)), nil] )
+|| 
+#6:Enc !inI,
+n(a, #1:Fresh) !inI,
+(b ; n(a, #1:Fresh) ; #6:Enc) !inI,
+(n(a, #1:Fresh) ; #2:Msg) !inI,
+(n(a, #1:Fresh) ; #6:Enc) !inI,
+sign(a ; b ; n(a, #1:Fresh) ; n(b, #4:Fresh) ; pke(hpke(data(a, #3:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #5:Fresh), pkey(i, b)), s), a) !inI,
+sign(a ; b ; n(a, #1:Fresh) ; n(b, #4:Fresh) ; f(hpke(data(a, #3:Fresh), pkey(a, b)), hpke(data(b, #5:Fresh), pkey(i, b))), s) !inI,
+sign(b ; n(a, #1:Fresh) ; #6:Enc, i) !inI,
+sign(n(a, #1:Fresh) ; n(b, #4:Fresh) ; pke(hpke(data(b, #5:Fresh), pkey(i, b)), s), b) !inI,
+(#0:Msg ; n(a, #1:Fresh) ; #2:Msg) inI
+|| 
+-(#0:Msg ; n(a, #1:Fresh) ; #2:Msg), 
++(n(a, #1:Fresh) ; #2:Msg), 
+-(n(a, #1:Fresh) ; #2:Msg), 
++(n(a, #1:Fresh)), 
+generatedByIntruder(#6:Enc), 
+-(n(a, #1:Fresh)), 
+-(#6:Enc), 
++(n(a, #1:Fresh) ; #6:Enc), 
+-(b), 
+-(n(a, #1:Fresh) ; #6:Enc), 
++(b ; n(a, #1:Fresh) ; #6:Enc), 
+-(b ; n(a, #1:Fresh) ; #6:Enc), 
++(sign(b ; n(a, #1:Fresh) ; #6:Enc, i)), 
+-(sign(b ; n(a, #1:Fresh) ; #6:Enc, i)), 
++(sign(n(a, #1:Fresh) ; n(b, #4:Fresh) ; pke(hpke(data(b, #5:Fresh), pkey(i, b)), s), b)), 
+-(sign(n(a, #1:Fresh) ; n(b, #4:Fresh) ; pke(hpke(data(b, #5:Fresh), pkey(i, b)), s), b)), 
++(sign(a ; b ; n(a, #1:Fresh) ; n(b, #4:Fresh) ; pke(hpke(data(a, #3:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #5:Fresh), pkey(i, b)), s), a)), 
+-(sign(a ; b ; n(a, #1:Fresh) ; n(b, #4:Fresh) ; pke(hpke(data(a, #3:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #5:Fresh), pkey(i, b)), s), a)), 
++(sign(a ; b ; n(a, #1:Fresh) ; n(b, #4:Fresh) ; f(hpke(data(a, #3:Fresh), pkey(a, b)), hpke(data(b, #5:Fresh), pkey(i, b))), s)), 
+-(sign(a ; b ; n(a, #1:Fresh) ; n(b, #4:Fresh) ; f(hpke(data(a, #3:Fresh), pkey(a, b)), hpke(data(b, #5:Fresh), pkey(i, b))), s))
+|| 
+nil
+|| never((#7:StrandSet & 
+:: #8:Fresh,#9:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #1:Fresh) ; pke(hpke(data(a, #3:Fresh), pkey(a, b)), s), a)), 
+   +(sign(n(a, #1:Fresh) ; n(b, #8:Fresh) ; pke(hpke(data(b, #9:Fresh), pkey(a, b)), s), b)), nil] ) || #10:IntruderKnowledge))
+< 1 . 6 . 2 . 7 . 3 . 2 . 3 . 3 . 8 > (
+:: nil ::
+[ nil | 
+   -(b), 
+   -(n(a, #0:Fresh) ; #6:Enc), 
+   +(b ; n(a, #0:Fresh) ; #6:Enc), nil]  & 
+:: nil ::
+[ nil | 
+   -(n(a, #0:Fresh)), 
+   -(#6:Enc), 
+   +(n(a, #0:Fresh) ; #6:Enc), nil]  & 
+:: nil ::
+[ nil | 
+   -(b ; n(a, #0:Fresh) ; #6:Enc), 
+   +(sign(b ; n(a, #0:Fresh) ; #6:Enc, i)), nil]  & 
+:: nil ::
+[ nil | 
+   -(n(a, #0:Fresh) ; #1:Msg), 
+   +(n(a, #0:Fresh)), nil]  & 
+:: nil ::
+[ nil | 
+   -(sign(a ; b ; n(a, #0:Fresh) ; n(b, #4:Fresh) ; pke(hpke(data(a, #3:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #5:Fresh), pkey(i, b)), s), a)), 
+   +(sign(a ; b ; n(a, #0:Fresh) ; n(b, #4:Fresh) ; f(hpke(data(a, #3:Fresh), pkey(a, b)), hpke(data(b, #5:Fresh), pkey(i, b))), s)), nil]  & 
+:: nil ::
+[ nil | 
+   -(sign(n(a, #0:Fresh) ; #1:Msg, #2:Name)), 
+   +(n(a, #0:Fresh) ; #1:Msg), nil]  & 
+:: #0:Fresh,#3:Fresh ::
+[ nil, 
+   +(sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #3:Fresh), pkey(a, b)), s), a)) | 
+   -(sign(n(a, #0:Fresh) ; n(b, #4:Fresh) ; pke(hpke(data(b, #5:Fresh), pkey(i, b)), s), b)), 
+   +(sign(a ; b ; n(a, #0:Fresh) ; n(b, #4:Fresh) ; pke(hpke(data(a, #3:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #5:Fresh), pkey(i, b)), s), a)), 
+   -(sign(a ; b ; n(a, #0:Fresh) ; n(b, #4:Fresh) ; f(hpke(data(a, #3:Fresh), pkey(a, b)), hpke(data(b, #5:Fresh), pkey(i, b))), s)), nil]  & 
+:: #5:Fresh,#4:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #0:Fresh) ; #6:Enc, i)), 
+   +(sign(n(a, #0:Fresh) ; n(b, #4:Fresh) ; pke(hpke(data(b, #5:Fresh), pkey(i, b)), s), b)), nil] )
+|| 
+#6:Enc !inI,
+n(a, #0:Fresh) !inI,
+(b ; n(a, #0:Fresh) ; #6:Enc) !inI,
+(n(a, #0:Fresh) ; #1:Msg) !inI,
+(n(a, #0:Fresh) ; #6:Enc) !inI,
+sign(a ; b ; n(a, #0:Fresh) ; n(b, #4:Fresh) ; pke(hpke(data(a, #3:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #5:Fresh), pkey(i, b)), s), a) !inI,
+sign(a ; b ; n(a, #0:Fresh) ; n(b, #4:Fresh) ; f(hpke(data(a, #3:Fresh), pkey(a, b)), hpke(data(b, #5:Fresh), pkey(i, b))), s) !inI,
+sign(b ; n(a, #0:Fresh) ; #6:Enc, i) !inI,
+sign(n(a, #0:Fresh) ; n(b, #4:Fresh) ; pke(hpke(data(b, #5:Fresh), pkey(i, b)), s), b) !inI,
+sign(n(a, #0:Fresh) ; #1:Msg, #2:Name) inI
+|| 
+-(sign(n(a, #0:Fresh) ; #1:Msg, #2:Name)), 
++(n(a, #0:Fresh) ; #1:Msg), 
+-(n(a, #0:Fresh) ; #1:Msg), 
++(n(a, #0:Fresh)), 
+generatedByIntruder(#6:Enc), 
+-(n(a, #0:Fresh)), 
+-(#6:Enc), 
++(n(a, #0:Fresh) ; #6:Enc), 
+-(b), 
+-(n(a, #0:Fresh) ; #6:Enc), 
++(b ; n(a, #0:Fresh) ; #6:Enc), 
+-(b ; n(a, #0:Fresh) ; #6:Enc), 
++(sign(b ; n(a, #0:Fresh) ; #6:Enc, i)), 
+-(sign(b ; n(a, #0:Fresh) ; #6:Enc, i)), 
++(sign(n(a, #0:Fresh) ; n(b, #4:Fresh) ; pke(hpke(data(b, #5:Fresh), pkey(i, b)), s), b)), 
+-(sign(n(a, #0:Fresh) ; n(b, #4:Fresh) ; pke(hpke(data(b, #5:Fresh), pkey(i, b)), s), b)), 
++(sign(a ; b ; n(a, #0:Fresh) ; n(b, #4:Fresh) ; pke(hpke(data(a, #3:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #5:Fresh), pkey(i, b)), s), a)), 
+-(sign(a ; b ; n(a, #0:Fresh) ; n(b, #4:Fresh) ; pke(hpke(data(a, #3:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #5:Fresh), pkey(i, b)), s), a)), 
++(sign(a ; b ; n(a, #0:Fresh) ; n(b, #4:Fresh) ; f(hpke(data(a, #3:Fresh), pkey(a, b)), hpke(data(b, #5:Fresh), pkey(i, b))), s)), 
+-(sign(a ; b ; n(a, #0:Fresh) ; n(b, #4:Fresh) ; f(hpke(data(a, #3:Fresh), pkey(a, b)), hpke(data(b, #5:Fresh), pkey(i, b))), s))
+|| 
+nil
+|| never((#7:StrandSet & 
+:: #8:Fresh,#9:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #3:Fresh), pkey(a, b)), s), a)), 
+   +(sign(n(a, #0:Fresh) ; n(b, #8:Fresh) ; pke(hpke(data(b, #9:Fresh), pkey(a, b)), s), b)), nil] ) || #10:IntruderKnowledge)
+==========================================
+reduce in MAUDE-NPA : run(9) .
+rewrites: 18 in 0ms cpu (0ms real) (18000000 rewrites/second)
+result IdSystemSet: (< 1 . 6 . 2 . 7 . 3 . 2 . 3 . 3 . 2 . 7 > (
+:: nil ::
+[ nil | 
+   -(b), 
+   -(n(a, #1:Fresh) ; #7:Enc), 
+   +(b ; n(a, #1:Fresh) ; #7:Enc), nil]  & 
+:: nil ::
+[ nil | 
+   -(n(a, #1:Fresh)), 
+   -(#7:Enc), 
+   +(n(a, #1:Fresh) ; #7:Enc), nil]  & 
+:: nil ::
+[ nil | 
+   -(b ; n(a, #1:Fresh) ; #7:Enc), 
+   +(sign(b ; n(a, #1:Fresh) ; #7:Enc, i)), nil]  & 
+:: nil ::
+[ nil | 
+   -(#0:Msg ; n(a, #1:Fresh) ; #2:Msg), 
+   +(n(a, #1:Fresh) ; #2:Msg), nil]  & 
+:: nil ::
+[ nil | 
+   -(n(a, #1:Fresh) ; #2:Msg), 
+   +(n(a, #1:Fresh)), nil]  & 
+:: nil ::
+[ nil | 
+   -(sign(a ; b ; n(a, #1:Fresh) ; n(b, #5:Fresh) ; pke(hpke(data(a, #4:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #6:Fresh), pkey(i, b)), s), a)), 
+   +(sign(a ; b ; n(a, #1:Fresh) ; n(b, #5:Fresh) ; f(hpke(data(a, #4:Fresh), pkey(a, b)), hpke(data(b, #6:Fresh), pkey(i, b))), s)), nil]  & 
+:: nil ::
+[ nil | 
+   -(sign(#0:Msg ; n(a, #1:Fresh) ; #2:Msg, #3:Name)), 
+   +(#0:Msg ; n(a, #1:Fresh) ; #2:Msg), nil]  & 
+:: #1:Fresh,#4:Fresh ::
+[ nil, 
+   +(sign(b ; n(a, #1:Fresh) ; pke(hpke(data(a, #4:Fresh), pkey(a, b)), s), a)) | 
+   -(sign(n(a, #1:Fresh) ; n(b, #5:Fresh) ; pke(hpke(data(b, #6:Fresh), pkey(i, b)), s), b)), 
+   +(sign(a ; b ; n(a, #1:Fresh) ; n(b, #5:Fresh) ; pke(hpke(data(a, #4:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #6:Fresh), pkey(i, b)), s), a)), 
+   -(sign(a ; b ; n(a, #1:Fresh) ; n(b, #5:Fresh) ; f(hpke(data(a, #4:Fresh), pkey(a, b)), hpke(data(b, #6:Fresh), pkey(i, b))), s)), nil]  & 
+:: #5:Fresh,#6:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #1:Fresh) ; #7:Enc, i)), 
+   +(sign(n(a, #1:Fresh) ; n(b, #5:Fresh) ; pke(hpke(data(b, #6:Fresh), pkey(i, b)), s), b)), nil] )
+|| 
+#7:Enc !inI,
+n(a, #1:Fresh) !inI,
+(b ; n(a, #1:Fresh) ; #7:Enc) !inI,
+(#0:Msg ; n(a, #1:Fresh) ; #2:Msg) !inI,
+(n(a, #1:Fresh) ; #2:Msg) !inI,
+(n(a, #1:Fresh) ; #7:Enc) !inI,
+sign(a ; b ; n(a, #1:Fresh) ; n(b, #5:Fresh) ; pke(hpke(data(a, #4:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #6:Fresh), pkey(i, b)), s), a) !inI,
+sign(a ; b ; n(a, #1:Fresh) ; n(b, #5:Fresh) ; f(hpke(data(a, #4:Fresh), pkey(a, b)), hpke(data(b, #6:Fresh), pkey(i, b))), s) !inI,
+sign(b ; n(a, #1:Fresh) ; #7:Enc, i) !inI,
+sign(n(a, #1:Fresh) ; n(b, #5:Fresh) ; pke(hpke(data(b, #6:Fresh), pkey(i, b)), s), b) !inI,
+sign(#0:Msg ; n(a, #1:Fresh) ; #2:Msg, #3:Name) inI
+|| 
+-(sign(#0:Msg ; n(a, #1:Fresh) ; #2:Msg, #3:Name)), 
++(#0:Msg ; n(a, #1:Fresh) ; #2:Msg), 
+-(#0:Msg ; n(a, #1:Fresh) ; #2:Msg), 
++(n(a, #1:Fresh) ; #2:Msg), 
+-(n(a, #1:Fresh) ; #2:Msg), 
++(n(a, #1:Fresh)), 
+generatedByIntruder(#7:Enc), 
+-(n(a, #1:Fresh)), 
+-(#7:Enc), 
++(n(a, #1:Fresh) ; #7:Enc), 
+-(b), 
+-(n(a, #1:Fresh) ; #7:Enc), 
++(b ; n(a, #1:Fresh) ; #7:Enc), 
+-(b ; n(a, #1:Fresh) ; #7:Enc), 
++(sign(b ; n(a, #1:Fresh) ; #7:Enc, i)), 
+-(sign(b ; n(a, #1:Fresh) ; #7:Enc, i)), 
++(sign(n(a, #1:Fresh) ; n(b, #5:Fresh) ; pke(hpke(data(b, #6:Fresh), pkey(i, b)), s), b)), 
+-(sign(n(a, #1:Fresh) ; n(b, #5:Fresh) ; pke(hpke(data(b, #6:Fresh), pkey(i, b)), s), b)), 
++(sign(a ; b ; n(a, #1:Fresh) ; n(b, #5:Fresh) ; pke(hpke(data(a, #4:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #6:Fresh), pkey(i, b)), s), a)), 
+-(sign(a ; b ; n(a, #1:Fresh) ; n(b, #5:Fresh) ; pke(hpke(data(a, #4:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #6:Fresh), pkey(i, b)), s), a)), 
++(sign(a ; b ; n(a, #1:Fresh) ; n(b, #5:Fresh) ; f(hpke(data(a, #4:Fresh), pkey(a, b)), hpke(data(b, #6:Fresh), pkey(i, b))), s)), 
+-(sign(a ; b ; n(a, #1:Fresh) ; n(b, #5:Fresh) ; f(hpke(data(a, #4:Fresh), pkey(a, b)), hpke(data(b, #6:Fresh), pkey(i, b))), s))
+|| 
+nil
+|| never((#8:StrandSet & 
+:: #9:Fresh,#10:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #1:Fresh) ; pke(hpke(data(a, #4:Fresh), pkey(a, b)), s), a)), 
+   +(sign(n(a, #1:Fresh) ; n(b, #9:Fresh) ; pke(hpke(data(b, #10:Fresh), pkey(a, b)), s), b)), nil] ) || #11:IntruderKnowledge))
+< 1 . 6 . 2 . 7 . 3 . 2 . 3 . 3 . 2 . 8 > (
+:: nil ::
+[ nil | 
+   -(b), 
+   -(n(a, #2:Fresh) ; #7:Enc), 
+   +(b ; n(a, #2:Fresh) ; #7:Enc), nil]  & 
+:: nil ::
+[ nil | 
+   -(n(a, #2:Fresh)), 
+   -(#7:Enc), 
+   +(n(a, #2:Fresh) ; #7:Enc), nil]  & 
+:: nil ::
+[ nil | 
+   -(b ; n(a, #2:Fresh) ; #7:Enc), 
+   +(sign(b ; n(a, #2:Fresh) ; #7:Enc, i)), nil]  & 
+:: nil ::
+[ nil | 
+   -(#1:Msg ; n(a, #2:Fresh) ; #3:Msg), 
+   +(n(a, #2:Fresh) ; #3:Msg), nil]  & 
+:: nil ::
+[ nil | 
+   -(#0:Msg ; #1:Msg ; n(a, #2:Fresh) ; #3:Msg), 
+   +(#1:Msg ; n(a, #2:Fresh) ; #3:Msg), nil]  & 
+:: nil ::
+[ nil | 
+   -(n(a, #2:Fresh) ; #3:Msg), 
+   +(n(a, #2:Fresh)), nil]  & 
+:: nil ::
+[ nil | 
+   -(sign(a ; b ; n(a, #2:Fresh) ; n(b, #5:Fresh) ; pke(hpke(data(a, #4:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #6:Fresh), pkey(i, b)), s), a)), 
+   +(sign(a ; b ; n(a, #2:Fresh) ; n(b, #5:Fresh) ; f(hpke(data(a, #4:Fresh), pkey(a, b)), hpke(data(b, #6:Fresh), pkey(i, b))), s)), nil]  & 
+:: #2:Fresh,#4:Fresh ::
+[ nil, 
+   +(sign(b ; n(a, #2:Fresh) ; pke(hpke(data(a, #4:Fresh), pkey(a, b)), s), a)) | 
+   -(sign(n(a, #2:Fresh) ; n(b, #5:Fresh) ; pke(hpke(data(b, #6:Fresh), pkey(i, b)), s), b)), 
+   +(sign(a ; b ; n(a, #2:Fresh) ; n(b, #5:Fresh) ; pke(hpke(data(a, #4:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #6:Fresh), pkey(i, b)), s), a)), 
+   -(sign(a ; b ; n(a, #2:Fresh) ; n(b, #5:Fresh) ; f(hpke(data(a, #4:Fresh), pkey(a, b)), hpke(data(b, #6:Fresh), pkey(i, b))), s)), nil]  & 
+:: #5:Fresh,#6:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #2:Fresh) ; #7:Enc, i)), 
+   +(sign(n(a, #2:Fresh) ; n(b, #5:Fresh) ; pke(hpke(data(b, #6:Fresh), pkey(i, b)), s), b)), nil] )
+|| 
+#7:Enc !inI,
+n(a, #2:Fresh) !inI,
+(b ; n(a, #2:Fresh) ; #7:Enc) !inI,
+(#1:Msg ; n(a, #2:Fresh) ; #3:Msg) !inI,
+(n(a, #2:Fresh) ; #3:Msg) !inI,
+(n(a, #2:Fresh) ; #7:Enc) !inI,
+sign(a ; b ; n(a, #2:Fresh) ; n(b, #5:Fresh) ; pke(hpke(data(a, #4:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #6:Fresh), pkey(i, b)), s), a) !inI,
+sign(a ; b ; n(a, #2:Fresh) ; n(b, #5:Fresh) ; f(hpke(data(a, #4:Fresh), pkey(a, b)), hpke(data(b, #6:Fresh), pkey(i, b))), s) !inI,
+sign(b ; n(a, #2:Fresh) ; #7:Enc, i) !inI,
+sign(n(a, #2:Fresh) ; n(b, #5:Fresh) ; pke(hpke(data(b, #6:Fresh), pkey(i, b)), s), b) !inI,
+(#0:Msg ; #1:Msg ; n(a, #2:Fresh) ; #3:Msg) inI
+|| 
+-(#0:Msg ; #1:Msg ; n(a, #2:Fresh) ; #3:Msg), 
++(#1:Msg ; n(a, #2:Fresh) ; #3:Msg), 
+-(#1:Msg ; n(a, #2:Fresh) ; #3:Msg), 
++(n(a, #2:Fresh) ; #3:Msg), 
+-(n(a, #2:Fresh) ; #3:Msg), 
++(n(a, #2:Fresh)), 
+generatedByIntruder(#7:Enc), 
+-(n(a, #2:Fresh)), 
+-(#7:Enc), 
++(n(a, #2:Fresh) ; #7:Enc), 
+-(b), 
+-(n(a, #2:Fresh) ; #7:Enc), 
++(b ; n(a, #2:Fresh) ; #7:Enc), 
+-(b ; n(a, #2:Fresh) ; #7:Enc), 
++(sign(b ; n(a, #2:Fresh) ; #7:Enc, i)), 
+-(sign(b ; n(a, #2:Fresh) ; #7:Enc, i)), 
++(sign(n(a, #2:Fresh) ; n(b, #5:Fresh) ; pke(hpke(data(b, #6:Fresh), pkey(i, b)), s), b)), 
+-(sign(n(a, #2:Fresh) ; n(b, #5:Fresh) ; pke(hpke(data(b, #6:Fresh), pkey(i, b)), s), b)), 
++(sign(a ; b ; n(a, #2:Fresh) ; n(b, #5:Fresh) ; pke(hpke(data(a, #4:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #6:Fresh), pkey(i, b)), s), a)), 
+-(sign(a ; b ; n(a, #2:Fresh) ; n(b, #5:Fresh) ; pke(hpke(data(a, #4:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #6:Fresh), pkey(i, b)), s), a)), 
++(sign(a ; b ; n(a, #2:Fresh) ; n(b, #5:Fresh) ; f(hpke(data(a, #4:Fresh), pkey(a, b)), hpke(data(b, #6:Fresh), pkey(i, b))), s)), 
+-(sign(a ; b ; n(a, #2:Fresh) ; n(b, #5:Fresh) ; f(hpke(data(a, #4:Fresh), pkey(a, b)), hpke(data(b, #6:Fresh), pkey(i, b))), s))
+|| 
+nil
+|| never((#8:StrandSet & 
+:: #9:Fresh,#10:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #2:Fresh) ; pke(hpke(data(a, #4:Fresh), pkey(a, b)), s), a)), 
+   +(sign(n(a, #2:Fresh) ; n(b, #9:Fresh) ; pke(hpke(data(b, #10:Fresh), pkey(a, b)), s), b)), nil] ) || #11:IntruderKnowledge)
+==========================================
+reduce in MAUDE-NPA : run(10) .
+rewrites: 18 in 0ms cpu (0ms real) (18000000 rewrites/second)
+result IdSystemSet: (< 1 . 6 . 2 . 7 . 3 . 2 . 3 . 3 . 2 . 7 . 1 > (
+:: nil ::
+[ nil | 
+   -(b), 
+   -(n(a, #0:Fresh) ; #4:Enc), 
+   +(b ; n(a, #0:Fresh) ; #4:Enc), nil]  & 
+:: nil ::
+[ nil | 
+   -(n(a, #0:Fresh)), 
+   -(#4:Enc), 
+   +(n(a, #0:Fresh) ; #4:Enc), nil]  & 
+:: nil ::
+[ nil | 
+   -(b ; n(a, #0:Fresh) ; #4:Enc), 
+   +(sign(b ; n(a, #0:Fresh) ; #4:Enc, i)), nil]  & 
+:: nil ::
+[ nil | 
+   -(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s)), 
+   +(n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s)), nil]  & 
+:: nil ::
+[ nil | 
+   -(n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s)), 
+   +(n(a, #0:Fresh)), nil]  & 
+:: nil ::
+[ nil | 
+   -(sign(a ; b ; n(a, #0:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #3:Fresh), pkey(i, b)), s), a)), 
+   +(sign(a ; b ; n(a, #0:Fresh) ; n(b, #2:Fresh) ; f(hpke(data(a, #1:Fresh), pkey(a, b)), hpke(data(b, #3:Fresh), pkey(i, b))), s)), nil]  & 
+:: nil ::
+[ nil | 
+   -(sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s), a)), 
+   +(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s)), nil]  & 
+:: #1:Fresh,#0:Fresh ::
+[ nil | 
+   +(sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s), a)), 
+   -(sign(n(a, #0:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(b, #3:Fresh), pkey(i, b)), s), b)), 
+   +(sign(a ; b ; n(a, #0:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #3:Fresh), pkey(i, b)), s), a)), 
+   -(sign(a ; b ; n(a, #0:Fresh) ; n(b, #2:Fresh) ; f(hpke(data(a, #1:Fresh), pkey(a, b)), hpke(data(b, #3:Fresh), pkey(i, b))), s)), nil]  & 
+:: #2:Fresh,#3:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #0:Fresh) ; #4:Enc, i)), 
+   +(sign(n(a, #0:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(b, #3:Fresh), pkey(i, b)), s), b)), nil] )
+|| 
+#4:Enc !inI,
+n(a, #0:Fresh) !inI,
+(b ; n(a, #0:Fresh) ; #4:Enc) !inI,
+(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s)) !inI,
+(n(a, #0:Fresh) ; #4:Enc) !inI,
+(n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s)) !inI,
+sign(a ; b ; n(a, #0:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #3:Fresh), pkey(i, b)), s), a) !inI,
+sign(a ; b ; n(a, #0:Fresh) ; n(b, #2:Fresh) ; f(hpke(data(a, #1:Fresh), pkey(a, b)), hpke(data(b, #3:Fresh), pkey(i, b))), s) !inI,
+sign(b ; n(a, #0:Fresh) ; #4:Enc, i) !inI,
+sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s), a) !inI,
+sign(n(a, #0:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(b, #3:Fresh), pkey(i, b)), s), b) !inI
+|| 
++(sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s), a)), 
+-(sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s), a)), 
++(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s)), 
+-(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s)), 
++(n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s)), 
+-(n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s)), 
++(n(a, #0:Fresh)), 
+generatedByIntruder(#4:Enc), 
+-(n(a, #0:Fresh)), 
+-(#4:Enc), 
++(n(a, #0:Fresh) ; #4:Enc), 
+-(b), 
+-(n(a, #0:Fresh) ; #4:Enc), 
++(b ; n(a, #0:Fresh) ; #4:Enc), 
+-(b ; n(a, #0:Fresh) ; #4:Enc), 
++(sign(b ; n(a, #0:Fresh) ; #4:Enc, i)), 
+-(sign(b ; n(a, #0:Fresh) ; #4:Enc, i)), 
++(sign(n(a, #0:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(b, #3:Fresh), pkey(i, b)), s), b)), 
+-(sign(n(a, #0:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(b, #3:Fresh), pkey(i, b)), s), b)), 
++(sign(a ; b ; n(a, #0:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #3:Fresh), pkey(i, b)), s), a)), 
+-(sign(a ; b ; n(a, #0:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #3:Fresh), pkey(i, b)), s), a)), 
++(sign(a ; b ; n(a, #0:Fresh) ; n(b, #2:Fresh) ; f(hpke(data(a, #1:Fresh), pkey(a, b)), hpke(data(b, #3:Fresh), pkey(i, b))), s)), 
+-(sign(a ; b ; n(a, #0:Fresh) ; n(b, #2:Fresh) ; f(hpke(data(a, #1:Fresh), pkey(a, b)), hpke(data(b, #3:Fresh), pkey(i, b))), s))
+|| 
+nil
+|| never((#5:StrandSet & 
+:: #6:Fresh,#7:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s), a)), 
+   +(sign(n(a, #0:Fresh) ; n(b, #6:Fresh) ; pke(hpke(data(b, #7:Fresh), pkey(a, b)), s), b)), nil] ) || #8:IntruderKnowledge))
+(< 1 . 6 . 2 . 7 . 3 . 2 . 3 . 3 . 2 . 8 . 7 > (
+:: nil ::
+[ nil | 
+   -(b), 
+   -(n(a, #2:Fresh) ; #8:Enc), 
+   +(b ; n(a, #2:Fresh) ; #8:Enc), nil]  & 
+:: nil ::
+[ nil | 
+   -(n(a, #2:Fresh)), 
+   -(#8:Enc), 
+   +(n(a, #2:Fresh) ; #8:Enc), nil]  & 
+:: nil ::
+[ nil | 
+   -(b ; n(a, #2:Fresh) ; #8:Enc), 
+   +(sign(b ; n(a, #2:Fresh) ; #8:Enc, i)), nil]  & 
+:: nil ::
+[ nil | 
+   -(#1:Msg ; n(a, #2:Fresh) ; #3:Msg), 
+   +(n(a, #2:Fresh) ; #3:Msg), nil]  & 
+:: nil ::
+[ nil | 
+   -(#0:Msg ; #1:Msg ; n(a, #2:Fresh) ; #3:Msg), 
+   +(#1:Msg ; n(a, #2:Fresh) ; #3:Msg), nil]  & 
+:: nil ::
+[ nil | 
+   -(n(a, #2:Fresh) ; #3:Msg), 
+   +(n(a, #2:Fresh)), nil]  & 
+:: nil ::
+[ nil | 
+   -(sign(a ; b ; n(a, #2:Fresh) ; n(b, #6:Fresh) ; pke(hpke(data(a, #5:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #7:Fresh), pkey(i, b)), s), a)), 
+   +(sign(a ; b ; n(a, #2:Fresh) ; n(b, #6:Fresh) ; f(hpke(data(a, #5:Fresh), pkey(a, b)), hpke(data(b, #7:Fresh), pkey(i, b))), s)), nil]  & 
+:: nil ::
+[ nil | 
+   -(sign(#0:Msg ; #1:Msg ; n(a, #2:Fresh) ; #3:Msg, #4:Name)), 
+   +(#0:Msg ; #1:Msg ; n(a, #2:Fresh) ; #3:Msg), nil]  & 
+:: #2:Fresh,#5:Fresh ::
+[ nil, 
+   +(sign(b ; n(a, #2:Fresh) ; pke(hpke(data(a, #5:Fresh), pkey(a, b)), s), a)) | 
+   -(sign(n(a, #2:Fresh) ; n(b, #6:Fresh) ; pke(hpke(data(b, #7:Fresh), pkey(i, b)), s), b)), 
+   +(sign(a ; b ; n(a, #2:Fresh) ; n(b, #6:Fresh) ; pke(hpke(data(a, #5:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #7:Fresh), pkey(i, b)), s), a)), 
+   -(sign(a ; b ; n(a, #2:Fresh) ; n(b, #6:Fresh) ; f(hpke(data(a, #5:Fresh), pkey(a, b)), hpke(data(b, #7:Fresh), pkey(i, b))), s)), nil]  & 
+:: #6:Fresh,#7:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #2:Fresh) ; #8:Enc, i)), 
+   +(sign(n(a, #2:Fresh) ; n(b, #6:Fresh) ; pke(hpke(data(b, #7:Fresh), pkey(i, b)), s), b)), nil] )
+|| 
+#8:Enc !inI,
+n(a, #2:Fresh) !inI,
+(b ; n(a, #2:Fresh) ; #8:Enc) !inI,
+(#1:Msg ; n(a, #2:Fresh) ; #3:Msg) !inI,
+(#0:Msg ; #1:Msg ; n(a, #2:Fresh) ; #3:Msg) !inI,
+(n(a, #2:Fresh) ; #3:Msg) !inI,
+(n(a, #2:Fresh) ; #8:Enc) !inI,
+sign(a ; b ; n(a, #2:Fresh) ; n(b, #6:Fresh) ; pke(hpke(data(a, #5:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #7:Fresh), pkey(i, b)), s), a) !inI,
+sign(a ; b ; n(a, #2:Fresh) ; n(b, #6:Fresh) ; f(hpke(data(a, #5:Fresh), pkey(a, b)), hpke(data(b, #7:Fresh), pkey(i, b))), s) !inI,
+sign(b ; n(a, #2:Fresh) ; #8:Enc, i) !inI,
+sign(n(a, #2:Fresh) ; n(b, #6:Fresh) ; pke(hpke(data(b, #7:Fresh), pkey(i, b)), s), b) !inI,
+sign(#0:Msg ; #1:Msg ; n(a, #2:Fresh) ; #3:Msg, #4:Name) inI
+|| 
+-(sign(#0:Msg ; #1:Msg ; n(a, #2:Fresh) ; #3:Msg, #4:Name)), 
++(#0:Msg ; #1:Msg ; n(a, #2:Fresh) ; #3:Msg), 
+-(#0:Msg ; #1:Msg ; n(a, #2:Fresh) ; #3:Msg), 
++(#1:Msg ; n(a, #2:Fresh) ; #3:Msg), 
+-(#1:Msg ; n(a, #2:Fresh) ; #3:Msg), 
++(n(a, #2:Fresh) ; #3:Msg), 
+-(n(a, #2:Fresh) ; #3:Msg), 
++(n(a, #2:Fresh)), 
+generatedByIntruder(#8:Enc), 
+-(n(a, #2:Fresh)), 
+-(#8:Enc), 
++(n(a, #2:Fresh) ; #8:Enc), 
+-(b), 
+-(n(a, #2:Fresh) ; #8:Enc), 
++(b ; n(a, #2:Fresh) ; #8:Enc), 
+-(b ; n(a, #2:Fresh) ; #8:Enc), 
++(sign(b ; n(a, #2:Fresh) ; #8:Enc, i)), 
+-(sign(b ; n(a, #2:Fresh) ; #8:Enc, i)), 
++(sign(n(a, #2:Fresh) ; n(b, #6:Fresh) ; pke(hpke(data(b, #7:Fresh), pkey(i, b)), s), b)), 
+-(sign(n(a, #2:Fresh) ; n(b, #6:Fresh) ; pke(hpke(data(b, #7:Fresh), pkey(i, b)), s), b)), 
++(sign(a ; b ; n(a, #2:Fresh) ; n(b, #6:Fresh) ; pke(hpke(data(a, #5:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #7:Fresh), pkey(i, b)), s), a)), 
+-(sign(a ; b ; n(a, #2:Fresh) ; n(b, #6:Fresh) ; pke(hpke(data(a, #5:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #7:Fresh), pkey(i, b)), s), a)), 
++(sign(a ; b ; n(a, #2:Fresh) ; n(b, #6:Fresh) ; f(hpke(data(a, #5:Fresh), pkey(a, b)), hpke(data(b, #7:Fresh), pkey(i, b))), s)), 
+-(sign(a ; b ; n(a, #2:Fresh) ; n(b, #6:Fresh) ; f(hpke(data(a, #5:Fresh), pkey(a, b)), hpke(data(b, #7:Fresh), pkey(i, b))), s))
+|| 
+nil
+|| never((#9:StrandSet & 
+:: #10:Fresh,#11:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #2:Fresh) ; pke(hpke(data(a, #5:Fresh), pkey(a, b)), s), a)), 
+   +(sign(n(a, #2:Fresh) ; n(b, #10:Fresh) ; pke(hpke(data(b, #11:Fresh), pkey(a, b)), s), b)), nil] ) || #12:IntruderKnowledge))
+< 1 . 6 . 2 . 7 . 3 . 2 . 3 . 3 . 2 . 8 . 8 > (
+:: nil ::
+[ nil | 
+   -(b), 
+   -(n(a, #3:Fresh) ; #8:Enc), 
+   +(b ; n(a, #3:Fresh) ; #8:Enc), nil]  & 
+:: nil ::
+[ nil | 
+   -(n(a, #3:Fresh)), 
+   -(#8:Enc), 
+   +(n(a, #3:Fresh) ; #8:Enc), nil]  & 
+:: nil ::
+[ nil | 
+   -(b ; n(a, #3:Fresh) ; #8:Enc), 
+   +(sign(b ; n(a, #3:Fresh) ; #8:Enc, i)), nil]  & 
+:: nil ::
+[ nil | 
+   -(#1:Msg ; #2:Msg ; n(a, #3:Fresh) ; #4:Msg), 
+   +(#2:Msg ; n(a, #3:Fresh) ; #4:Msg), nil]  & 
+:: nil ::
+[ nil | 
+   -(#2:Msg ; n(a, #3:Fresh) ; #4:Msg), 
+   +(n(a, #3:Fresh) ; #4:Msg), nil]  & 
+:: nil ::
+[ nil | 
+   -(#0:Msg ; #1:Msg ; #2:Msg ; n(a, #3:Fresh) ; #4:Msg), 
+   +(#1:Msg ; #2:Msg ; n(a, #3:Fresh) ; #4:Msg), nil]  & 
+:: nil ::
+[ nil | 
+   -(n(a, #3:Fresh) ; #4:Msg), 
+   +(n(a, #3:Fresh)), nil]  & 
+:: nil ::
+[ nil | 
+   -(sign(a ; b ; n(a, #3:Fresh) ; n(b, #6:Fresh) ; pke(hpke(data(a, #5:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #7:Fresh), pkey(i, b)), s), a)), 
+   +(sign(a ; b ; n(a, #3:Fresh) ; n(b, #6:Fresh) ; f(hpke(data(a, #5:Fresh), pkey(a, b)), hpke(data(b, #7:Fresh), pkey(i, b))), s)), nil]  & 
+:: #3:Fresh,#5:Fresh ::
+[ nil, 
+   +(sign(b ; n(a, #3:Fresh) ; pke(hpke(data(a, #5:Fresh), pkey(a, b)), s), a)) | 
+   -(sign(n(a, #3:Fresh) ; n(b, #6:Fresh) ; pke(hpke(data(b, #7:Fresh), pkey(i, b)), s), b)), 
+   +(sign(a ; b ; n(a, #3:Fresh) ; n(b, #6:Fresh) ; pke(hpke(data(a, #5:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #7:Fresh), pkey(i, b)), s), a)), 
+   -(sign(a ; b ; n(a, #3:Fresh) ; n(b, #6:Fresh) ; f(hpke(data(a, #5:Fresh), pkey(a, b)), hpke(data(b, #7:Fresh), pkey(i, b))), s)), nil]  & 
+:: #6:Fresh,#7:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #3:Fresh) ; #8:Enc, i)), 
+   +(sign(n(a, #3:Fresh) ; n(b, #6:Fresh) ; pke(hpke(data(b, #7:Fresh), pkey(i, b)), s), b)), nil] )
+|| 
+#8:Enc !inI,
+n(a, #3:Fresh) !inI,
+(b ; n(a, #3:Fresh) ; #8:Enc) !inI,
+(#1:Msg ; #2:Msg ; n(a, #3:Fresh) ; #4:Msg) !inI,
+(#2:Msg ; n(a, #3:Fresh) ; #4:Msg) !inI,
+(n(a, #3:Fresh) ; #4:Msg) !inI,
+(n(a, #3:Fresh) ; #8:Enc) !inI,
+sign(a ; b ; n(a, #3:Fresh) ; n(b, #6:Fresh) ; pke(hpke(data(a, #5:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #7:Fresh), pkey(i, b)), s), a) !inI,
+sign(a ; b ; n(a, #3:Fresh) ; n(b, #6:Fresh) ; f(hpke(data(a, #5:Fresh), pkey(a, b)), hpke(data(b, #7:Fresh), pkey(i, b))), s) !inI,
+sign(b ; n(a, #3:Fresh) ; #8:Enc, i) !inI,
+sign(n(a, #3:Fresh) ; n(b, #6:Fresh) ; pke(hpke(data(b, #7:Fresh), pkey(i, b)), s), b) !inI,
+(#0:Msg ; #1:Msg ; #2:Msg ; n(a, #3:Fresh) ; #4:Msg) inI
+|| 
+-(#0:Msg ; #1:Msg ; #2:Msg ; n(a, #3:Fresh) ; #4:Msg), 
++(#1:Msg ; #2:Msg ; n(a, #3:Fresh) ; #4:Msg), 
+-(#1:Msg ; #2:Msg ; n(a, #3:Fresh) ; #4:Msg), 
++(#2:Msg ; n(a, #3:Fresh) ; #4:Msg), 
+-(#2:Msg ; n(a, #3:Fresh) ; #4:Msg), 
++(n(a, #3:Fresh) ; #4:Msg), 
+-(n(a, #3:Fresh) ; #4:Msg), 
++(n(a, #3:Fresh)), 
+generatedByIntruder(#8:Enc), 
+-(n(a, #3:Fresh)), 
+-(#8:Enc), 
++(n(a, #3:Fresh) ; #8:Enc), 
+-(b), 
+-(n(a, #3:Fresh) ; #8:Enc), 
++(b ; n(a, #3:Fresh) ; #8:Enc), 
+-(b ; n(a, #3:Fresh) ; #8:Enc), 
++(sign(b ; n(a, #3:Fresh) ; #8:Enc, i)), 
+-(sign(b ; n(a, #3:Fresh) ; #8:Enc, i)), 
++(sign(n(a, #3:Fresh) ; n(b, #6:Fresh) ; pke(hpke(data(b, #7:Fresh), pkey(i, b)), s), b)), 
+-(sign(n(a, #3:Fresh) ; n(b, #6:Fresh) ; pke(hpke(data(b, #7:Fresh), pkey(i, b)), s), b)), 
++(sign(a ; b ; n(a, #3:Fresh) ; n(b, #6:Fresh) ; pke(hpke(data(a, #5:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #7:Fresh), pkey(i, b)), s), a)), 
+-(sign(a ; b ; n(a, #3:Fresh) ; n(b, #6:Fresh) ; pke(hpke(data(a, #5:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #7:Fresh), pkey(i, b)), s), a)), 
++(sign(a ; b ; n(a, #3:Fresh) ; n(b, #6:Fresh) ; f(hpke(data(a, #5:Fresh), pkey(a, b)), hpke(data(b, #7:Fresh), pkey(i, b))), s)), 
+-(sign(a ; b ; n(a, #3:Fresh) ; n(b, #6:Fresh) ; f(hpke(data(a, #5:Fresh), pkey(a, b)), hpke(data(b, #7:Fresh), pkey(i, b))), s))
+|| 
+nil
+|| never((#9:StrandSet & 
+:: #10:Fresh,#11:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #3:Fresh) ; pke(hpke(data(a, #5:Fresh), pkey(a, b)), s), a)), 
+   +(sign(n(a, #3:Fresh) ; n(b, #10:Fresh) ; pke(hpke(data(b, #11:Fresh), pkey(a, b)), s), b)), nil] ) || #12:IntruderKnowledge)
+==========================================
+reduce in MAUDE-NPA : run(11) .
+rewrites: 18 in 0ms cpu (0ms real) (18000000 rewrites/second)
+result IdSystemSet: (< 1 . 6 . 2 . 7 . 3 . 2 . 3 . 3 . 2 . 7 . 1 > (
+:: nil ::
+[ nil | 
+   -(b), 
+   -(n(a, #0:Fresh) ; #4:Enc), 
+   +(b ; n(a, #0:Fresh) ; #4:Enc), nil]  & 
+:: nil ::
+[ nil | 
+   -(n(a, #0:Fresh)), 
+   -(#4:Enc), 
+   +(n(a, #0:Fresh) ; #4:Enc), nil]  & 
+:: nil ::
+[ nil | 
+   -(b ; n(a, #0:Fresh) ; #4:Enc), 
+   +(sign(b ; n(a, #0:Fresh) ; #4:Enc, i)), nil]  & 
+:: nil ::
+[ nil | 
+   -(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s)), 
+   +(n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s)), nil]  & 
+:: nil ::
+[ nil | 
+   -(n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s)), 
+   +(n(a, #0:Fresh)), nil]  & 
+:: nil ::
+[ nil | 
+   -(sign(a ; b ; n(a, #0:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #3:Fresh), pkey(i, b)), s), a)), 
+   +(sign(a ; b ; n(a, #0:Fresh) ; n(b, #2:Fresh) ; f(hpke(data(a, #1:Fresh), pkey(a, b)), hpke(data(b, #3:Fresh), pkey(i, b))), s)), nil]  & 
+:: nil ::
+[ nil | 
+   -(sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s), a)), 
+   +(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s)), nil]  & 
+:: #1:Fresh,#0:Fresh ::
+[ nil | 
+   +(sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s), a)), 
+   -(sign(n(a, #0:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(b, #3:Fresh), pkey(i, b)), s), b)), 
+   +(sign(a ; b ; n(a, #0:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #3:Fresh), pkey(i, b)), s), a)), 
+   -(sign(a ; b ; n(a, #0:Fresh) ; n(b, #2:Fresh) ; f(hpke(data(a, #1:Fresh), pkey(a, b)), hpke(data(b, #3:Fresh), pkey(i, b))), s)), nil]  & 
+:: #2:Fresh,#3:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #0:Fresh) ; #4:Enc, i)), 
+   +(sign(n(a, #0:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(b, #3:Fresh), pkey(i, b)), s), b)), nil] )
+|| 
+#4:Enc !inI,
+n(a, #0:Fresh) !inI,
+(b ; n(a, #0:Fresh) ; #4:Enc) !inI,
+(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s)) !inI,
+(n(a, #0:Fresh) ; #4:Enc) !inI,
+(n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s)) !inI,
+sign(a ; b ; n(a, #0:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #3:Fresh), pkey(i, b)), s), a) !inI,
+sign(a ; b ; n(a, #0:Fresh) ; n(b, #2:Fresh) ; f(hpke(data(a, #1:Fresh), pkey(a, b)), hpke(data(b, #3:Fresh), pkey(i, b))), s) !inI,
+sign(b ; n(a, #0:Fresh) ; #4:Enc, i) !inI,
+sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s), a) !inI,
+sign(n(a, #0:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(b, #3:Fresh), pkey(i, b)), s), b) !inI
+|| 
++(sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s), a)), 
+-(sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s), a)), 
++(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s)), 
+-(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s)), 
++(n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s)), 
+-(n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s)), 
++(n(a, #0:Fresh)), 
+generatedByIntruder(#4:Enc), 
+-(n(a, #0:Fresh)), 
+-(#4:Enc), 
++(n(a, #0:Fresh) ; #4:Enc), 
+-(b), 
+-(n(a, #0:Fresh) ; #4:Enc), 
++(b ; n(a, #0:Fresh) ; #4:Enc), 
+-(b ; n(a, #0:Fresh) ; #4:Enc), 
++(sign(b ; n(a, #0:Fresh) ; #4:Enc, i)), 
+-(sign(b ; n(a, #0:Fresh) ; #4:Enc, i)), 
++(sign(n(a, #0:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(b, #3:Fresh), pkey(i, b)), s), b)), 
+-(sign(n(a, #0:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(b, #3:Fresh), pkey(i, b)), s), b)), 
++(sign(a ; b ; n(a, #0:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #3:Fresh), pkey(i, b)), s), a)), 
+-(sign(a ; b ; n(a, #0:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #3:Fresh), pkey(i, b)), s), a)), 
++(sign(a ; b ; n(a, #0:Fresh) ; n(b, #2:Fresh) ; f(hpke(data(a, #1:Fresh), pkey(a, b)), hpke(data(b, #3:Fresh), pkey(i, b))), s)), 
+-(sign(a ; b ; n(a, #0:Fresh) ; n(b, #2:Fresh) ; f(hpke(data(a, #1:Fresh), pkey(a, b)), hpke(data(b, #3:Fresh), pkey(i, b))), s))
+|| 
+nil
+|| never((#5:StrandSet & 
+:: #6:Fresh,#7:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s), a)), 
+   +(sign(n(a, #0:Fresh) ; n(b, #6:Fresh) ; pke(hpke(data(b, #7:Fresh), pkey(a, b)), s), b)), nil] ) || #8:IntruderKnowledge))
+< 1 . 6 . 2 . 7 . 3 . 2 . 3 . 3 . 2 . 8 . 8 . 7 > (
+:: nil ::
+[ nil | 
+   -(b), 
+   -(n(a, #3:Fresh) ; #9:Enc), 
+   +(b ; n(a, #3:Fresh) ; #9:Enc), nil]  & 
+:: nil ::
+[ nil | 
+   -(n(a, #3:Fresh)), 
+   -(#9:Enc), 
+   +(n(a, #3:Fresh) ; #9:Enc), nil]  & 
+:: nil ::
+[ nil | 
+   -(b ; n(a, #3:Fresh) ; #9:Enc), 
+   +(sign(b ; n(a, #3:Fresh) ; #9:Enc, i)), nil]  & 
+:: nil ::
+[ nil | 
+   -(#1:Msg ; #2:Msg ; n(a, #3:Fresh) ; #4:Msg), 
+   +(#2:Msg ; n(a, #3:Fresh) ; #4:Msg), nil]  & 
+:: nil ::
+[ nil | 
+   -(#2:Msg ; n(a, #3:Fresh) ; #4:Msg), 
+   +(n(a, #3:Fresh) ; #4:Msg), nil]  & 
+:: nil ::
+[ nil | 
+   -(#0:Msg ; #1:Msg ; #2:Msg ; n(a, #3:Fresh) ; #4:Msg), 
+   +(#1:Msg ; #2:Msg ; n(a, #3:Fresh) ; #4:Msg), nil]  & 
+:: nil ::
+[ nil | 
+   -(n(a, #3:Fresh) ; #4:Msg), 
+   +(n(a, #3:Fresh)), nil]  & 
+:: nil ::
+[ nil | 
+   -(sign(a ; b ; n(a, #3:Fresh) ; n(b, #7:Fresh) ; pke(hpke(data(a, #6:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #8:Fresh), pkey(i, b)), s), a)), 
+   +(sign(a ; b ; n(a, #3:Fresh) ; n(b, #7:Fresh) ; f(hpke(data(a, #6:Fresh), pkey(a, b)), hpke(data(b, #8:Fresh), pkey(i, b))), s)), nil]  & 
+:: nil ::
+[ nil | 
+   -(sign(#0:Msg ; #1:Msg ; #2:Msg ; n(a, #3:Fresh) ; #4:Msg, #5:Name)), 
+   +(#0:Msg ; #1:Msg ; #2:Msg ; n(a, #3:Fresh) ; #4:Msg), nil]  & 
+:: #3:Fresh,#6:Fresh ::
+[ nil, 
+   +(sign(b ; n(a, #3:Fresh) ; pke(hpke(data(a, #6:Fresh), pkey(a, b)), s), a)) | 
+   -(sign(n(a, #3:Fresh) ; n(b, #7:Fresh) ; pke(hpke(data(b, #8:Fresh), pkey(i, b)), s), b)), 
+   +(sign(a ; b ; n(a, #3:Fresh) ; n(b, #7:Fresh) ; pke(hpke(data(a, #6:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #8:Fresh), pkey(i, b)), s), a)), 
+   -(sign(a ; b ; n(a, #3:Fresh) ; n(b, #7:Fresh) ; f(hpke(data(a, #6:Fresh), pkey(a, b)), hpke(data(b, #8:Fresh), pkey(i, b))), s)), nil]  & 
+:: #7:Fresh,#8:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #3:Fresh) ; #9:Enc, i)), 
+   +(sign(n(a, #3:Fresh) ; n(b, #7:Fresh) ; pke(hpke(data(b, #8:Fresh), pkey(i, b)), s), b)), nil] )
+|| 
+#9:Enc !inI,
+n(a, #3:Fresh) !inI,
+(b ; n(a, #3:Fresh) ; #9:Enc) !inI,
+(#1:Msg ; #2:Msg ; n(a, #3:Fresh) ; #4:Msg) !inI,
+(#2:Msg ; n(a, #3:Fresh) ; #4:Msg) !inI,
+(#0:Msg ; #1:Msg ; #2:Msg ; n(a, #3:Fresh) ; #4:Msg) !inI,
+(n(a, #3:Fresh) ; #4:Msg) !inI,
+(n(a, #3:Fresh) ; #9:Enc) !inI,
+sign(a ; b ; n(a, #3:Fresh) ; n(b, #7:Fresh) ; pke(hpke(data(a, #6:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #8:Fresh), pkey(i, b)), s), a) !inI,
+sign(a ; b ; n(a, #3:Fresh) ; n(b, #7:Fresh) ; f(hpke(data(a, #6:Fresh), pkey(a, b)), hpke(data(b, #8:Fresh), pkey(i, b))), s) !inI,
+sign(b ; n(a, #3:Fresh) ; #9:Enc, i) !inI,
+sign(n(a, #3:Fresh) ; n(b, #7:Fresh) ; pke(hpke(data(b, #8:Fresh), pkey(i, b)), s), b) !inI,
+sign(#0:Msg ; #1:Msg ; #2:Msg ; n(a, #3:Fresh) ; #4:Msg, #5:Name) inI
+|| 
+-(sign(#0:Msg ; #1:Msg ; #2:Msg ; n(a, #3:Fresh) ; #4:Msg, #5:Name)), 
++(#0:Msg ; #1:Msg ; #2:Msg ; n(a, #3:Fresh) ; #4:Msg), 
+-(#0:Msg ; #1:Msg ; #2:Msg ; n(a, #3:Fresh) ; #4:Msg), 
++(#1:Msg ; #2:Msg ; n(a, #3:Fresh) ; #4:Msg), 
+-(#1:Msg ; #2:Msg ; n(a, #3:Fresh) ; #4:Msg), 
++(#2:Msg ; n(a, #3:Fresh) ; #4:Msg), 
+-(#2:Msg ; n(a, #3:Fresh) ; #4:Msg), 
++(n(a, #3:Fresh) ; #4:Msg), 
+-(n(a, #3:Fresh) ; #4:Msg), 
++(n(a, #3:Fresh)), 
+generatedByIntruder(#9:Enc), 
+-(n(a, #3:Fresh)), 
+-(#9:Enc), 
++(n(a, #3:Fresh) ; #9:Enc), 
+-(b), 
+-(n(a, #3:Fresh) ; #9:Enc), 
++(b ; n(a, #3:Fresh) ; #9:Enc), 
+-(b ; n(a, #3:Fresh) ; #9:Enc), 
++(sign(b ; n(a, #3:Fresh) ; #9:Enc, i)), 
+-(sign(b ; n(a, #3:Fresh) ; #9:Enc, i)), 
++(sign(n(a, #3:Fresh) ; n(b, #7:Fresh) ; pke(hpke(data(b, #8:Fresh), pkey(i, b)), s), b)), 
+-(sign(n(a, #3:Fresh) ; n(b, #7:Fresh) ; pke(hpke(data(b, #8:Fresh), pkey(i, b)), s), b)), 
++(sign(a ; b ; n(a, #3:Fresh) ; n(b, #7:Fresh) ; pke(hpke(data(a, #6:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #8:Fresh), pkey(i, b)), s), a)), 
+-(sign(a ; b ; n(a, #3:Fresh) ; n(b, #7:Fresh) ; pke(hpke(data(a, #6:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #8:Fresh), pkey(i, b)), s), a)), 
++(sign(a ; b ; n(a, #3:Fresh) ; n(b, #7:Fresh) ; f(hpke(data(a, #6:Fresh), pkey(a, b)), hpke(data(b, #8:Fresh), pkey(i, b))), s)), 
+-(sign(a ; b ; n(a, #3:Fresh) ; n(b, #7:Fresh) ; f(hpke(data(a, #6:Fresh), pkey(a, b)), hpke(data(b, #8:Fresh), pkey(i, b))), s))
+|| 
+nil
+|| never((#10:StrandSet & 
+:: #11:Fresh,#12:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #3:Fresh) ; pke(hpke(data(a, #6:Fresh), pkey(a, b)), s), a)), 
+   +(sign(n(a, #3:Fresh) ; n(b, #11:Fresh) ; pke(hpke(data(b, #12:Fresh), pkey(a, b)), s), b)), nil] ) || #13:IntruderKnowledge)
+==========================================
+reduce in MAUDE-NPA : run(12) .
+rewrites: 18 in 0ms cpu (0ms real) (18000000 rewrites/second)
+result IdSystem: < 1 . 6 . 2 . 7 . 3 . 2 . 3 . 3 . 2 . 7 . 1 > (
+:: nil ::
+[ nil | 
+   -(b), 
+   -(n(a, #0:Fresh) ; #4:Enc), 
+   +(b ; n(a, #0:Fresh) ; #4:Enc), nil]  & 
+:: nil ::
+[ nil | 
+   -(n(a, #0:Fresh)), 
+   -(#4:Enc), 
+   +(n(a, #0:Fresh) ; #4:Enc), nil]  & 
+:: nil ::
+[ nil | 
+   -(b ; n(a, #0:Fresh) ; #4:Enc), 
+   +(sign(b ; n(a, #0:Fresh) ; #4:Enc, i)), nil]  & 
+:: nil ::
+[ nil | 
+   -(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s)), 
+   +(n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s)), nil]  & 
+:: nil ::
+[ nil | 
+   -(n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s)), 
+   +(n(a, #0:Fresh)), nil]  & 
+:: nil ::
+[ nil | 
+   -(sign(a ; b ; n(a, #0:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #3:Fresh), pkey(i, b)), s), a)), 
+   +(sign(a ; b ; n(a, #0:Fresh) ; n(b, #2:Fresh) ; f(hpke(data(a, #1:Fresh), pkey(a, b)), hpke(data(b, #3:Fresh), pkey(i, b))), s)), nil]  & 
+:: nil ::
+[ nil | 
+   -(sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s), a)), 
+   +(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s)), nil]  & 
+:: #1:Fresh,#0:Fresh ::
+[ nil | 
+   +(sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s), a)), 
+   -(sign(n(a, #0:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(b, #3:Fresh), pkey(i, b)), s), b)), 
+   +(sign(a ; b ; n(a, #0:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #3:Fresh), pkey(i, b)), s), a)), 
+   -(sign(a ; b ; n(a, #0:Fresh) ; n(b, #2:Fresh) ; f(hpke(data(a, #1:Fresh), pkey(a, b)), hpke(data(b, #3:Fresh), pkey(i, b))), s)), nil]  & 
+:: #2:Fresh,#3:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #0:Fresh) ; #4:Enc, i)), 
+   +(sign(n(a, #0:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(b, #3:Fresh), pkey(i, b)), s), b)), nil] )
+|| 
+#4:Enc !inI,
+n(a, #0:Fresh) !inI,
+(b ; n(a, #0:Fresh) ; #4:Enc) !inI,
+(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s)) !inI,
+(n(a, #0:Fresh) ; #4:Enc) !inI,
+(n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s)) !inI,
+sign(a ; b ; n(a, #0:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #3:Fresh), pkey(i, b)), s), a) !inI,
+sign(a ; b ; n(a, #0:Fresh) ; n(b, #2:Fresh) ; f(hpke(data(a, #1:Fresh), pkey(a, b)), hpke(data(b, #3:Fresh), pkey(i, b))), s) !inI,
+sign(b ; n(a, #0:Fresh) ; #4:Enc, i) !inI,
+sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s), a) !inI,
+sign(n(a, #0:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(b, #3:Fresh), pkey(i, b)), s), b) !inI
+|| 
++(sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s), a)), 
+-(sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s), a)), 
++(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s)), 
+-(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s)), 
++(n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s)), 
+-(n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s)), 
++(n(a, #0:Fresh)), 
+generatedByIntruder(#4:Enc), 
+-(n(a, #0:Fresh)), 
+-(#4:Enc), 
++(n(a, #0:Fresh) ; #4:Enc), 
+-(b), 
+-(n(a, #0:Fresh) ; #4:Enc), 
++(b ; n(a, #0:Fresh) ; #4:Enc), 
+-(b ; n(a, #0:Fresh) ; #4:Enc), 
++(sign(b ; n(a, #0:Fresh) ; #4:Enc, i)), 
+-(sign(b ; n(a, #0:Fresh) ; #4:Enc, i)), 
++(sign(n(a, #0:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(b, #3:Fresh), pkey(i, b)), s), b)), 
+-(sign(n(a, #0:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(b, #3:Fresh), pkey(i, b)), s), b)), 
++(sign(a ; b ; n(a, #0:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #3:Fresh), pkey(i, b)), s), a)), 
+-(sign(a ; b ; n(a, #0:Fresh) ; n(b, #2:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s) ; pke(hpke(data(b, #3:Fresh), pkey(i, b)), s), a)), 
++(sign(a ; b ; n(a, #0:Fresh) ; n(b, #2:Fresh) ; f(hpke(data(a, #1:Fresh), pkey(a, b)), hpke(data(b, #3:Fresh), pkey(i, b))), s)), 
+-(sign(a ; b ; n(a, #0:Fresh) ; n(b, #2:Fresh) ; f(hpke(data(a, #1:Fresh), pkey(a, b)), hpke(data(b, #3:Fresh), pkey(i, b))), s))
+|| 
+nil
+|| never((#5:StrandSet & 
+:: #6:Fresh,#7:Fresh ::
+[ nil | 
+   -(sign(b ; n(a, #0:Fresh) ; pke(hpke(data(a, #1:Fresh), pkey(a, b)), s), a)), 
+   +(sign(n(a, #0:Fresh) ; n(b, #6:Fresh) ; pke(hpke(data(b, #7:Fresh), pkey(a, b)), s), b)), nil] ) || #8:IntruderKnowledge)
+Maude> Bye.
+Wed Sep 14 16:26:21 CEST 2011
+localhost:prototype-20110914 santiago$ 

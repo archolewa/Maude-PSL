@@ -1,0 +1,152 @@
+----  Amended Needham-Schroeder with Conventional Keys
+
+---------------------------------------------------
+--- We modify only the relevant MAUDE-NPA modules 
+---------------------------------------------------
+
+fmod PROTOCOL-EXAMPLE-SYMBOLS is
+  --- Importing sorts Msg, Fresh, Public
+  protecting DEFINITION-PROTOCOL-RULES .
+  
+  ----------------------------------------------------------
+  --- Overwrite this module with the syntax of your protocol
+  --- Notes:
+  --- * Sort Msg and Fresh are special and imported
+  --- * Every sort must be a subsort of Msg
+  --- * No sort can be a supersort of Msg
+  ----------------------------------------------------------
+
+  --- Sort Information 
+  sorts   SName Name Key Nonce Masterkey Sessionkey .
+  subsort Name Nonce  Key < Msg .
+  subsort Masterkey  Sessionkey < Key .
+  subsort SName < Name .
+  subsort Name < Public . --- This is quite relevant and necessary
+
+  --- Nonce operator
+  op n : Name Fresh -> Nonce [frozen] .
+
+  --- Principals
+  op a : -> Name . --- Alice
+  op b : -> Name . --- Bob
+  op i : -> Name . --- Intruder
+  
+  --- Server name
+  op s : ->  SName . 
+
+ 
+  --- MKey
+  op mkey : Name Name -> Masterkey [frozen] .
+ 
+  --- Seskey
+  op seskey : Name Name Nonce -> Sessionkey [frozen] .
+
+  ---encrypt
+  op e : Key Msg -> Msg [frozen] .
+  op d : Key Msg -> Msg  [frozen] .
+
+  --- successor
+  op dec : Nonce -> Msg [frozen] .
+  op null : -> Msg .
+
+  --- Concatenation
+  op _;_ : Msg Msg -> Msg [gather (e E) frozen] .
+
+endfm
+
+fmod PROTOCOL-EXAMPLE-ALGEBRAIC is
+  protecting PROTOCOL-EXAMPLE-SYMBOLS .
+  
+  ----------------------------------------------------------
+  --- Overwrite this module with the algebraic properties 
+  --- of your protocol
+  ----------------------------------------------------------
+  
+ eq d(K:Key, e (K:Key, Z:Msg )) = Z:Msg [variant] .
+ eq e(K:Key, d (K:Key, Z:Msg )) = Z:Msg [variant] .
+   
+
+endfm
+
+fmod PROTOCOL-SPECIFICATION is
+  protecting PROTOCOL-EXAMPLE-SYMBOLS . 
+  protecting DEFINITION-PROTOCOL-RULES .
+  protecting DEFINITION-CONSTRAINTS-INPUT .
+
+  ----------------------------------------------------------
+  --- Overwrite this module with the strands 
+  --- of your protocol
+  ----------------------------------------------------------
+  
+  var A B S : Name .  
+  var r r0 r1 : Fresh .
+  vars NA NB NS NB0 NB1 : Nonce .
+  vars M1 M2 M3 M N MA MB : Msg .
+  var K : Key . 
+  var SK : Sessionkey .
+
+  eq STRANDS-DOLEVYAO
+  =  :: nil :: [ nil | +(A), nil ]  & 
+     :: nil :: [ nil | +(s), nil ] &
+     :: nil :: [ nil | -(K), -(M), +(d(K,M)), nil ] &
+     :: nil :: [ nil | -(M), -(K), +(e(K, M)), nil ] &
+     :: nil :: [ nil | -(N), -(M), +(M ; N) , nil ] &
+     :: nil :: [ nil | -(NB1), +(dec(NB1)), nil ] &
+     :: nil :: [ nil | -(dec(NB1)), +(NB1), nil ] &
+     :: nil :: [ nil | -(M ; N), +(M) , nil ] &
+     :: nil :: [ nil | -(M ; N), +(N) , nil ] &
+     :: nil :: [ nil | +(mkey(i,A)), nil ]  &
+     :: nil :: [ nil | +(mkey(A,i)), nil ]  &
+     :: r ::   [ nil | +(n(i,r)), nil ] &
+     :: nil :: [ nil | +(mkey(i,s)), nil ] &
+     :: nil :: [ nil | +(mkey(s,i)), nil ] 
+  [nonexec] . 
+
+ eq STRANDS-PROTOCOL
+   = :: r ::
+     --- Alice's Strand
+     [ nil | +(A), 
+             -(M2), 
+             +(A ; B ; n(A,r) ; M2), 
+             -(e(mkey(A,s), n(A,r) ; B ; SK ; M3)),
+             +(M3),
+             -(e(SK, NB)),
+             +(e(SK, dec(NB))), 
+             nil ] &
+     :: r0 , r1 :: 
+     --- Bob's Strand
+     [ nil | -(A), 
+             +(e(mkey(B,s), A ; n(B,r0))),  
+             -(e(mkey(B,s), SK ; n(B,r0) ; A)),
+             +(e(SK, n(B,r1))),
+             -(e(SK, dec(n(B,r1)))), 
+             nil ]  &
+     :: r :: 
+     --- Server's Strand
+     [ nil | -(A ; B ; NA ; e(mkey(B,s), A ; NB0)), 
+             +(e(mkey(A,s), NA ; B ; seskey(A,B,n(S,r)) ;
+                            e(mkey(B,s), seskey(A,B,n(S,r)) ; NB0 ; A))),  
+             nil ]
+
+  [nonexec] .
+
+eq ATTACK-STATE(0) =
+    :: r0 , r1 :: 
+    --- Bob's Strand
+    [ nil,  -(a), 
+            +(e(mkey(b,s), a ; n(b,r0))),  
+            -(e(mkey(b,s), SK ; n(b,r0) ; a)),
+            +(e(SK, n(b,r1))),
+            -(e(SK, dec(n(b,r1)))) | nil ] 
+    || empty
+    || nil
+    || nil
+    || nil
+  [nonexec] .
+  
+endfm
+
+--- THIS HAS TO BE THE LAST LOADED MODULE !!!!
+fmod MAUDE-NPA is
+  protecting GENERIC-TOOLS .
+endfm 

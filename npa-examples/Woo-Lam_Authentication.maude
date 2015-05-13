@@ -1,0 +1,141 @@
+---- Woo and Lam Authentication Protocols
+
+---------------------------------------------------
+--- We modify only the relevant MAUDE-NPA modules 
+---------------------------------------------------
+
+fmod PROTOCOL-EXAMPLE-SYMBOLS is
+  --- Importing sorts Msg, Fresh, Public
+  protecting DEFINITION-PROTOCOL-RULES .
+  
+  ----------------------------------------------------------
+  --- Overwrite this module with the syntax of your protocol
+  --- Notes:
+  --- * Sort Msg and Fresh are special and imported
+  --- * Every sort must be a subsort of Msg
+  --- * No sort can be a supersort of Msg
+  ----------------------------------------------------------
+
+  --- Sort Information 
+  sorts  UName SName Name Key Nonce  Masterkey Sessionkey Text .
+  subsort Name Nonce  Key Text < Msg .
+  subsort Masterkey  Sessionkey < Key .
+  subsort SName UName < Name .
+  subsort Name < Public . --- This is quite relevant and necessary
+  
+     --- text
+  op txt : Name Name Nonce  -> Text [frozen] .
+  --- Nonce operator
+  op n : Name Fresh -> Nonce [frozen] .
+  op mr : Name Fresh -> Nonce [frozen] . --- Nonce, run identifier
+
+  --- User names
+  ops a b i z g nm : -> UName .
+
+  --- Server name
+  op s : ->  SName . 
+
+  --- MKey
+  op mkey : Name Name -> Masterkey [frozen] .
+ 
+  --- Seskey
+  op seskey : Name Name Nonce -> Sessionkey [frozen] .
+
+  ---encrypt
+  op e  : Key Msg -> Msg [frozen] .
+  op d : Key Msg -> Msg  [frozen] .
+
+  --- Concatenation
+  op _;_ : Msg Msg -> Msg [frozen gather (e E)] .
+
+endfm
+
+fmod PROTOCOL-EXAMPLE-ALGEBRAIC is
+  protecting PROTOCOL-EXAMPLE-SYMBOLS .
+  
+  ----------------------------------------------------------
+  --- Overwrite this module with the algebraic properties 
+  --- of your protocol
+  ----------------------------------------------------------
+  
+ eq d(K:Key, e (K:Key, Z:Msg )) = Z:Msg [variant] .
+ eq e(K:Key, d (K:Key, Z:Msg )) = Z:Msg [variant] . 
+
+endfm
+
+fmod PROTOCOL-SPECIFICATION is
+  protecting PROTOCOL-EXAMPLE-SYMBOLS . 
+  protecting DEFINITION-PROTOCOL-RULES .
+  protecting DEFINITION-CONSTRAINTS-INPUT .
+
+  ----------------------------------------------------------
+  --- Overwrite this module with the strands 
+  --- of your protocol
+  ----------------------------------------------------------
+  
+  var A B S Z G : UName .  
+  vars r r' r'' r''' r# r## r1 rM : Fresh .
+  var TS NA NMA NB NMB NMS NB1 NZ : Nonce .
+  vars M1 M2 MA MB MS MZ N M MB1 MB2 : Msg . 
+  var K Kz Kb : Key .
+  var SK : Sessionkey .  
+
+  eq STRANDS-DOLEVYAO
+  =  :: nil :: [ nil | +(A), nil ]  & 
+     :: nil :: [ nil | +(s), nil ] &
+     :: nil :: [ nil | -(K), -(M), +(d(K,M)), nil ] &
+     :: nil :: [ nil | -(M), -(K), +(e(K, M)), nil ] &
+     :: nil :: [ nil | -(N), -(M), +(M ; N) , nil ] &
+     :: nil :: [ nil | -(M ; N), +(M) , nil ] &
+     :: nil :: [ nil | -(M ; N), +(N) , nil ] &
+     :: nil :: [ nil | +(mkey(A,i)), nil ]  &
+     :: nil :: [ nil | +(mkey(i,A)), nil ]  &
+     :: nil :: [ nil | +(mkey(i,s)), nil ] 
+  [nonexec] . 
+
+  eq STRANDS-PROTOCOL
+
+--- Alice's Strand. 
+   = :: nil ::
+     [ nil | +(A),
+             -(NB),
+             +(e(mkey(A,s), NB)), 
+             nil ]
+   &
+     :: r  :: 
+   --- Bob's Strand.
+     [ nil | -(A),
+             +(n(B,r)),
+             -(MA),
+             +(e(mkey(B,s), A ; MA)),
+             -(e(mkey(B,s), n(B,r))), 
+             nil ] 
+   & 
+     :: r ::
+     --- Server's Strand 
+    [ nil |  -(e(mkey(B,s), A ; e(mkey(A,s) , NB))),
+             +(e(mkey(B,s), NB)), 
+             nil]
+ 
+  [nonexec] .
+
+eq ATTACK-STATE(0) =
+:: r ::
+--- A normal execution of the protocol
+    [ nil,  -(a),
+            +(n(b,r)),
+            -(MA),
+            +(e(mkey(b,s) , a ; MA)),
+            -(e(mkey(b,s) , n(b,r))) | nil ]  
+     || empty
+     || nil
+     || nil
+     || nil
+[nonexec] . 
+ 
+endfm
+
+--- THIS HAS TO BE THE LAST LOADED MODULE !!!!
+fmod MAUDE-NPA is
+  protecting GENERIC-TOOLS .
+endfm 
