@@ -1242,7 +1242,8 @@ class DefDecl(PSLStmtNode):
                 node.children.append(Token(node, [token], lineNum))
                 roleNameFound = True
             elif roleNameFound:
-                raise pslErrors.SyntaxError(' '.join([pslErrors.error, pslErrors.color_line_number(lineNum), "Unexpected token: ", pslErrors.color_token(token) + ".", 
+                raise pslErrors.SyntaxError(' '.join([pslErrors.error, pslErrors.color_line_number(lineNum), "Unexpected token: ", 
+                    pslErrors.color_token(token) + ".", 
                 "Expected a statement of the form:", pslErrors.color_token(' '.join(defSyntax.tokens))]))
         equalityIndex = stmt.tokens.index('=')
         defs = zip(stmt.tokens[equalityIndex+1:], stmt.lineNums[equalityIndex+1:])
@@ -1254,9 +1255,11 @@ class DefDecl(PSLStmtNode):
                 lastDef = node.children[-1]
                 lastDefTokens = [lastDef.children[0], ':=']
                 lastDefTokens.extend([token.get_token() for token in lastDef.children[1]])
-                raise pslErrors.SyntaxError(' '.join([pslErrors.error, pslErrors.color_line_number(lineNum), "Missing comma before definition:", ' '.join(lastDefTokens)]))
+                raise pslErrors.SyntaxError(' '.join([pslErrors.error, pslErrors.color_line_number(lineNum), 
+                    "Missing comma before definition:", ' '.join(lastDefTokens)]))
             elif token == ',' and colonEqualsFound:
-                raise pslErrors.SyntaxError(' '.join([pslErrors.error, pslErrors.color_line_number(lineNum), "Missing identifier for term: ", ' '.join([token.get_token() for token in term]) + "."]))
+                raise pslErrors.SyntaxError(' '.join([pslErrors.error, pslErrors.color_line_number(lineNum), 
+                    "Missing identifier for term: ", ' '.join([token.get_token() for token in term]) + "."]))
             if colonEqualsFound:
                 roleName = token
                 node.children.append(DefPair(node, children=[roleName, list(reversed(term))], lineNum=lineNum))
@@ -1268,7 +1271,8 @@ class DefDecl(PSLStmtNode):
             else:
                 term.append(Token(node, [token], lineNum))
         if colonEqualsFound:
-            raise pslErrors.SyntaxError(' '.join([pslErrors.error, pslErrors.color_line_number(lineNum), "Missing identifier for term: ", ' '.join([token.get_token() for token in term]) + "."]))
+            raise pslErrors.SyntaxError(' '.join([pslErrors.error, pslErrors.color_line_number(lineNum), 
+                "Missing identifier for term: ", ' '.join([token.get_token() for token in term]) + "."]))
         return node
 
     def translate(self):
@@ -1421,13 +1425,6 @@ class StepStmt(PSLStmtNode):
         firstRoleVars = [token for token in firstRoleTokens if token in declaredVars]
         secondRoleVars = [token for token in secondRoleTokens if token in declaredVars]
         return {firstRole:firstRoleVars, secondRole:secondRoleVars}
-
-
-class DefList(Node):
-
-    @staticmethod
-    def parse(stmt, parent):
-        raise NotImplementedError()
 
 
 class Intruder(PSLSection):

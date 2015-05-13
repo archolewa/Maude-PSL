@@ -149,10 +149,10 @@ def lex_code(pslFile):
     errorMsgs = []
     for i in range(len(numberedLines)):
         line, num = numberedLines[i]
-        for i in range(len(line)):
-            token = line[i]
+        for j in range(len(line)):
+            token = line[j].strip()
             try:
-                nextToken = line[i+1]
+                nextToken = line[j+1]
             except IndexError:
                 try:
                     nextToken = numberedLines[i+1][0][0]
@@ -168,7 +168,7 @@ def lex_code(pslFile):
                             nextNextToken = ''
             else:
                 try:
-                    nextNextToken = line[i+2]
+                    nextNextToken = line[j+2]
                 except IndexError:
                     try:
                         nextNextToken = numberedLines[i+1][0][0]
@@ -294,7 +294,7 @@ def gen_intermediate(parseTree, theoryFileName):
             otherDef = defMap[(defPair.role(), defPair.term())]
             raise pslErrors.TranslationError(' '.join([pslErrors.error, pslErrors.color_line_number(defPair.lineNum) + ",", 
                 otherDef[DEF_LINE_NUM], "Term", pslErrors.color_token(defPair.term()), 
-                "has multiple shorthands: ", pslErrors.color_token(defPair.shorthands()) + ",", 
+                "has multiple shorthands: ", pslErrors.color_token(defPair.shorthand()) + ",", 
                 pslErrors.color_token(otherDef[DEF_SHORTHAND])]))
         else:
             defMap[(defPair.role(), defPair.term())] = (defPair.shorthand(), defPair.lineNum)
