@@ -10,7 +10,7 @@ Theory
 
     op _;_ : Msg Msg -> Msg [gather(e E)] .
 
-    ops e d : Msg -> Msg .
+    ops e d : Key Msg -> Msg .
     
     var K : Key .
     var M : Msg .

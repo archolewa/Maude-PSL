@@ -369,7 +369,6 @@ def gen_NPA_code(maudeCode, theoryFileName):
         except ValueError:
             errorResult = "result [TranslationData]:"
             errorIndex = stdout.index(errorResult) + len(errorResult)
-            print(stdout)
             process_error(stdout[errorIndex:])
         else:
             endOfModule = stdout.rfind("Maude>")
