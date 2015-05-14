@@ -10,7 +10,7 @@ Theory
 
     op _;_ : Msg Msg -> Msg [gather(e E)] .
 
-    ops e d : Msg -> Msg .
+    ops e d : Key Msg -> Msg .
     
     var K : Key .
     var M : Msg .
@@ -19,25 +19,27 @@ Theory
 
 
 Protocol
-    vars A B  : Name .
+    vars ANAME BNAME  : Name .
     vars K SK : Key .
     var NB : Nonce .
     vars r r1 : Fresh .
 
-    In(A) = A, B, K .
-    In(B) = A, B, K .
+    roles A B .
 
-    1 . A -> B : e(K, skey(A, r)) |- 
+    In(A) = ANAME, BNAME, K .
+    In(B) = ANAME, BNAME, K .
+
+    1 . A -> B : e(K, skey(ANAME, r)) |- 
                  e(K, SK)         .
 
-    2 . B -> A : e(K, SK         ; n(B, r1)) |-
-                 e(K, skey(A, r) ; NB)       .
+    2 . B -> A : e(K, SK         ; n(BNAME, r1)) |-
+                 e(K, skey(ANAME, r) ; NB)       .
 
     3 . A -> B : e(K, NB)       |- 
-                 e(K, n(B, r1)) .
+                 e(K, n(BNAME, r1)) .
 
-    Out(A) = K, skey(A, r), NB .
-    Out(B) = A, B, K, SK, n(B, r1) .
+    Out(A) = K, skey(ANAME, r), NB .
+    Out(B) = ANAME, BNAME, K, SK, n(BNAME, r1) .
 
 
 Intruder
@@ -52,10 +54,9 @@ Intruder
 
 
 Attacks
-    vars A B : Name .
     0 .
         B executes protocol .
-        Subst(B) = A |-> a, B |-> b .
+        Subst(B) = ANAME |-> a, BNAME |-> b .
 
 
 ends
