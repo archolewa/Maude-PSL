@@ -23,26 +23,29 @@ Theory
   eq sk(K,pk(K,Z)) = Z .
 
 Protocol
-    vars A B A1 : Name .
+    vars AName BName A1Name : Name .
     vars r r1   : Fresh .
     vars NA1 NB : Nonce .
 
-    In(A) = A, B .
-    In(B) = B .
+    Roles A, B .
+
+    In(A) = AName, BName .
+    Def(A) = na := n(AName, r) .
+    In(B) = BName .
 
 
-    1 . A -> B : pk(B, n(A, r) ; A) |- 
-                 pk(B, NA1     ; A1) .
+    1 . A -> B : pk(BName, n(AName, r) ; AName) |- 
+                 pk(BName, NA1     ; A1Name) .
 
-    2 . B -> A : pk(A1, NA1     ; n(B, r1) ; B) |-    
-                 pk(A , n(A, r) ; NB       ; B) . 
+    2 . B -> A : pk(A1Name, NA1     ; n(BName, r1) ; BName) |-    
+                 pk(AName , n(AName, r) ; NB       ; BName) . 
 
-    3 . A -> B : pk(B, NB) |- 
-                 pk(B, n(B, r1)) .                    
+    3 . A -> B : pk(BName, NB) |- 
+                 pk(BName, n(BName, r1)) .                    
 
 
-    Out(A) = A, B, n(A, r), NB, h(n(A, r) ; NB) .
-    Out(B) = A1, B, NA1, n(B, r1), h(NA1 ; n(B, r1)) .
+    Out(A) = AName, BName, n(AName, r), NB, h(n(AName, r) ; NB) .
+    Out(B) = A1Name, BName, NA1, n(BName, r1), h(NA1 ; n(BName, r1)) .
 
 Intruder
     var C    : Name .
@@ -50,18 +53,18 @@ Intruder
     vars X Y : Msg .
     var K    : Key .
 
-    => C .
+          => C .
     X, Y <=> X ; Y .
-    X => pk(K, X), sk(i, X) .
+    X     => sk(i, X) .
+    X, K  =>  pk(K, X) . 
 
 Attacks
-    vars A1 B : Name .
-    var r1 : Fresh .
     0 .
-        B executes protocol .
-        Intruder learns n(B, r1) .
+        B executes up to 2 .
+        A executes protocol .
+        Subst(A) = BName |-> b, AName |-> a .
         //Tells us how we should instantiate the attack strand.
-        Subst(B) = B |-> b, A1 |-> a .
-
+        Subst(B) = BName |-> b, A1Name |-> a NA |-> na .
+        Intruder learns n(BName, r1) .
 
 ends

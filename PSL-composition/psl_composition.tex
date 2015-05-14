@@ -1,7 +1,14 @@
 \documentclass{article} 
 \usepackage{amsmath}
+\usepackage{hyperref}
+
+\title{Document on PSL Composition}
+\author{Andrew Cholewa \\
+        \href{mailto:archolewa@gmail.com}{archolewa@gmail.com}}
+\date{\today}
 
 \begin{document}
+\maketitle
 \section{PSL Composition}
 
 In the following document, we describe a proposed syntax for protocol
@@ -279,9 +286,9 @@ depends on what changes (if any) need to be made to the attack syntax for attack
 More details can be found in the comments for the above modules.
 
 The python level parser must also be implemented. The job of the Python parser is to take the PSL specification and turn it into a 
-term for use by Maude. Most of the changes should be relatively minor, however Python may need to include some empty terms as ``seeds."
-For example, in the standalone translation, the parser adds the seed \verb|[$noDef]| if the user does not define any definitions.
-See \verb|./composition_examples/debuggin_maude/comp_nsl_db.maude| for an example of what the Maude code expects from a composition
-specification.
+term for use by Maude. In particular, the Python code will need to locate the PSL-specifications of the two sub-protocols, obtain
+the intermediate term for Maude to rewrite (obtained by calling \verb|gen_intermediate| see the \verb|psl.py| file), and wrap them
+in a \verb|$translate| operator, along with an arbitrary (but unique number). 
+See \verb|composition_examples/debugging_maude/comp_nsl_db.maude| for an example of what the Python code should generate.
 
 \end{document}

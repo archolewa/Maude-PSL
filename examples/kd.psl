@@ -1,6 +1,6 @@
 spec KD is
 Theory
-    type Name Key Nonce .
+    types Name Key Nonce .
     subtype Name < Public .
 
     op skey : Name Fresh -> Key .
@@ -14,30 +14,35 @@ Theory
     
     var K : Key .
     var M : Msg .
+
     eq e(K, d(K, M)) = M .
     eq d(K, e(K, M)) = M .
 
 
 Protocol
-    vars A B  : Name .
+    vars ANAME BNAME : Name .
     vars K SK : Key .
     var NB : Nonce .
     vars r r1 : Fresh .
 
-    In(A) = A, B, K .
-    In(B) = A, B, K .
+    roles A B .
 
-    1 . A -> B : e(K, skey(A, r)) |- 
+    In(A) = ANAME, BNAME, K .
+    In(B) = ANAME, BNAME, K .
+
+    Def(A) = bob := e(K, ANAME), jane := d(K, ANAME) .
+
+    1 . A -> B : e(K, skey(ANAME, r)) |- 
                  e(K, SK)         .
 
-    2 . B -> A : e(K, SK         ; n(B, r1)) |-
-                 e(K, skey(A, r) ; NB)       .
+    2 . B -> A : e(K, SK             ; n(BNAME, r1)) |-
+                 e(K, skey(ANAME, r) ; NB)       .
 
     3 . A -> B : e(K, NB)       |- 
-                 e(K, n(B, r1)) .
+                 e(K, n(BNAME, r1)) .
 
-    Out(A) = K, skey(A, r), NB .
-    Out(B) = A, B, K, SK, n(B, r1) .
+    Out(A) = K, skey(ANAME, r), NB .
+    Out(B) = ANAME, BNAME, K, SK, n(BNAME, r1) .
 
 
 Intruder
@@ -52,10 +57,9 @@ Intruder
 
 
 Attacks
-    vars A B : Name .
     0 .
         B executes protocol .
-        Subst(B) = A |-> a, B |-> b .
+        Subst(B) = ANAME |-> a, BNAME |-> b .
 
 
 ends

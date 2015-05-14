@@ -96,6 +96,46 @@ LINE_NUM = 1
 STATE_SPACE_REDUCTION_VARIANTS = ['state-space-reduction:', 'State-space-reduction:'] 
 END_LINE = ['.', 'without:', 'Without:', 'avoid:', 'Avoid:'] + STATE_SPACE_REDUCTION_VARIANTS
 
+def maudify():
+    """
+    Where processing starts.
+    Queries the command line for the path to a PSL file, as well as command line arguments (TBD), and 
+    converts the PSL
+    file specification into a Maude-NPA specification.  options:
+         -m Allows you to specify a path to the maude executable you'd like
+                         to execute
+        The steps to doing this are:
+        1. Do an initial, high-level parse of the file that does such things as: generating the definitions, annotating the lines with the line number on which
+        the line begins, and adding some seed terms that Maude needs to perform the conversion.
+        2. Feed the generated term into Maude, and obtain the result. Then write that result into a file with the same name (and path) as the PSL file, except it is
+        terminated with ".maude" rather than :".psl."
+    """
+    try:
+        pslFilePath = sys.argv[1]
+    except IndexError:
+        print("Usage: ./psl.py FILENAME.psl")
+        return
+    try:
+        options = sys.argv[2:]
+    except IndexError:
+        pass
+    else:
+        for option, argument in zip(options, options[1:]):
+            if option == "-m":
+                global MAUDE_COMMAND, PRELUDE
+                MAUDE_COMMAND = argument
+                NO_PRELUDE = ''
+                PRELUDE = ''
+    fileName = os.path.basename(pslFilePath).split('.')[0]
+    with open(pslFilePath, 'r') as f:
+        parseTree = parse_code(lex_code(f))
+    theoryFileName = build_theory(parseTree, os.path.dirname(pslFilePath), fileName) 
+    #TODO: Need to invoke different functions depending on whether we're doing protocol composition, or normal PSL translation.
+    intermediate = gen_intermediate(parseTree, theoryFileName) 
+    gen_NPA_code(intermediate, theoryFileName)
+
+
+
 def nonzero_nats():
     """
     A generator that yields as many natural numbers as you need (up to 
@@ -236,42 +276,6 @@ def is_start_of_section(token, nextToken):
             nextToken != 'learns')
 
 
-def maudify():
-    """
-    Given a pslFilePath, and a set of conversion options(TBD), converts the PSL
-    file specification into a Maude-NPA specification.  options:
-         -m Allows you to specify a path to the maude executable you'd like
-                         to execute
-        The steps to doing this are:
-        1. Error check the high level syntax.
-        2. Annotate the file with line numbers, and wrap the specification in 
-        parenthesis
-        3. Feed the annotated file into Maude, along with the Maude
-        conversation file.  
-    """
-    try:
-        pslFilePath = sys.argv[1]
-    except IndexError:
-        print("Usage: ./psl.py FILENAME.psl")
-        return
-    try:
-        options = sys.argv[2:]
-    except IndexError:
-        pass
-    else:
-        for option, argument in zip(options, options[1:]):
-            if option == "-m":
-                global MAUDE_COMMAND, PRELUDE
-                MAUDE_COMMAND = argument
-                NO_PRELUDE = ''
-                PRELUDE = ''
-    fileName = os.path.basename(pslFilePath).split('.')[0]
-    with open(pslFilePath, 'r') as f:
-        parseTree = parse_code(lex_code(f))
-    theoryFileName = build_theory(parseTree, os.path.dirname(pslFilePath), fileName) 
-    #TODO: Need to invoke different functions depending on whether we're doing protocol composition, or normal PSL translation.
-    intermediate = gen_intermediate(parseTree, theoryFileName) 
-    gen_NPA_code(intermediate, theoryFileName)
 
 DEF_KEY_ROLE = 0
 DEF_KEY_TERM = 1
@@ -279,9 +283,10 @@ DEF_SHORTHAND = 0
 DEF_LINE_NUM = 1
 def gen_intermediate(parseTree, theoryFileName):
     """
-    Generates the maude code needed to translate a PSL specification into a trio of Maude-NPA module.
+    Given the PSL parse tree, and the name of the maude file that contains the user-provided equational theory,
+    generates the term that Maude can then rewrite into a trio of Maude-NPA modules.
     
-    Returns the code as a list of lines.
+    Returns the term as a list of lines.
     """
     code = ['load psl.maude', ' '.join(['load', theoryFileName]), 'mod INTERMEDIATE is', 'protecting TRANSLATION-TO-MAUDE-NPA .', 
             'protecting PROTOCOL-EXAMPLE-SYMBOLS .']
@@ -292,8 +297,9 @@ def gen_intermediate(parseTree, theoryFileName):
     for defPair in defPairs:
         if (defPair.role(), defPair.term()) in defMap:
             otherDef = defMap[(defPair.role(), defPair.term())]
+            print(otherDef)
             raise pslErrors.TranslationError(' '.join([pslErrors.error, pslErrors.color_line_number(defPair.lineNum) + ",", 
-                otherDef[DEF_LINE_NUM], "Term", pslErrors.color_token(defPair.term()), 
+                str(otherDef[DEF_LINE_NUM]), "Term", pslErrors.color_token(defPair.term()), 
                 "has multiple shorthands: ", pslErrors.color_token(defPair.shorthand()) + ",", 
                 pslErrors.color_token(otherDef[DEF_SHORTHAND])]))
         else:
@@ -363,6 +369,7 @@ def gen_NPA_code(maudeCode, theoryFileName):
         except ValueError:
             errorResult = "result [TranslationData]:"
             errorIndex = stdout.index(errorResult) + len(errorResult)
+            print(stdout)
             process_error(stdout[errorIndex:])
         else:
             endOfModule = stdout.rfind("Maude>")
@@ -384,7 +391,8 @@ def process_error(error):
             "The substitution: ", invalidMapping, "cannot be made idempotent."]))
     elif errorType.strip() == "$$$malformedDefs":
         errorDefs = []
-        for error in errorTerm.split("$$;;;;$$"):
+        for error in errorTerm.split("$$;;;$$"):
+            error = error.strip()
             pair, lineNumber = error.split("$$,$$")
             lineNumber = lineNumber.replace(")", '')
             errorDefs.append(' '.join([pslErrors.error, pslErrors.color_line_number(lineNumber.strip()), 
@@ -569,6 +577,7 @@ def build_theory(parseTree, filePath, fileName):
     theoryFileName = os.path.join(filePath, '.'.join([fileName, 'maude']))
     with open(theoryFileName, 'w') as maudeFile:
         maudeFile.write('\n\n'.join(['\n'.join(syntax), '\n'.join(coherentEquations)]))
+    
     return theoryFileName
 
 def make_coherent(equations, syntax):

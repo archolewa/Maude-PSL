@@ -120,6 +120,7 @@ fmod DEFINITION-SEMANTICS is
 
     eq $checkWellFormed(((K:Msg, N:Nat) := T:Msg), DS:Definitions) = K:Msg := T:Msg, $checkWellFormed(DS:Definitions) .
     eq $checkWellFormed($noDefs) = $noDefs .
+    eq $checkWellFormed(D:Definition) = D:Definition .
     ceq $checkWellFormed((DS:Definitions, DSK:[Definitions])) = $checkWellFormed(DSK:[Definitions])
         if DS:Definitions =/= $noDefs .
     eq $checkWellFormed(DSK:[Definitions]) = $$$malformedDefs($moveLineNum(DSK:[Definitions])) [owise] .
