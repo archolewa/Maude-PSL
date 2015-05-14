@@ -1104,8 +1104,10 @@ mod TRANSLATION-TO-MAUDE-NPA is
 
     eq [V:VarDecl] $varList($emptyAttackList) = $varList(V:VarDecl) .
     eq [V:VarDecl] $varList(VL:VarDecls) = $varList(V:VarDecl VL:VarDecls) . 
-        
 
+    eq $varList(B:VarDecls V:VarDecl M:VarDecls V:VarDecls E:VarDecls) = $varList(B:VarDecls V:VarDecl M:VarDecls E:VarDecls) .
+    eq $varList(B:VarDecls V:VarDecl M:VarDecls V:VarDecls) = $varList(B:VarDecls V:VarDecl M:VarDecls) .
+        
     ---The presence of the $translate constant (added by the equation above) 
     ---ensures that we don't try to construct the Maude-NPA module until
     ---the PSL specification has been fully translated.
