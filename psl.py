@@ -398,6 +398,9 @@ def process_error(error):
                                          #Stripping off the () around the definition
                 "Malformed Definition:", pslErrors.color_token(pair[1:-1])]))
         raise pslErrors.TranslationError('\n'.join(errorDefs))
+    elif errorType.strip() == "$$$malformedTerm":
+        errorTerm, lineNumber =  errorTerm.rsplit(',', 1)
+        raise pslErrors.TranslationError(' '.join([pslErrors.error, pslErrors.color_line_number(lineNumber.strip()), "Malformed term:", errorTerm]))
 
 
 
