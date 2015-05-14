@@ -34,26 +34,16 @@ Theory
   eq d(K:Key,e(K:Key,M:Msg)) = M:Msg .
 
 Protocol
-    vars A B : Name .
+    vars ANAME BNAME : Name .
     vars r r' r1 : Fresh .
     vars XEA XEB : Exp .
     var S : Secret .
 
-    In(A) = A, B .
-    Def(A) = na := n(A, r), secret := sec(A, r') .
-    /*
-    Try using these definitions to make sure they work properly.
-        Def(A) = pa := n(A, r1), 
-                  s := sec(A, r'), 
-               g^pa := exp(g, pa), 
-               xea^pa := exp(XEA, pa) .
-        Def(B) = g^pb := exp(g, pb), 
-                   pb := n(B, r2), 
-               xeb^pb := exp(XEB, pb) .
-   */
-
+    In(A) = ANAME, BNAME .
     In(B) = B .
-    Def(B) = nb := n(B, r1) .
+
+    Def(A) = na := n(ANAME, r), secret := sec(ANAME, r') .
+    Def(B) = nb := n(BNAME, r1) .
 
     1 . A -> B : A  ; B ; exp(g, na)      
               |- A1 ; B ; XEB .
