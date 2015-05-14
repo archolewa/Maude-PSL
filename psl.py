@@ -17,11 +17,6 @@ import os
     there was a problem with some automatically generated code, in which case
     there's an error that I missed while performing initial error checking.
     
-    TODO: Check to make sure the provided Input/Output mappings are valid 
-    functions, in the sense that for every T |-> T', sort(T') <= sort(T) .
-    TODO: Implement global variables
-    TODO: Implement the disjoint variables idea discussed in September.
-
     To use: type the command ./psl.py FILENAME.psl
     Options:
         -m PATH/TO/MAUDE/EXECUTABLE use to specify the path to the maude 
@@ -68,8 +63,6 @@ import os
 #NAME_OF_MODULE-ROLENAME as constants of sort Role to the theory.
 #Also, for composition, automatically replace the role names with the same
 #generated constant.
-#TODO: When generating the syntax file, add an operator $_;_ for the
-#synchronization msg.
 
 #Terms are "blackboxes" of user-defined syntax. For simplicity, we assume
 #that all tokens in the user defined syntax are disjoint from all tokens
@@ -215,6 +208,10 @@ def lex_code(pslFile):
 
 
 def protocol_step(nextToken, nextNextToken):
+    """
+    Returns true if nextToken and nextNextToken correspond to what's expected as the second and third tokens in a protocol
+    step. This is important to distinguish between statement terminating periods, and the periods in each protocol step statement.
+    """
     try:
         return nextNextToken == '->' and nextToken not in pslTree.TOP_LEVEL_TOKENS
     except IndexError:
@@ -222,12 +219,18 @@ def protocol_step(nextToken, nextNextToken):
 
 
 def type_check_sectionStmts(sectionStmts):
+    """
+    Checks to make sure that the statements in each section are in fact statement objects. For debugging purposes only.
+    """
     for section in sectionStmts:
         for statement in sectionStmts:
             assert(isinstance(statement, pslTree.Statement)), "statement is not a pslTree.Statement: %s" % statement
 
 
 def tokenize(line):
+    """
+    Splits the passed PSL line into a list of tokens, and returns those tokens.
+    """
     return [token for token in re.split(pslTree.Token.tokenizer, line.strip()) if token]
 
 
@@ -280,7 +283,6 @@ DEF_LINE_NUM = 1
 def gen_intermediate(parseTree, theoryFileName):
     """
     Generates the maude code needed to translate a PSL specification into a trio of Maude-NPA module.
-    
     Returns the code as a list of lines.
     """
     code = ['load psl.maude', ' '.join(['load', theoryFileName]), 'mod INTERMEDIATE is', 'protecting TRANSLATION-TO-MAUDE-NPA .', 
@@ -298,7 +300,7 @@ def gen_intermediate(parseTree, theoryFileName):
                 pslErrors.color_token(otherDef[DEF_SHORTHAND])]))
         else:
             defMap[(defPair.role(), defPair.term())] = (defPair.shorthand(), defPair.lineNum)
-    shorthandSortMap = compute_sorts(defMap, theoryFileName)
+    shorthandSortMap = compute_sorts(defMap, theoryFileName, parseTree)
     code.extend([' '.join(['op', shorthand, ':', '->', sort, '.']) for shorthand, sort in shorthandSortMap.items()])
     code.append('endm')
     code.append('rew')
@@ -333,13 +335,16 @@ def gen_NPA_code(maudeCode, theoryFileName):
     stdout, stderr = maudeExecution.communicate('\n'.join(maudeCode))
     if stderr:
         errors = []
+        #Expected error pattern:
         #Warning: <standard input>, line N : <error message> 
         for line in [line.strip() for line in stderr.split('\n') if line.strip()]:
             _,lineNum, error = line.split(':')
+            #expected pattern currently in lineNum:
             #<standard input>, line N
             lineNum = int(lineNum.split()[-1])
             #Maude's lines on the terminal start counting from 1, but Python lists start counting at 0.
             pslLine = maudeCode[lineNum-1]
+            #pattern of psl statements inside Maude code
             #blah blah . [ num ] 
             try:
                 pslLineNum = int(pslLine.split()[-2])
@@ -372,6 +377,10 @@ def gen_NPA_code(maudeCode, theoryFileName):
                 maudeFile.write('\nselect MAUDE-NPA .')
 
 def process_error(error):
+    """
+    Given a partially evaluated PSL specification, extracts the offending error term, and extracts from the error term the information 
+    need for a usable error message. Then raises a TranslationError containing said usable error message.
+    """
     errorTermStart = error.index("$$$")
     errorType, errorTerm = error[errorTermStart:].split('(', 1)
     numParens = 1
@@ -414,7 +423,7 @@ def compute_end_of_term(errorType, errorTerm):
     raise ValueError(' '.join(["End of error term of type: ", errorType, "not found when trying to extract the term from:", errorTerm]))
            
 MAX_ITERATIONS = 100
-def compute_sorts(defMap, syntaxFileName):
+def compute_sorts(defMap, syntaxFileName, pslTree):
     """
     Computes the sorts of the user-defined shorthand. 
     
@@ -427,7 +436,7 @@ def compute_sorts(defMap, syntaxFileName):
     Returns a dictionary mapping shorthand to their respective sorts.
     """
     is_function(defMap)
-    role_variables_correct(defMap)
+    role_variables_correct(defMap, pslTree)
     SHORTHAND = 0
     LINE_NUMBER = 1
     ROLE = 0
@@ -526,12 +535,40 @@ def is_function(defMap):
         else:
             definedShorthand[shorthand] = (term, lineNumber)
 
-def role_variables_correct(defMap):
+def role_variables_correct(defMap, pslTree):
     """
     Given a mapping from pairs (role, term) |-> (shorthand, lineNum)
-    checks to make sure that the variables in term only
-    show up in terms associated with role.
+    checks to make sure that the variables in term are allowed
+    to show up in terms associated with role. 
     """
+    #Working on modifying the disjoint_vars code from pslTree.py to work here.
+    protocol = pslTree.get_protocol()
+    roleMap = protocol.variables_per_role()
+    declaredVars = protocol.declared_variables()
+    roleTermPairs = defMap.keys()
+    errors = []
+    checkedRoles = []
+    for role, term in roleTermPairs:
+        #checkedRoles.append(role)
+        inVars = set(roleMap[role])
+        otherStmtVars = protocol.statement_vars(float('inf'))
+        otherStmtVars = {roleName:otherStmtVars[roleName] for roleName in otherStmtVars if roleName != role}
+        #Because we've already passed the terms to Maude to be parsed, the variables in the term are annotated with their sort. We need to ignore that sort
+        #when checking if a variable is in someone else's variables.
+        for var in [token for token in tokenize(term) if token.split(':')[0] in declaredVars]:
+            for roleName in otherStmtVars:
+                varName = var.split(':')[0]
+                if varName in otherStmtVars[roleName] and varName not in inVars:
+                    errorMsg = ' '.join([pslErrors.error, pslErrors.color_line_number(defMap[(role, term)][LINE_NUM]), "Variable", pslErrors.color_token(varName.strip()), 
+                        "appears in the protocol terms of roles",
+                        pslErrors.color_token(roleName), "and", pslErrors.color_token(role) + ".",
+                        "Variables must be disjoint between roles, with the possible exception of In(put) variables."])
+                    if errorMsg not in errors:
+                        errors.append(errorMsg)
+    if errors:
+        raise pslErrors.TranslationError('\n'.join(errors))
+
+
 
 def parse_code(sectionStmts):
     root = pslTree.Root()
