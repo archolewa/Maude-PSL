@@ -1144,10 +1144,10 @@ mod TRANSLATION-TO-MAUDE-NPA is
 endm
 
 ---(
-This module handles protocol composition. Note that this module, and the
-one above are NOT compatible. One or the other needs to be chosen for
+This module handles protocol composition. Note that this module, and TRANSLATION-TO-MAUDE-NPA
+are NOT compatible. One or the other needs to be chosen for
 rewriting in, depending on whether we're translating a standard PSL 
-specification, or a composition.
+specification, or a composition. This decision will have to be made at the Python level.
 ---)
 mod COMPOSITION is
     protecting COMPOSITION-SYNTAX .
@@ -1172,23 +1172,12 @@ mod COMPOSITION is
     vars T1 T2 : TranslationData .
     vars SD1 SD2 : StrandData .
 
-    ---(
-    ceq $translated(N, [RO1 |-> {IN1} :: r1 :: [L1 | R1]{OUT1} & SD1] T1) 
-        [SD:StrandData]
-    =  
-       $translated(N, [RO1 |-> {IN1} :: r1 :: [L1 | R1]{OUT1} & SD1] T1) 
-       [RO1 |-> {IN1} :: r1 :: [L1 | R1]{OUT1} & SD:StrandData]
-    if not RO1 in SD:StrandData .
-    ---)
-    
     vars CHILDMSG PARENTMSG : Msg .
 
     op compose : How Role Role -> CompType . 
 
     vars L3 L4 : SMsgList-L .
     vars R3 R4 : SMsgList-R .
-    ---eq RO1 ;1 RO2 = compose(1-1, RO1, RO2) .
-    ---eq RO1 ;* RO2 = compose(1-*, RO1, RO2) .
 
     ---One to one
     ---Note that if we're composing more than two protocols, it may be the
