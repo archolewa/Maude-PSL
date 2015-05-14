@@ -1,0 +1,96 @@
+spec Carlse-SK is
+Theory
+  types Uname Sname Name Key Nonce Masterkey Sessionkey .
+  subtype Masterkey Sessionkey < Key .
+  subtype Sname Uname < Name .
+  subtype Name < Public . 
+
+  op n : Name Fresh -> Nonce  .
+  ops a b i : -> Uname [ctor] .
+  op s : ->  Sname [ctor] . 
+  op mkey : Name Name -> Masterkey [comm] .
+  op seskey : Name Name Nonce -> Sessionkey .
+  op e  : Key Msg -> Msg .
+  op d : Key Msg -> Msg .
+  op _;_ : Msg Msg -> Msg [gather (e E)] .
+
+  var K : Key .
+  var Z : Msg .
+  eq d(K:Key, e (K:Key, Z:Msg )) = Z:Msg .
+  eq e(K:Key, d (K:Key, Z:Msg )) = Z:Msg . 
+
+   /*
+       A -> B : A,na
+       B -> S : A,na,B,nb
+       S -> B : E(kbs:kab,nb,A),E(kas:na,B,kab)
+       B -> A : E(kas:na,B,kab),E(kab:na),nb'
+       A -> B : E(kab:nb')
+    */
+Protocol
+    vars ANAME BNAME ANAME1 ANAME2 BNAME1 : Uname .
+    var SNAME : Sname .
+    vars M N MA : Msg .
+    vars NA NA1 NB NB1 : Nonce .
+    var K : Key .
+    var SKA SKB : Sessionkey .
+    vars r r1 r2 : Fresh .
+
+    roles A B S .
+
+    Def(A) = na := n(ANAME, r), kas := mkey(ANAME, s) .
+    Def(B) = nb := n(BNAME, r), kbs := mkey(BNAME, s), 
+            nb1 := n(BNAME, r1) .
+    Def(S) = ns := n(SNAME, r2),        kab := seskey(ANAME2, BNAME1, ns),
+            ksa := mkey(ANAME2, SNAME), ksb := mkey(BNAME1, SNAME) . 
+
+    In(A) = ANAME, BNAME, SNAME .
+    In(B) = BNAME, SNAME .
+    In(S) = SNAME .
+
+    1 . A -> B : ANAME  ; na
+              |- ANAME1 ; NA  .
+
+    2 . B -> S : ANAME1 ; NA  ; BNAME  ; nb
+              |- ANAME2 ; NA1 ; BNAME1 ; NB .
+
+    3 . S -> B : e(ksb, kab   ; NB ; ANAME2)   ; e(ksa, NA1 ; BNAME1 ; kab)
+              |- e(kbs, SKB   ; nb ; ANAME1)   ; MA .
+
+    4 . B -> A : MA                       ; e(SKB, NA) ; nb1
+              |- e(kas, na ; BNAME ; SKA) ; e(SKA, na) ; NB1 .
+
+    5 . A -> B : e(SKA, NB1) 
+              |- e(SKB, nb1) .
+
+    Out(A) = SKA, NB1, na .
+    Out(B) = SKB, nb1, nb, NA .
+    Out(S) = kab, NB, NA1 . 
+
+Intruder
+    vars ANAME : Uname .
+    var r : Fresh .
+    vars M N : Msg .
+    var K : Key .
+
+    => ANAME, s, mkey(i, s), mkey(i, ANAME) . 
+    K, M => d(K, M), e(K, M) .
+    M, N <=> M ; N .
+
+Attacks
+    0 . 
+       B executes protocol .
+       Subst(B) = ANAME1 |-> a , BNAME |-> b, SNAME |-> s .
+
+    1 .
+      B executes protocol .
+      Subst(B) = ANAME1 |-> a, BNAME |-> b, SNAME |-> s .
+      Intruder learns SKB .
+
+    2 .
+      B executes protocol .
+      Subst(B) = ANAME1 |-> a, BNAME |-> b, SNAME |-> s .
+      without:
+          A executes protocol .
+          Subst(A) = ANAME |-> a, BNAME |-> b, SNAME |-> s, NB1 |-> n(b, r1) .
+
+ends
