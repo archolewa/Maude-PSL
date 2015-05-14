@@ -290,7 +290,7 @@ class Section(Node):
 
     def var_name_sort_mapping(self):
         """
-        Returns a map from variable name to the variable's sort.
+        Returns a map from variable name to the variable's sort for all variables declared in this section.
         """
         declaredVars = {}
         for child in self.children:
@@ -1407,8 +1407,9 @@ class StepStmt(PSLStmtNode):
         sentTerm = ' '.join([token.get_token() for token in self.children[FIRST_TERM_INDEX].tokens()])
         sentTermVars = self.statement_vars()[senderRoleName]
         errors = []
+        freshVars = [var for (var, sort) in self.get_root().get_protocol().var_name_sort_mapping().iteritems() if sort == "Fresh"]
         for var in sentTermVars:
-            if var not in inVars and var not in senderVars:
+            if var not in inVars and var not in senderVars and var not in freshVars:
                 errors.append(' '.join([pslErrors.error, pslErrors.color_line_number(self.lineNum), "Variable", pslErrors.color_token(var), "appears in neither", 
                     pslErrors.color_token(''.join(['In(', senderRoleName, ')'])), "nor in the previous received terms of", pslErrors.color_token(senderRoleName) + "."]))
         return errors
