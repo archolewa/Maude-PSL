@@ -1,0 +1,67 @@
+spec NSL is
+
+Theory
+  sorts Name Nonce Key .
+  subsort Name < Key .
+  subsort Name < Public .
+
+  ops pk sk : Key Msg -> Msg .
+
+  op n : Name Fresh -> Nonce .
+  
+  ops a b i : -> Name . // Alice Bob Intruder
+  
+  op _;_ : Msg Msg -> Msg [gather (e E)] .
+
+  op h : Msg -> Key .
+
+  var Z : Msg .
+  var K : Key .
+  
+  // Encryption/Decryption Cancellation
+  eq pk(K,sk(K,Z)) = Z .
+  eq sk(K,pk(K,Z)) = Z .
+
+Protocol
+    vars A B A1 : Name .
+    vars r r1   : Fresh .
+    vars NA1 NB : Nonce .
+
+    In(A) = A, B .
+    In(B) = B .
+
+
+    1 . A -> B : pk(B, n(A, r) ; A) |- 
+                 pk(B, NA1     ; A1) .
+
+    2 . B -> A : pk(A1, NA1     ; n(B, r1) ; B) |-    
+                 pk(A , n(A, r) ; NB       ; B) . 
+
+    3 . A -> B : pk(B, NB) |- 
+                 pk(B, n(B, r1)) .                    
+
+
+    Out(A) = A, B, n(A, r), NB, h(n(A, r) ; NB) .
+    Out(B) = A1, B, NA1, n(B, r1), h(NA1 ; n(B, r1)) .
+
+Intruder
+    var C    : Name .
+    var r2   : Fresh .
+    vars X Y : Msg .
+    var K    : Key .
+
+    => C .
+    X, Y <=> X ; Y .
+    X => pk(K, X), sk(i, X) .
+
+Attacks
+    vars A1 B : Name .
+    var r1 : Fresh .
+    0 .
+        B executes protocol .
+        Intruder learns n(B, r1) .
+        //Tells us how we should instantiate the attack strand.
+        Subst(B) = B |-> b, A1 |-> a .
+
+
+ends

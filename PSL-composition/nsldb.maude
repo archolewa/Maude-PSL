@@ -1,0 +1,59 @@
+fmod PROTOCOL-EXAMPLE-SYMBOLS is
+    protecting DEFINITION-PROTOCOL-RULES .
+    protecting NSL-SYMBOLS + DB-SYMBOLS .
+
+  ops NSL-init1 NSL-resp1 : -> Role .
+  ops DB-init1 DB-resp1   : -> Role .
+  
+endfm
+
+fmod PROTOCOL-EXAMPLE-ALGEBRAIC is 
+    protecting PROTOCOL-EXAMPLE-SYMBOLS .
+    protecting NSL-ALGEBRAIC + DB-ALGEBRAIC .
+
+endfm
+
+fmod PROTOCOL-SPECIFICATION is
+  protecting PROTOCOL-EXAMPLE-SYMBOLS .
+  protecting DEFINITION-PROTOCOL-RULES .
+  protecting DEFINITION-CONSTRAINTS-INPUT .
+
+  eq STRANDS-DOLEVYAO = 
+    :: nil :: [ nil | +(C:Name), nil ] &
+    :: r:Fresh :: [ nil | +(n(i, r:Fresh)), nil ] &
+    :: nil :: [ nil | -(X:Msg), -(Y:Msg), +(X:Msg ; Y:Msg), nil ] &
+    :: nil :: [ nil | -(X:Msg ; Y:Msg), +(X:Msg), nil ] &
+    :: nil :: [ nil | -(X:Msg ; Y:Msg), +(Y:Msg), nil ] &
+    :: nil :: [ nil | -(X:Msg), +(pk(K:Key, X:Msg)), nil ] &
+    :: nil :: [ nil | -(X:Msg), +(sk(K:Key, X:Msg)), nil ] &
+    :: nil :: [ nil | -(X:Msg), -(Y:Msg), +(X:Msg * Y:Msg), nil ] 
+    [nonexec] .
+
+  eq STRANDS-PROTOCOL = 
+    :: r:Fresh :: [ nil | +(pk(B:Name, n(A:Name, r:Fresh) ; A:Name)),
+                    -(pk(A:Name, n(A:Name, r:Fresh) ; NB:Nonce ; B:Name)),
+                    +(pk(B:Name, NB:Nonce)),
+                    {NSL-init1 -> DB-resp1 ;; 1-1 ;; B:Name ; A:Name ; n(A:Name, r:Fresh)}, 
+                    nil ] 
+    &
+    :: r1:Fresh :: [ nil | -(pk(B:Name, NA1:Nonce ; A1:Name)),
+                    +(pk(A1:Name, NA1:Nonce ; n(B:Name, r1:Fresh) ; B:Name)),
+                    -(pk(B:Name, n(B:Name, r1:Fresh))),
+                    {NSL-resp1 -> DB-init1 ;; 1-1 ;; B:Name ; A:Name ; NA1:Nonce},
+                    nil ] 
+    &
+    :: r2:Fresh :: [ nil | 
+                    {NSL-resp1 -> DB-init1 ;; 1-1 ;; A:Name ; B:Name ; N:Nonce},
+                    +(n(A:Name, r2:Fresh)),
+                    -(N:Nonce * n(A:Name, r2:Fresh)), nil ]
+    & 
+    :: nil :: [ nil | 
+                {NSL-init1 -> DB-resp1 ;; 1-1 ;; B:Name ; A:Name ; N:Nonce},
+                -(NA:Nonce),
+                +(N:Nonce * NA:Nonce ), 
+                nil ] .
+                                        
+                    
+
+
+endfm

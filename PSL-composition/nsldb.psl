@@ -1,0 +1,9 @@
+spec NSL;DB is
+    composing NSL ; DB .
+
+    NSL.A ;1 DB.B : DB.B |-> NSL.A,  DB.A |-> NSL.B, DB.N |-> n(NSL.A, NSL.r) .
+    NSL.B ;1 DB.A : DB.B |-> NSL.A1, DB.A |-> NSL.B, DB.N |-> NSL.NA1 .
+
+
+ends
+

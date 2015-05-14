@@ -1,0 +1,49 @@
+spec DB is 
+
+Theory
+    types Name Key Nonce .
+    subtype Name < Key .
+    subtype Name < Public .
+
+    ops a b i : -> Name .
+
+    op 0 : -> Msg .
+    op n : Name Fresh -> Nonce .
+
+    op _*_ : Msg Msg -> Msg [assoc comm] .
+
+    vars X Y : Msg .
+    eq X * X = 0 .
+    eq X * 0 = X .
+    eq X * X * Y = Y .
+
+Protocol
+
+    vars A B  : Name .
+    vars N NA : Nonce .
+    var r     : Fresh .
+
+    In(A) = A, B, N .
+    In(B) = A, B, N .
+
+    1 . A -> B : n(A, r) |- NA .
+    2 . B -> A : N * NA  |- N * n(A, r) .
+
+    Out(A) = n(A, r), N * n(A, r) .
+    Out(B) = NA, N * NA .
+
+Intruder
+    var C : Name .
+    vars X Y : Msg .
+    var r : Fresh .
+
+         => C, n(i, r) .
+    X, Y => X * Y .
+
+Attacks
+    vars A B : Name .
+    0 .
+        B executes protocol .
+        Subst(B) = A |-> a, B |-> b .
+
+ends

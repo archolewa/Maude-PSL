@@ -1,0 +1,41 @@
+fmod PROTOCOL-EXAMPLE-SYMBOLS is protecting DEFINITION-PROTOCOL-RULES . --- -1
+  sorts Name Nonce Key .
+  subsort Name < Key .
+  subsort Name < Public .
+  subsorts Name Nonce Key < Msg .
+
+  ops pk sk : Key Msg -> Msg .
+
+  ops a b i : -> Name . --- Alice Bob Intruder
+  
+  op _;_ : Msg Msg -> Msg [gather (e E)] .
+
+  op h : Msg -> Key .
+
+  var Z : Msg .
+  var K : Key .
+  
+  --- Encryption/Decryption Cancellation
+  eq pk(K,sk(K,Z)) = Z .
+  eq sk(K,pk(K,Z)) = Z .
+
+  op skey : Name Fresh -> Key .
+  op n    : Name Fresh -> Nonce .
+
+  ops a b i : -> Name .
+
+  op _;_ : Msg Msg -> Msg [gather(e E)] .
+
+  ops e d : Key Msg -> Msg .
+
+  var M : Msg .
+  eq e(K, d(K, M)) = M .
+  eq d(K, e(K, M)) = M .
+
+  ops nsl-A nsl-B : -> Role .
+
+  ops kd-A kd-B : -> Role .
+
+  op _$;_ : Msg Msg -> Msg [gather(E e)] .
+
+endfm
