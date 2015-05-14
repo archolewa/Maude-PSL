@@ -321,9 +321,7 @@ def gen_intermediate(parseTree, theoryFileName):
             roleTermPair[DEF_KEY_TERM]]) for roleTermPair, shorthandLineNum in defMap.items()])
     else:
         defs = '$noDefs'
-    #&&&
-    #code.append(' '.join(['[', defs, ']']))
-    code.append(' '.join(['[', '$checkWellFormed(', defs, ')', ']']))
+    code.append(' '.join(['[', '$makeIdem($checkWellFormed(', defs, '))', ']']))
     code.append('.')
     return code
 
@@ -446,7 +444,7 @@ def compute_sorts(defMap, syntaxFileName, pslTree):
     #shorthand, and shorthand that does. Then we iteratively grow the shorthand that doesn't depend on others as we compute the
     #sorts of the indepedent shorthand, until we've computed the sorts of all the shorthand.
     shorthand = {shorthand for shorthand, lineNumber in defMap.values()}
-    dependentShorthand = {(role, term):(shorthand, lineNumber) for ((role, term), (shorthand, lineNumber)) in defMap.iteritems() if
+    dependentShorthand = {(role, term):shorthandLineNum for ((role, term), shorthandLineNum) in defMap.iteritems() if
         set(term.split()).intersection(shorthand)}
     independentShorthand = {roleTerm:defMap[roleTerm] for roleTerm in defMap if not roleTerm in dependentShorthand}
     knownShorthand = dict()
