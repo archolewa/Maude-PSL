@@ -1137,10 +1137,6 @@ mod TRANSLATION-TO-MAUDE-NPA is
         V:VarDecls
     endfm) .
 
-    vars A B : Name .
-    vars N1 N2 : Nonce .
-    vars r1 r2 : Fresh .
-    vars X Y : Msg .
 endm
 
 ---(
@@ -1366,16 +1362,6 @@ mod COMP-TRANSLATION-TO-MAUDE-NPA is
         eq STRANDS-PROTOCOL = convert(SD:StrandData) [nonexec] .
     endfm) [print SD:StrandData] .
 
-    vars A B A1 : Name .
-    vars NA1 NB : Nonce .
-
-    var C    : Name .
-    vars X Y : Msg .
-    ---var K    : Key .
-    var NA : Nonce .
-    var NO : Nonce .
-    vars r r1 r2 r3 : Fresh .
-    ---var SK : Key .
 endm
 
 
