@@ -19,17 +19,17 @@ Theory
 
 Protocol
 
-    vars A B  : Name .
+    vars ANAME BNAME  : Name .
     vars N NA : Nonce .
     var r     : Fresh .
 
-    In(A) = A, B, N .
-    In(B) = A, B, N .
+    In(A) = ANAME, BNAME, N .
+    In(B) = ANAME, BNAME, N .
 
-    1 . A -> B : n(A, r) |- NA .
-    2 . B -> A : N * NA  |- N * n(A, r) .
+    1 . A -> B : n(ANAME, r) |- NA .
+    2 . B -> A : N * NA      |- N * n(ANAME, r) .
 
-    Out(A) = n(A, r), N * n(A, r) .
+    Out(A) = n(ANAME, r), N * n(ANAME, r) .
     Out(B) = NA, N * NA .
 
 Intruder
@@ -41,9 +41,8 @@ Intruder
     X, Y => X * Y .
 
 Attacks
-    vars A B : Name .
     0 .
         B executes protocol .
-        Subst(B) = A |-> a, B |-> b .
+        Subst(B) = ANAME |-> a, BNAME |-> b .
 
 ends

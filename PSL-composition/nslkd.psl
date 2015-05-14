@@ -1,14 +1,14 @@
 spec NSL;KD is
     composing NSL ; KD .
 
-    A ;* B : ANAME1 |-> BNAME,  BNAME |-> ANAME, 
-        K |-> h(n(ANAME, r) ; NB) . 
-    B ;* A : ANAME |-> BNAME, BNAME |-> ANAME1, 
-        K |-> h(NA1 ; n(BNAME, r1)) .
+    A ;* B : ANAME1 |-> BName,  BNAME |-> AName, 
+        K |-> h(n(AName, r) ; NB) . 
+    B ;* A : ANAME |-> Bname, BNAME |-> A1name, 
+        K |-> h(NA1 ; n(Bname, r1)) .
 
-    A ;* A : A |-> A,  B |-> B, 
-        K |-> h(n(A, r) ; NB) .     
-    B ;* B : A |-> A1, B |-> B, 
-        K |-> h(NA1 ; n(B, r1)) .
+    A ;* A : ANAME |-> AName,  BNAME |-> BName, 
+        K |-> h(n(AName, r) ; NB) .     
+    B ;* B : ANAME |-> A1Name, BNAME |-> BName, 
+        K |-> h(NA1 ; n(BName, r1)) .
 
 ends
