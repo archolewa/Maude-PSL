@@ -31,3 +31,8 @@ these modules are compatible with.
 To load <FILENAME>.maude into the Maude-NPA, type:
 
 ./maude27 -no-prelude prelude.maude maude-npa.maude <FILENAME>.maude
+
+For more details about PSL, see psl_description.pdf (a draft of Andrew Cholewa's
+Spring 2015 Masters Thesis at University of Illinois at Urbana-Champaign), 
+included with this repository.
+
