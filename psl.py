@@ -626,8 +626,8 @@ def make_coherent(equations, syntax):
     if stderr:
         raise pslErrors.TranslationError(stderr)
     eqLines = [line for line in stdout.split('\n') if 'eq' in line.split()]
-    equations = [line for line in equations if not 'eq' in line.split()]
-    equations = equations[:-1] + compute_equations(eqLines, syntax) + [equations[-1]]
+    equationModule = [line for line in equations if 'eq' not in line.split()]
+    equationModule = equationModule[:-1] + compute_equations(eqLines, syntax) + [equationModule[-1]]
     return equations
 
 def compute_equations(eqLines, syntax):
@@ -677,10 +677,20 @@ def extract_equation_terms_attributes(eqLines):
     for line in eqLines:
         lefthandSide, righthandSide = line.split('=')
         lefthandSide = lefthandSide.split()[1].strip()
-        righthandSide, attributes = [term.strip() for term in righthandSide.split('[')]
+        righthandSide, attributes = compute_righthand_attributes(righthandSide)
         attributes = attributes[:attributes.index(']')]
         eqDict[lefthandSide] = (righthandSide, attributes)
     return eqDict
+
+def compute_righthand_attributes(righthandSide):
+    """
+    Given a righthand side of a meta equation, splits it into the righthand
+    side of the equation, and the equation attributes, and returns them as
+    an ordered pair.
+    """
+    righthandSide = righthandSide.strip()
+    attributeStart = righthandSide.rfind('[')
+    return (righthandSide[:attributeStart], righthandSide[attributeStart+1:-1])
 
 
 def split_eq_theory(eqTheory):
