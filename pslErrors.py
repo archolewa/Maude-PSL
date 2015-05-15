@@ -1,5 +1,5 @@
 """
-Maude-PSL, Version: [2.0] [March 12th 2015]
+Maude-PSL, Version: [1.0] [March 12th 2015]
 Copyright (c) 2015, University of Illinois
 All rights reserved.
 Redistribution and use in source and binary forms, with or without modification, 
