@@ -1,0 +1,83 @@
+spec Woolam is
+Theory
+    types  UName SName Name Key Nonce  Masterkey Sessionkey .
+    subtype Masterkey  Sessionkey < Key .
+    subtype SName UName < Name .
+    subtype Name < Public . 
+
+    op n : Name Fresh -> Nonce .
+    ops a b i : -> UName [ctor] .
+    op s : ->  SName  [ctor] . 
+    op mkey : Name Name -> Masterkey .
+    op seskey : Name Name Nonce -> Sessionkey .
+    op e  : Key Msg -> Msg .
+    op d : Key Msg -> Msg  .
+    op _;_ : Msg Msg -> Msg [gather (e E)] .
+
+    var K : Key .
+    var Z : Msg .
+    eq d(K, e(K, Z)) = Z .
+    eq e(K, d(K, Z)) = Z . 
+
+
+  /*
+   A -> B : A
+   B -> A : nb
+   A -> B : E(kas:nb)
+   B -> S : E(kbs:A,E(kas:nb))
+   S -> B : E(kbs:nb)
+  */
+
+Protocol
+    vars ANAME BNAME : UName .
+    var SNAME : SName .
+    vars NB NBS : Nonce .
+    vars MA M N : Msg .
+    var r : Fresh .
+    var K : Key .
+    var D : Name .
+
+    roles A B S .
+
+    In(A) = ANAME, BNAME, SNAME .
+    In(B) = ANAME, BNAME, SNAME .
+    In(S) = ANAME, BNAME, SNAME .
+
+    Def(A) = kas := mkey(ANAME, s) . 
+    Def(B) = nb  := n(BNAME,r),    kbs := mkey(BNAME, s) .
+    Def(S) = kas := mkey(ANAME,s), kbs := mkey(BNAME,s) .
+
+    1 . A -> B : ANAME |- ANAME   .
+
+    2 . B -> A : nb |- NB .
+
+    3 . A -> B : e(kas, NB) |- MA .
+
+    4 . B -> S :  e(kbs, ANAME ; MA)
+               |- e(kbs, ANAME ; e(kas, NBS)) .
+
+    5 . S -> B :  e(kbs, NBS) 
+               |- e(kbs, nb) .
+
+    Out(A) = NB .
+    Out(B) = nb .
+    Out(S) = NB .
+
+
+Intruder
+    var D    : Name .
+    var r    : Fresh .
+    var K    : Key .
+    vars M N : Msg .
+          => D, n(i, r), mkey(D, i), mkey(i, D) .
+    K, M  => d(K, M), e(K, M) .
+    M, N <=> M ; N .
+
+
+Attacks
+    //Empty attack for debugging purposes. If an "attack" isn't found, then 
+    //there's something wrong with the specification.
+    0 . 
+       B executes protocol .
+       Subst(B) = ANAME |-> a , BNAME |-> b, SNAME |-> s . 
+ends
