@@ -809,7 +809,7 @@ rl [translateAttackWithoutNever] :
     eq $checkSorts($none) = id .
 
     ---Checks if the sort of the first argument is a supersort of the sort of
-    ---the second arugment.
+    ---the second argument.
     op $isValidPair : Msg Msg Nat -> Mapping .
     ceq $isValidPair(D:Msg, R:Msg, N) = 
         if sortLeq(META-MOD:Module, getType(metaReduce(META-MOD:Module, upTerm(R:Msg))), getType(metaReduce(META-MOD:Module, upTerm(D:Msg))))
