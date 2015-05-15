@@ -1,0 +1,95 @@
+spec Kao-Chow is
+Theory
+  types  UName SName Name Key Nonce Masterkey Sessionkey .
+  subtype Masterkey Sessionkey < Key .
+  subtype SName UName < Name .
+  subtype Name < Public . 
+
+  op n : Name Fresh -> Nonce  .
+  op t : Name Fresh -> Nonce  . 
+  ops a b i : -> UName [ctor] .
+  op s : ->  SName [ctor] . 
+  op mkey : Name Name -> Masterkey .
+  op seskey : Name Name Nonce -> Sessionkey .
+  op e : Key Msg -> Msg .
+  op d : Key Msg -> Msg .
+  op _;_ : Msg Msg -> Msg [gather (e E)] .
+
+  var K : Key .
+  var Z : Msg .
+  eq d(K, e(K, Z)) = Z .
+  eq e(K, d(K, Z)) = Z . 
+
+   /*
+    A -> S : A , B , na
+    S -> B : E(kas:A,B,na,kab) , E(kbs:A,B,na,kab)
+    B -> A : E(kas:A,B,na,kab) , E(kab:na) , nb
+    A -> B : E(kab:nb)
+   */
+Protocol
+    vars ANAME BNAME : UName .
+    var SNAME : SName .
+    vars MA M N : Msg .
+    vars r r1 r2 : Fresh .
+    var NAB : Nonce .
+    vars SKA SKB : Sessionkey .
+    var NAS NBS : Nonce .
+    var NBA : Nonce .
+
+    roles A B S .
+
+    In(A) = ANAME, BNAME, SNAME .
+    In(B) = ANAME, BNAME, SNAME .
+    In(S) = ANAME, BNAME, SNAME .
+
+    Def(A) =  na := n(ANAME, r),    kas := mkey(ANAME, s) .
+    Def(B) =  nb := n(ANAME, r1),   kbs := mkey(BNAME, s) .
+    Def(S) = kas := mkey(ANAME, s), kbs := mkey(BNAME, s), 
+             kab := seskey(ANAME,BNAME,n(s,r2)) .
+
+
+    1 . A -> S :  ANAME ; BNAME ; na
+               |- ANAME ; BNAME ; NAS  .
+
+    2 . S -> B :  e(kas, ANAME ; BNAME ; NAS ; kab) ; e(kbs, ANAME ; BNAME ; NAS ; kab)
+               |- MA                                ; e(kbs, ANAME ; BNAME ; NAB ; SKB) .
+
+    3 . B -> A :  MA                        ; e(SKB, NAB)       ; nb
+               |- e(kas, ANAME ; BNAME ; na ; SKA) ; e(SKA, na) ; NBA .
+
+    4 . A -> B :  e(SKA, NBA) 
+               |- e(SKB, nb) .
+
+    Out(A) = na, NBA, SKA .
+    Out(B) = NAB, nb, SKB .
+    Out(S) = NAS, NBS, kab .
+
+
+Intruder
+    var D : Name .
+    var r : Fresh .
+    var K : Key .
+    vars M N : Msg .
+
+           => D, n(i, r), mkey(i, D), mkey(D, i) .
+    K, M   => d(K, M), e(K, M) .
+    M ; N <=> M, N .
+
+Attacks
+    0 . 
+       B executes protocol .
+       Subst(B) = ANAME |-> a, BNAME |-> b, SNAME |-> s . 
+
+    1 .
+      B executes protocol .
+      Subst(B) = ANAME |-> a, BNAME |-> b, SNAME |-> s . 
+      Intruder learns SKB .
+
+    2 .
+      B executes protocol .
+      Subst(B) = ANAME |-> a, BNAME |-> b, SNAME |-> s . 
+      without:
+        A executes protocol .
+        Subst(A) = ANAME |-> a, BNAME |-> b, SNAME |-> s .
+
+ends
