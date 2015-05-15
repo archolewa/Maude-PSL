@@ -1,15 +1,15 @@
 spec Yahalom is
 Theory
-  types  Uname Sname name Key Nonce Masterkey Sessionkey .
+  types  Uname Sname Name Key Nonce Masterkey Sessionkey .
   subtype Masterkey Sessionkey < Key .
-  subtype Sname Uname < name .
-  subtype name < Public .
+  subtype Sname Uname < Name .
+  subtype Name < Public .
   
-  op n : name Fresh -> Nonce .
+  op n : Name Fresh -> Nonce .
   ops a b i : -> Uname [ctor] .
   op s : ->  Sname [ctor] . 
-  op mkey : name name -> Masterkey .
-  op seskey : name name Nonce -> Sessionkey .
+  op mkey : Name Name -> Masterkey .
+  op seskey : Name Name Nonce -> Sessionkey .
   op e : Key Msg -> Msg .
   op d : Key Msg -> Msg .
   op _;_ : Msg Msg -> Msg [gather (e E)] .
@@ -25,74 +25,68 @@ Theory
     A -> B : E(kbs:A,kab),E(kab:nb)
    */
 
-/*
-Note: The variable scoping here makes no sense. Ostensibly, the SK in Protocol, and the SK in Attacks should be different values. However, they're meant to represent the same
-value. So, it seems like we should allow global variable declarations. Of course, the way the code is currently structured, implementing that won't exactly be trivial.
-
-*/
 Protocol
-    vars A B : Uname .
-    var S : Sname .
-    vars NA NB : Nonce . 
+    vars ANAME BNAME : Uname .
+    var SNAME : Sname .
+    vars NA NBA NAS NBS : Nonce . 
     var  r : Fresh .
     var M N MB : Msg .
-    var SK : Sessionkey .
-    var D : name .
+    var SKA SKB : Sessionkey .
+    var D : Name .
     var K : Key .
 
-    Def(A) = na := n(A, r), kas := mkey(A,s) .
-    In(A) = A, B, S .
+    roles A B S .
 
-    Def(B) = nb := n(B, r), kbs := mkey(B,s) .
-    In(B) = A, B, S .
+    In(A) = ANAME, BNAME, SNAME .
+    In(B) = ANAME, BNAME, SNAME .
+    In(S) = ANAME, BNAME, SNAME .
 
-    Def(S) = kas := mkey(A, s), kbs := mkey(B, s), kab := seskey(A , B , n(s,r)) .
-    In(S) = A, B, S .
+    Def(A) = na := n(ANAME, r), kas := mkey(ANAME,s) .
 
-    1 . A -> B :  A ; na 
-               |- A ; NA .
+    Def(B) = nb := n(BNAME, r), kbs := mkey(BNAME,s) .
 
-    2 . B -> S :  B ; e(kbs, A ; NA ; nb)
-               |- B ; e(kbs, A ; NA ; NB) .
+    Def(S) = kas := mkey(ANAME, s), kbs := mkey(BNAME, s), 
+        kab := seskey(ANAME , BNAME , n(s,r)) .
 
-    3 . S -> A : e(kas, B ; kab ; NA ; NB) ; e(kbs, A ; kab)
-              |- e(kas, B ; SK  ; na ; NB) ; MB .
+    1 . A -> B :  ANAME ; na 
+               |- ANAME ; NA .
 
-    4 . A -> B : MB             ; e(SK, NB) 
-              |- e(kbs, A ; SK) ; e(SK, nb) .
+    2 . B -> S :  BNAME ; e(kbs, ANAME ; NA  ; nb)
+               |- BNAME ; e(kbs, ANAME ; NAS ; NBS) .
 
-    Out(A) = na, NB, SK .
-    Out(B) = NA, nb, SK .
-    Out(S) = NA, NB, kab .
+    3 . S -> A :  e(kas, BNAME ; kab  ; NAS ; NBS) ; e(kbs, ANAME ; kab)
+               |- e(kas, BNAME ; SKA  ; na  ; NBA) ; MB .
+
+    4 . A -> B :  MB                  ; e(SKA, NBA) 
+               |- e(kbs, ANAME ; SKB) ; e(SKB, nb) .
+
+    Out(A) = na, NBA, SKA .
+    Out(B) = NA, nb, SKB .
+    Out(S) = NA, NBS, kab .
 
 Intruder
-   => D:Name, n(i, r:Fresh), mkey(i, A:Name), mkey(A:Name, i), mkey(i, s) .
-   K:Key, M:Msg => d(K:Key, M:Msg), e(K:Key, M:Msg) .
-   M:Msg ; N:Msg <=> M:Msg, N:Msg .
+    vars C D : Name .
+    var r : Fresh .
+    var K : Key .
+    vars M N : Msg .
+          => D, n(i, r), mkey(i, C), mkey(C, i), mkey(i, s) .
+   K, M   => d(K, M), e(K, M) .
+   M ; N <=> M, N .
 
 Attacks
-  vars A B : UName .
-  var S : SName .
-  var SK : Sessionkey .
-
   0 . 
-       In(B) = A |-> a , B |-> b, S |-> s . 
        B executes protocol .
-       Out(B) = ditto .
+       Subst(B) = ANAME |-> a , BNAME |-> b, SNAME |-> s . 
 
   1 .
-      In(B) = A |-> a , B |-> b, S |-> s  .
       B executes protocol .
-      Intruder learns SK .
-      Out(B) = ditto .
+      Subst(B) = ANAME |-> a , BNAME |-> b, SNAME |-> s  .
+      Intruder learns SKB .
 
    2 .
-       In(B) = A |-> a, B |-> b, S |-> s  .
        B executes protocol .
-       Out(B) = ditto .
+       Subst(B) = ANAME |-> a, BNAME |-> b, SNAME |-> s  .
        without:
-           In(A) = A |-> a, B |-> b, S |-> s  .
            A executes protocol .
-           Out(A) = NB |-> n(b, r), ditto .
-
+           Subst(A) = ANAME |-> a, BNAME |-> b, SNAME |-> s, NBA |-> n(b, r)  .
 ends
