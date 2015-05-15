@@ -886,6 +886,14 @@ rl [translateAttackWithoutNever] :
             'nil.SMsgList-R], 
             $error('::_::`[_|_`][F:Term, $applyMapping1(ML:Term, M:Mappings), 
             'nil.SMsgList-R])) [owise print "Strand meta term list: " ML:Term] .
+    ---Applies if we're using the "up to" syntax, in which case the last 
+    ---term in the list is a constant (which Maude-NPA will treat as a variable) 
+    ---of sort LIST, NOT nil. 
+    eq $applyMapping('::_::`[_|_`][F:Term, ML:Term, 'LIST.SMsgList-R], M:Mappings) =
+        downTerm('::_::`[_|_`][F:Term, $applyMapping1(ML:Term, M:Mappings), 
+            'LIST.SMsgList-R], 
+            $error('::_::`[_|_`][F:Term, $applyMapping1(ML:Term, M:Mappings), 
+            'LIST.SMsgList-R])) [owise print "Strand meta term list: " ML:Term] .
 
     op $applyMapping1 : TermList Mappings ~> TermList .
     var M : Mappings .
@@ -894,7 +902,6 @@ rl [translateAttackWithoutNever] :
     var F : Qid .
     vars M1 M2 : Msg .
     op $error : -> Msg .
-    ---op $applyMapping2 : TermList Mappings -> TermList .
     var T1 : Term .
     eq $applyMapping1(TL:TermList, id) = TL:TermList .
     ceq $applyMapping1((T, TL), (M1 |-> M2, M)) = T1, 
