@@ -1,0 +1,107 @@
+/*
+    The Wide Mouthed Frog protocol is a common example protocol created by Michael
+    Burrows in his 1989 technical report:
+    Michael Burrows, Martin Abadi, and Roger Needham. A logic of authentication. 
+    Technical Report 39, Digital Systems Research Center, Feb 1989.
+*/
+spec WMF is 
+Theory
+  types  UName SName Name Key Nonce  Masterkey Sessionkey .
+  subtype Masterkey  Sessionkey < Key .
+  subtype SName UName < Name .
+  subtype Name < Public . // This is quite relevant and necessary
+
+  // Nonce operator
+  op n  : Name Fresh -> Nonce  .
+
+  // User names
+  ops a b i : -> UName .
+
+  // Server name
+  op s : ->  SName . 
+
+// MKey
+  op mkey : Name Name -> Masterkey  .
+ 
+// Seskey
+ op seskey : Name Name Nonce -> Sessionkey  .
+
+ //encrypt
+  op e : Key Msg -> Msg  .
+  op d : Key Msg -> Msg   .
+
+// successor
+
+ op p : Msg -> Msg  .
+
+
+// Concatenation
+  op _;_ : Msg Msg -> Msg [gather (e E)] .
+
+ var K : Key .
+ var Z : Msg .
+ eq d(K, e(K, Z)) = Z .
+ eq e(K, d(K, Z)) = Z . 
+
+
+Protocol
+    vars ANAME BNAME SNAME : Name .
+    vars KAS KBS KAB KBA : Key .
+    vars r1 r2 r3 : Fresh .
+    vars MA MB : Msg .
+
+    roles A B S .
+
+    Def(A) = keyAS := mkey(ANAME, SNAME), 
+             keyAB := seskey(ANAME, BNAME, n(ANAME, r2)) . 
+    Def(B) = keyBS := mkey(BNAME, SNAME) .
+    Def(S) = keyAS := mkey(ANAME, SNAME), 
+             keyBS := mkey(BNAME, SNAME) .
+
+    In(A) = ANAME, BNAME, SNAME, MA .
+    In(B) = ANAME, BNAME, SNAME .
+    In(S) = ANAME, BNAME, SNAME .
+
+    1 . A -> S :  ANAME ; e(keyAS, BNAME ; keyAB) 
+               |- ANAME ; e(keyAS, BNAME ; KAB) .
+
+    2 . S -> B :  e(keyBS, ANAME ; KAB)  
+               |- e(keyBS, ANAME ; KBA) .
+
+    3 . A -> B :  ANAME ; e(keyAB, MA) 
+               |- ANAME ; e(KBA,   MB) .
+
+    Out(A) = keyAB .
+    Out(S) = KAB .
+    Out(B) = KBA .
+
+
+Intruder
+    var r : Fresh .
+    vars X Y : Msg .
+    var K : Key .
+    var N : Name .
+    var S : SName .
+          => N, seskey(i, N, n(i, r)), mkey(i, S) .
+    X, Y <=> X ; Y .
+    K, X  => e(K, X), d(K, X) .
+
+
+Attacks
+    //An empty attack for debugging purposes.
+    0 .
+        A executes protocol .
+        Subst(A) = ANAME |-> a, BNAME |-> b, SNAME |-> s .
+
+    1 .
+        A executes protocol .
+        Subst(A) = ANAME |-> a, BNAME |-> b, SNAME |-> s .
+        Intruder learns keyAB .
+
+    2 .
+        A executes protocol .
+        Subst(A) = ANAME |-> a, BNAME |-> b, SNAME |-> s .
+        without:
+            B executes protocol .
+            Subst(B) = ANAME |-> a, BNAME |-> b, SNAME |-> s .
+ends
