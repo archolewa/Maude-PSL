@@ -336,7 +336,11 @@ def gen_NPA_code(maudeCode, theoryFileName):
         #Expected error pattern:
         #Warning: <standard input>, line N : <error message> 
         for line in [line.strip() for line in stderr.split('\n') if line.strip()]:
-            _,lineNum, error = line.split(':')
+            try:
+                _,lineNum, error = line.split(':')
+            except ValueError:
+                print(stderr)
+                assert False
             #expected pattern currently in lineNum:
             #<standard input>, line N
             lineNum = int(lineNum.split()[-1])
@@ -401,6 +405,29 @@ def process_error(error):
     elif errorType.strip() == "$$$malformedTerm":
         errorTerm, lineNumber =  errorTerm.rsplit(',', 1)
         raise pslErrors.TranslationError(' '.join([pslErrors.error, pslErrors.color_line_number(lineNumber.strip()), "Malformed term:", errorTerm]))
+    elif errorType.strip() == "$$$notAFunction":
+        errorMappings = errorTerm.split("$$$;;;$$$")
+        errorMsg = []
+        for error in errorMappings:
+            var, results = [string.strip() for string in error.split('|->')]
+            problemTerms = []
+            lineNumbers = []
+            for result in [r.strip() for r in results.split('}$') if r.strip()]:
+                result = result.replace('${', '')
+                startLineNum = result.rindex(';')+1
+                lineNumber = result[startLineNum:].strip()
+                result = result[:startLineNum-1].strip()
+                problemTerms.append(result)
+                lineNumbers.append(lineNumber)
+            errorMsg.append(''.join([pslErrors.errorNoLine, " Substitution does not",
+                " define a function. Variable: ", pslErrors.color_token(var),
+                " maps to the terms:\n\t", '\n\t'.join([' Line: '.join([
+                    pslErrors.color_token(term),
+                    pslErrors.color_line_number(lineNum)]) for term, lineNum
+                    in zip(problemTerms, lineNumbers)])]))
+        raise pslErrors.TranslationError('\n'.join(errorMsg)) 
+    elif errorType.strip() == "$$$invalidSorting":
+        pass
 
 
 

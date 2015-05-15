@@ -768,7 +768,7 @@ rl [translateAttackWithoutNever] :
     we don't need to separately track the line numbers.
     ---)
     op $isValid : MsgPairs -> Mappings .
-    eq $isValid(M:MsgPairs) = $checkSorts($isFunction(M:MsgPairs)) .
+    eq $isValid(M:MsgPairs) = $checkSorts($isFunction(M:MsgPairs))  .
 
     ---(
     Line numbers are already encoded in the $$$notAFunction error term, so we don't need to encode them separately.
@@ -789,14 +789,15 @@ rl [translateAttackWithoutNever] :
     ---We only care about those mappings that have more than mapping. Anything
     ---with a single result term is not ambiguous, and is left over from how
     ---we implemented $isFunction.
-    eq $$$notAFunction(M:Msg |-> ${M1:Msg ; N1:Nat}$ MS:MsgPairs) =
-        $$$notAFunction(MS:MsgPairs) .
-    eq $$$notAFunction($$$notAFunction(MS1:MsgPairs) MS2:MsgPairs) = 
-        $$$notAFunction(MS1:MsgPairs MS2:MsgPairs) .
+    eq $$$notAFunction(M:Msg |-> ${M1:Msg ; N1:Nat}$ MS:[MsgPairs]) =
+        $$$notAFunction(MS:[MsgPairs]) .
+    eq $$$notAFunction($$$notAFunction(MS1:[MsgPairs]) MS2:[MsgPairs]) = 
+        $$$notAFunction(MS1:[MsgPairs] $$$;;;$$$ MS2:[MsgPairs]) .
     eq $$$notAFunction(M:Msg |-> MN1:MsgNumSet M:Msg |-> MN2:MsgNumSet 
-        MS:MsgPairs) 
+        MS:[MsgPairs]) 
     =
-        $$$notAFunction(M:Msg |-> MN1:MsgNumSet MN2:MsgNumSet MS:MsgPairs) .
+        $$$notAFunction(M:Msg |-> MN1:MsgNumSet MN2:MsgNumSet $$$;;;$$$ 
+            MS:[MsgPairs]) .
         
         
     
