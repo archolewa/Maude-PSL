@@ -1,4 +1,49 @@
 """
+Maude-PSL, Version: [2.0] [March 12th 2015]
+Copyright (c) 2015, University of Illinois
+All rights reserved.
+Redistribution and use in source and binary forms, with or without modification, 
+are permitted provided that the following conditions are met:
+* Redistributions of source code must retain the above copyright notice, 
+this list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice, 
+this list of conditions and the following disclaimer in the documentation 
+and/or other materials provided with the distribution.
+* Neither the name of the University of Illinois nor the names of its contributors 
+may be used to endorse or promote products derived from this software without 
+specific prior written permission.
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, 
+THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE 
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-----------------------------------------------------------------------------------------------------------
+Copyright (c) 2015. To the extent that a federal employee is an author of 
+a portion of the software or a derivative work thereof, no copyright is 
+claimed by the United States Government, as represented by the Secretary 
+of the Navy ("GOVERNMENT") under Title 17, U.S. Code. All Other Rights Reserved.
+Permission to use, copy, and modify this software and its documentation is 
+hereby granted, provided that both the copyright notice and this permission 
+notice appear in all copies of the software, derivative works or modified 
+versions, and any portions thereof, and that both notices appear in 
+supporting documentation.
+GOVERNMENT ALLOWS FREE USE OF THIS SOFTWARE IN ITS "AS IS" CONDITION AND 
+DISCLAIM ANY LIABILITY OF ANY KIND FOR ANY DAMAGES WHATSOEVER RESULTING 
+FROM THE USE OF THIS SOFTWARE.
+GOVERNMENT requests users of this software to return modifications, 
+improvements or extensions that they make to: 
+maudenpa@chacs.nrl.navy.mil]
+-or-
+Naval Research Laboratory, Code 5543
+4555 Overlook Avenue, SW
+Washington, DC 20375
+"""
+"""
 Important: To simplify implementation, the parser assumes that the set of user-defined tokens are disjoint from the set of top level tokens.
 """
 import re
