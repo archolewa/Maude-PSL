@@ -53,6 +53,8 @@ fmod TRANSLATION-SYNTAX is
     4. The role's output
     ---)
     op _|->{_}_{_} : Role MsgSet Strand MsgSet -> StrandDatum [ctor prec 30] .
+
+
 endfm
 
 
@@ -334,6 +336,7 @@ fmod ATTACK-SYNTAX is
     op _|->_ : Msg MsgNumSet -> MsgPair [prec 30] .
     op $none : -> MsgPairs .
     op __ : MsgPairs MsgPairs -> MsgPairs [ctor assoc comm id: $none] .
+    op _$$$;;;$$$_ : [MsgPairs] [MsgPairs] -> [MsgPairs] [ctor assoc comm id: $none] .
     ---Stores the information on an invalid substitution. The Python code
     ---invoking this Maude code then scans the output for the presence of
     ---this term. If the Python code finds this term, then it extracts the

@@ -769,7 +769,7 @@ rl [translateAttackWithoutNever] :
     we don't need to separately track the line numbers.
     ---)
     op $isValid : MsgPairs -> Mappings .
-    eq $isValid(M:MsgPairs) = $checkSorts($isFunction(M:MsgPairs)) .
+    eq $isValid(M:MsgPairs) = $checkSorts($isFunction(M:MsgPairs))  .
 
     ---(
     Line numbers are already encoded in the $$$notAFunction error term, so we don't need to encode them separately.
@@ -790,14 +790,15 @@ rl [translateAttackWithoutNever] :
     ---We only care about those mappings that have more than mapping. Anything
     ---with a single result term is not ambiguous, and is left over from how
     ---we implemented $isFunction.
-    eq $$$notAFunction(M:Msg |-> ${M1:Msg ; N1:Nat}$ MS:MsgPairs) =
-        $$$notAFunction(MS:MsgPairs) .
-    eq $$$notAFunction($$$notAFunction(MS1:MsgPairs) MS2:MsgPairs) = 
-        $$$notAFunction(MS1:MsgPairs MS2:MsgPairs) .
+    eq $$$notAFunction(M:Msg |-> ${M1:Msg ; N1:Nat}$ MS:[MsgPairs]) =
+        $$$notAFunction(MS:[MsgPairs]) .
+    eq $$$notAFunction($$$notAFunction(MS1:[MsgPairs]) MS2:[MsgPairs]) = 
+        $$$notAFunction(MS1:[MsgPairs] $$$;;;$$$ MS2:[MsgPairs]) .
     eq $$$notAFunction(M:Msg |-> MN1:MsgNumSet M:Msg |-> MN2:MsgNumSet 
-        MS:MsgPairs) 
+        MS:[MsgPairs]) 
     =
-        $$$notAFunction(M:Msg |-> MN1:MsgNumSet MN2:MsgNumSet MS:MsgPairs) .
+        $$$notAFunction(M:Msg |-> MN1:MsgNumSet MN2:MsgNumSet $$$;;;$$$ 
+            MS:[MsgPairs]) .
         
         
     
@@ -809,7 +810,7 @@ rl [translateAttackWithoutNever] :
     eq $checkSorts($none) = id .
 
     ---Checks if the sort of the first argument is a supersort of the sort of
-    ---the second arugment.
+    ---the second argument.
     op $isValidPair : Msg Msg Nat -> Mapping .
     ceq $isValidPair(D:Msg, R:Msg, N) = 
         if sortLeq(META-MOD:Module, getType(metaReduce(META-MOD:Module, upTerm(R:Msg))), getType(metaReduce(META-MOD:Module, upTerm(D:Msg))))
@@ -887,6 +888,14 @@ rl [translateAttackWithoutNever] :
             'nil.SMsgList-R], 
             $error('::_::`[_|_`][F:Term, $applyMapping1(ML:Term, M:Mappings), 
             'nil.SMsgList-R])) [owise print "Strand meta term list: " ML:Term] .
+    ---Applies if we're using the "up to" syntax, in which case the last 
+    ---term in the list is a constant (which Maude-NPA will treat as a variable) 
+    ---of sort LIST, NOT nil. 
+    eq $applyMapping('::_::`[_|_`][F:Term, ML:Term, 'LIST.SMsgList-R], M:Mappings) =
+        downTerm('::_::`[_|_`][F:Term, $applyMapping1(ML:Term, M:Mappings), 
+            'LIST.SMsgList-R], 
+            $error('::_::`[_|_`][F:Term, $applyMapping1(ML:Term, M:Mappings), 
+            'LIST.SMsgList-R])) [owise print "Strand meta term list: " ML:Term] .
 
     op $applyMapping1 : TermList Mappings ~> TermList .
     var M : Mappings .
@@ -895,7 +904,6 @@ rl [translateAttackWithoutNever] :
     var F : Qid .
     vars M1 M2 : Msg .
     op $error : -> Msg .
-    ---op $applyMapping2 : TermList Mappings -> TermList .
     var T1 : Term .
     eq $applyMapping1(TL:TermList, id) = TL:TermList .
     ceq $applyMapping1((T, TL), (M1 |-> M2, M)) = T1, 
@@ -1105,8 +1113,10 @@ mod TRANSLATION-TO-MAUDE-NPA is
 
     eq [V:VarDecl] $varList($emptyAttackList) = $varList(V:VarDecl) .
     eq [V:VarDecl] $varList(VL:VarDecls) = $varList(V:VarDecl VL:VarDecls) . 
-        
 
+    eq $varList(B:VarDecls V:VarDecl M:VarDecls V:VarDecls E:VarDecls) = $varList(B:VarDecls V:VarDecl M:VarDecls E:VarDecls) .
+    eq $varList(B:VarDecls V:VarDecl M:VarDecls V:VarDecls) = $varList(B:VarDecls V:VarDecl M:VarDecls) .
+        
     ---The presence of the $translate constant (added by the equation above) 
     ---ensures that we don't try to construct the Maude-NPA module until
     ---the PSL specification has been fully translated.
@@ -1138,10 +1148,6 @@ mod TRANSLATION-TO-MAUDE-NPA is
         V:VarDecls
     endfm) .
 
-    vars A B : Name .
-    vars N1 N2 : Nonce .
-    vars r1 r2 : Fresh .
-    vars X Y : Msg .
 endm
 
 ---(
@@ -1367,16 +1373,6 @@ mod COMP-TRANSLATION-TO-MAUDE-NPA is
         eq STRANDS-PROTOCOL = convert(SD:StrandData) [nonexec] .
     endfm) [print SD:StrandData] .
 
-    vars A B A1 : Name .
-    vars NA1 NB : Nonce .
-
-    var C    : Name .
-    vars X Y : Msg .
-    ---var K    : Key .
-    var NA : Nonce .
-    var NO : Nonce .
-    vars r r1 r2 r3 : Fresh .
-    ---var SK : Key .
 endm
 
 

@@ -29,36 +29,32 @@ Theory
 
   op _;_ : Msg Msg -> Msg [gather (e E)] .
 
-  eq exp(exp(W:Gen,Y:NeNonceSet),Z:NeNonceSet) = exp(W:Gen, Y:NeNonceSet * Z:NeNonceSet) .
-  eq e(K:Key,d(K:Key,M:Msg)) = M:Msg .
-  eq d(K:Key,e(K:Key,M:Msg)) = M:Msg .
+  var W : Gen .
+  vars Y Z : NeNonceSet .
+  var K : Key .
+  var M : Msg .
+  eq exp(exp(W,Y),Z) = exp(W, Y * Z) .
+  eq e(K,d(K,M)) = M .
+  eq d(K,e(K,M)) = M .
 
 Protocol
-    vars A B : Name .
+    vars ANAME BNAME ANAME1 : Name .
     vars r r' r1 : Fresh .
     vars XEA XEB : Exp .
     var S : Secret .
 
-    In(A) = A, B .
-    Def(A) = na := n(A, r), secret := sec(A, r') .
-    /*
-    Try using these definitions to make sure they work properly.
-        Def(A) = pa := n(A, r1), 
-                  s := sec(A, r'), 
-               g^pa := exp(g, pa), 
-               xea^pa := exp(XEA, pa) .
-        Def(B) = g^pb := exp(g, pb), 
-                   pb := n(B, r2), 
-               xeb^pb := exp(XEB, pb) .
-   */
+    roles A B .
 
-    In(B) = B .
-    Def(B) = nb := n(B, r1) .
+    In(A) = ANAME, BNAME .
+    In(B) = BNAME .
 
-    1 . A -> B : A  ; B ; exp(g, na)      
-              |- A1 ; B ; XEB .
-    2 . B -> A : A1 ; B ; exp(g, nb)      
-              |- A  ; B ; XEA .
+    Def(A) = na := n(ANAME, r), secret := sec(ANAME, r') .
+    Def(B) = nb := n(BNAME, r1) .
+
+    1 . A -> B : ANAME  ; BNAME ; exp(g, na)      
+              |- ANAME1 ; BNAME ; XEB .
+    2 . B -> A : ANAME1 ; BNAME ; exp(g, nb)      
+              |- ANAME  ; BNAME ; XEA .
     3 . A -> B : e(exp(XEA, na), secret)     
               |- e(exp(XEB, nb), S) .
 
@@ -66,17 +62,17 @@ Protocol
     Out(B) = nb, exp(g, nb), XEA, S .
 
 Intruder
-    vars A : Name .
+    vars NAME : Name .
     var K : Key .
     vars M M1 M2 : Msg .
     vars NS1 NS2 : NeNonceSet .
     var GE : GenvExp .
     var r  : Fresh .
-    => n(i, r), g, A .
+             => n(i, r), g, NAME .
     M1 ; M2 <=> M1, M2 .
-    K, M => e(K, M), d(K, M) .
-    NS1, NS2  => NS1 * NS2 .
-    GE, NS1 => exp(GE, NS1) .
+    K, M     => e(K, M), d(K, M) .
+    NS1, NS2 => NS1 * NS2 .
+    GE, NS1  => exp(GE, NS1) .
 
 Attacks
     /*
@@ -84,26 +80,15 @@ Attacks
         properly. If this "attack" does not find an initial state, then this
         protocol was implemented incorrectly.
     */
-    vars A B : Name
-    var S : Secret .
     0 .
         B executes protocol .
-        Subst(B) = A1 |-> a, B |-> b, S |-> sec(a, r') .
+        Subst(B) = ANAME1 |-> a, BNAME |-> b, S |-> sec(a, r') .
         without:
-            Subst(A) = A |-> a, B |-> b .
+            Subst(A) = ANAME |-> a, BNAME |-> b .
             A executes protocol .
     1 .
         B executes protocol .
-        Subst(B) = A1 |-> a, B |-> b, S |-> sec(a, r') .
+        Subst(B) = ANAME1 |-> a, BNAME |-> b, S |-> sec(a, r') .
         Intruder learns sec(a, r') .
-            
-    /*
-        Note: Attack 2 in the dh.maude example is identical to attack 1 above,
-        except that it includes never patterns for avoiding unreachable states.
-        This language isn't expressive enough for that kind of optimization. 
-        However, that's an optimization that should probably be performed at the
-        lower Maude-NPA strand level, because optimizations run the risk of losing
-        completenes, in which case you should only perform them if you *really*
-        know what you're doing.
-    */
+
 ends

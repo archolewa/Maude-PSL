@@ -30,16 +30,14 @@ Protocol
     In(A) = ANAME, BNAME, K .
     In(B) = ANAME, BNAME, K .
 
-    Def(A) = bob := e(K, ANAME), jane := d(K, ANAME) .
+    1 . A -> B :  e(K, skey(ANAME, r))  
+               |- e(K, SK)         .
 
-    1 . A -> B : e(K, skey(ANAME, r)) |- 
-                 e(K, SK)         .
+    2 . B -> A :  e(K, SK         ; n(BNAME, r1))
+               |- e(K, skey(ANAME, r) ; NB)       .
 
-    2 . B -> A : e(K, SK             ; n(BNAME, r1)) |-
-                 e(K, skey(ANAME, r) ; NB)       .
-
-    3 . A -> B : e(K, NB)       |- 
-                 e(K, n(BNAME, r1)) .
+    3 . A -> B :  e(K, NB)       
+               |- e(K, n(BNAME, r1)) .
 
     Out(A) = K, skey(ANAME, r), NB .
     Out(B) = ANAME, BNAME, K, SK, n(BNAME, r1) .

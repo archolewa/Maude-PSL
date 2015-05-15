@@ -39,14 +39,14 @@ Protocol
 
   roles A B S .
 
-  Def(A) = na := n(ANAME, r), kas := mkey(ANAME, SNAME) .
+  Def(A) = na := n(ANAME, r), kas := mkey(ANAME, s) .
 
   In(A)  = ANAME, BNAME, SNAME .
 
-  Def(B) = nb := n(BNAME, r), nb1 := n(BNAME, r'), kbs := mkey(BNAME,SNAME) .
+  Def(B) = nb := n(BNAME, r), nb1 := n(BNAME, r'), kbs := mkey(BNAME,s) .
   In(B)  = BNAME, SNAME .
 
-  Def(S) = ksa := mkey(AS,SNAME), ksb := mkey(BS,SNAME), 
+  Def(S) = ksa := mkey(AS, s), ksb := mkey(BS, s), 
            kab := seskey(AS, BS, n(s,r)) .
   In(S) = SNAME .
 
@@ -75,7 +75,7 @@ Intruder
    vars M N : Msg .
    var r : Fresh .
 
-   => C, s, mkey(i, D), mkey(i, s), n(i, r) .
+   => C, s, mkey(i, D), mkey(i, s) .
    K, M => d(K, M), e(K, M) .
    M, N <=> M ; N .
 
