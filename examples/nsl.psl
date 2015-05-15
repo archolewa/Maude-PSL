@@ -10,6 +10,8 @@ Theory
   op n : Name Fresh -> Nonce .
   
   ops a b i : -> Name . // Alice Bob Intruder
+
+  op t : -> Msg .
   
   op _;_ : Msg Msg -> Msg [gather (e E)] .
 
@@ -27,18 +29,16 @@ Protocol
     vars r r1   : Fresh .
     vars NA1 NB : Nonce .
 
-    Roles A, B .
+    roles A B .
 
     In(A) = AName, BName .
-    Def(A) = na := n(AName, r) .
     In(B) = BName .
 
-
     1 . A -> B : pk(BName, n(AName, r) ; AName) |- 
-                 pk(BName, NA1     ; A1Name) .
+                 pk(BName, NA1         ; A1Name) .
 
-    2 . B -> A : pk(A1Name, NA1     ; n(BName, r1) ; BName) |-    
-                 pk(AName , n(AName, r) ; NB       ; BName) . 
+    2 . B -> A : pk(A1Name, NA1         ; n(BName, r1) ; BName) |-    
+                 pk(AName , n(AName, r) ; NB           ; BName) . 
 
     3 . A -> B : pk(BName, NB) |- 
                  pk(BName, n(BName, r1)) .                    
@@ -63,8 +63,7 @@ Attacks
         B executes up to 2 .
         A executes protocol .
         Subst(A) = BName |-> b, AName |-> a .
-        //Tells us how we should instantiate the attack strand.
-        Subst(B) = BName |-> b, A1Name |-> a NA |-> na .
+        Subst(B) = BName |-> b, A1Name |-> a, NA1 |-> n(a, r) .
         Intruder learns n(BName, r1) .
 
 ends

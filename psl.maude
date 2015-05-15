@@ -813,7 +813,7 @@ rl [translateAttackWithoutNever] :
     we don't need to separately track the line numbers.
     ---)
     op $isValid : MsgPairs -> Mappings .
-    eq $isValid(M:MsgPairs) = $checkSorts($isFunction(M:MsgPairs)) .
+    eq $isValid(M:MsgPairs) = $checkSorts($isFunction(M:MsgPairs))  .
 
     ---(
     Line numbers are already encoded in the $$$notAFunction error term, so we don't need to encode them separately.
@@ -834,14 +834,15 @@ rl [translateAttackWithoutNever] :
     ---We only care about those mappings that have more than mapping. Anything
     ---with a single result term is not ambiguous, and is left over from how
     ---we implemented $isFunction.
-    eq $$$notAFunction(M:Msg |-> ${M1:Msg ; N1:Nat}$ MS:MsgPairs) =
-        $$$notAFunction(MS:MsgPairs) .
-    eq $$$notAFunction($$$notAFunction(MS1:MsgPairs) MS2:MsgPairs) = 
-        $$$notAFunction(MS1:MsgPairs MS2:MsgPairs) .
+    eq $$$notAFunction(M:Msg |-> ${M1:Msg ; N1:Nat}$ MS:[MsgPairs]) =
+        $$$notAFunction(MS:[MsgPairs]) .
+    eq $$$notAFunction($$$notAFunction(MS1:[MsgPairs]) MS2:[MsgPairs]) = 
+        $$$notAFunction(MS1:[MsgPairs] $$$;;;$$$ MS2:[MsgPairs]) .
     eq $$$notAFunction(M:Msg |-> MN1:MsgNumSet M:Msg |-> MN2:MsgNumSet 
-        MS:MsgPairs) 
+        MS:[MsgPairs]) 
     =
-        $$$notAFunction(M:Msg |-> MN1:MsgNumSet MN2:MsgNumSet MS:MsgPairs) .
+        $$$notAFunction(M:Msg |-> MN1:MsgNumSet MN2:MsgNumSet $$$;;;$$$ 
+            MS:[MsgPairs]) .
         
         
     
@@ -853,7 +854,7 @@ rl [translateAttackWithoutNever] :
     eq $checkSorts($none) = id .
 
     ---Checks if the sort of the first argument is a supersort of the sort of
-    ---the second arugment.
+    ---the second argument.
     op $isValidPair : Msg Msg Nat -> Mapping .
     ceq $isValidPair(D:Msg, R:Msg, N) = 
         if sortLeq(META-MOD:Module, getType(metaReduce(META-MOD:Module, upTerm(R:Msg))), getType(metaReduce(META-MOD:Module, upTerm(D:Msg))))
@@ -931,6 +932,14 @@ rl [translateAttackWithoutNever] :
             'nil.SMsgList-R], 
             $error('::_::`[_|_`][F:Term, $applyMapping1(ML:Term, M:Mappings), 
             'nil.SMsgList-R])) [owise print "Strand meta term list: " ML:Term] .
+    ---Applies if we're using the "up to" syntax, in which case the last 
+    ---term in the list is a constant (which Maude-NPA will treat as a variable) 
+    ---of sort LIST, NOT nil. 
+    eq $applyMapping('::_::`[_|_`][F:Term, ML:Term, 'LIST.SMsgList-R], M:Mappings) =
+        downTerm('::_::`[_|_`][F:Term, $applyMapping1(ML:Term, M:Mappings), 
+            'LIST.SMsgList-R], 
+            $error('::_::`[_|_`][F:Term, $applyMapping1(ML:Term, M:Mappings), 
+            'LIST.SMsgList-R])) [owise print "Strand meta term list: " ML:Term] .
 
     op $applyMapping1 : TermList Mappings ~> TermList .
     var M : Mappings .
@@ -939,7 +948,6 @@ rl [translateAttackWithoutNever] :
     var F : Qid .
     vars M1 M2 : Msg .
     op $error : -> Msg .
-    ---op $applyMapping2 : TermList Mappings -> TermList .
     var T1 : Term .
     eq $applyMapping1(TL:TermList, id) = TL:TermList .
     ceq $applyMapping1((T, TL), (M1 |-> M2, M)) = T1, 

@@ -14,8 +14,10 @@ Theory
     op d : Key Msg -> Msg  .
     op _;_ : Msg Msg -> Msg [gather (e E)] .
 
-    eq d(K:Key, e(K:Key, Z:Msg )) = Z:Msg .
-    eq e(K:Key, d(K:Key, Z:Msg )) = Z:Msg . 
+    var K : Key .
+    var Z : Msg .
+    eq d(K, e(K, Z)) = Z .
+    eq e(K, d(K, Z)) = Z . 
 
 
   /*
@@ -27,36 +29,35 @@ Theory
   */
 
 Protocol
-    vars A B : UName .
-    var S : SName .
-    vars NB : Nonce .
+    vars ANAME BNAME : UName .
+    var SNAME : SName .
+    vars NB NBS : Nonce .
     vars MA M N : Msg .
     var r : Fresh .
     var K : Key .
     var D : Name .
 
-    Def(A) = kas := mkey(A, s) . 
-    In(A) = A, B, S .
+    roles A B S .
 
-    Def(B) = nb := n(B,r), kbs := mkey(B, s) .
-    In(B) = A, B, S .
+    In(A) = ANAME, BNAME, SNAME .
+    In(B) = ANAME, BNAME, SNAME .
+    In(S) = ANAME, BNAME, SNAME .
 
-    Def(S) = kas := mkey(A,s), kbs := mkey(B,s) .
-    In(S) = A, B, S .
+    Def(A) = kas := mkey(ANAME, s) . 
+    Def(B) = nb  := n(BNAME,r),    kbs := mkey(BNAME, s) .
+    Def(S) = kas := mkey(ANAME,s), kbs := mkey(BNAME,s) .
 
-    1 . A -> B : A  |- A   .
+    1 . A -> B : ANAME |- ANAME   .
 
-    //This is very very prone to typos. We need to come up with a better naming convention for macros. I'm thinking all lower-case. It might clash a little bit with
-    //constants, but constants are rarely used in the protocol declaration.
     2 . B -> A : nb |- NB .
 
     3 . A -> B : e(kas, NB) |- MA .
 
-    4 . B -> S : e(kbs, A ; MA)
-              |- e(kbs, A ; e(kas, NB)) .
+    4 . B -> S :  e(kbs, ANAME ; MA)
+               |- e(kbs, ANAME ; e(kas, NBS)) .
 
-    5 . S -> B : e(kbs, NB) 
-              |- e(kbs, nb) .
+    5 . S -> B :  e(kbs, NBS) 
+               |- e(kbs, nb) .
 
     Out(A) = NB .
     Out(B) = nb .
@@ -64,20 +65,19 @@ Protocol
 
 
 Intruder
-    => D:Name, n(i, r:Fresh), mkey(D:Name, i), mkey(i, D:Name) .
-    K:Key, M:Msg => d(K:Key, M:Msg), e(K:Key, M:Msg) .
-    M:Msg, N:Msg <=> M:Msg ; N:Msg .
+    var D    : Name .
+    var r    : Fresh .
+    var K    : Key .
+    vars M N : Msg .
+          => D, n(i, r), mkey(D, i), mkey(i, D) .
+    K, M  => d(K, M), e(K, M) .
+    M, N <=> M ; N .
 
 
 Attacks
-    vars A B : UName . 
-    var S : SName .
-
-    //Empty attack for debugging purposes. If an "attack" isn't found, then there's something wrong with the specification.
+    //Empty attack for debugging purposes. If an "attack" isn't found, then 
+    //there's something wrong with the specification.
     0 . 
-       In(B) = A |-> a , B |-> b, S |-> s . 
        B executes protocol .
-       Out(B) = ditto .
-
-
+       Subst(B) = ANAME |-> a , BNAME |-> b, SNAME |-> s . 
 ends

@@ -319,7 +319,7 @@ def maudify():
     theoryFileName = build_theory(parseTree, os.path.dirname(pslFilePath), fileName) 
     #TODO: Need to invoke different functions depending on whether we're doing protocol composition, or normal PSL translation.
     intermediate = gen_intermediate(parseTree, theoryFileName) 
-    gen_NPA_code(intermediate, theoryFileName)
+    gen_NPA_code(intermediate, theoryFileName, parseTree)
 
 DEF_KEY_ROLE = 0
 DEF_KEY_TERM = 1
@@ -370,7 +370,7 @@ def gen_intermediate(parseTree, theoryFileName):
     code.append('.')
     return code
 
-def gen_NPA_code(maudeCode, theoryFileName):
+def gen_NPA_code(maudeCode, theoryFileName, parseTree):
     maudeCommand = [MAUDE_COMMAND, NO_PRELUDE, '-no-banner', '-no-advise', '-no-wrap', PRELUDE, NPA_SYNTAX, theoryFileName, 
             TRANSLATION_FILE]
     maudeExecution = subprocess.Popen(maudeCommand, stdout=subprocess.PIPE, 
@@ -381,7 +381,11 @@ def gen_NPA_code(maudeCode, theoryFileName):
         #Expected error pattern:
         #Warning: <standard input>, line N : <error message> 
         for line in [line.strip() for line in stderr.split('\n') if line.strip()]:
-            _,lineNum, error = line.split(':')
+            try:
+                _,lineNum, error = line.split(':')
+            except ValueError:
+                print(stderr)
+                assert False
             #expected pattern currently in lineNum:
             #<standard input>, line N
             lineNum = int(lineNum.split()[-1])
@@ -411,7 +415,7 @@ def gen_NPA_code(maudeCode, theoryFileName):
         except ValueError:
             errorResult = "result [TranslationData]:"
             errorIndex = stdout.index(errorResult) + len(errorResult)
-            process_error(stdout[errorIndex:])
+            process_error(stdout[errorIndex:], parseTree)
         else:
             endOfModule = stdout.rfind("Maude>")
             module = '\n' + stdout[index:endOfModule].strip()
@@ -419,7 +423,7 @@ def gen_NPA_code(maudeCode, theoryFileName):
                 maudeFile.write(module)
                 maudeFile.write('\nselect MAUDE-NPA .')
 
-def process_error(error):
+def process_error(error, parseTree):
     """
     Given a partially evaluated PSL specification, extracts the offending error term, and extracts from the error term the information 
     need for a usable error message. Then raises a TranslationError containing said usable error message.
@@ -446,6 +450,40 @@ def process_error(error):
     elif errorType.strip() == "$$$malformedTerm":
         errorTerm, lineNumber =  errorTerm.rsplit(',', 1)
         raise pslErrors.TranslationError(' '.join([pslErrors.error, pslErrors.color_line_number(lineNumber.strip()), "Malformed term:", errorTerm]))
+    elif errorType.strip() == "$$$notAFunction":
+        errorMappings = errorTerm.split("$$$;;;$$$")
+        errorMsg = []
+        for error in errorMappings:
+            var, results = [string.strip() for string in error.split('|->')]
+            problemTerms = []
+            lineNumbers = []
+            for result in [r.strip() for r in results.split('}$') if r.strip()]:
+                result = result.replace('${', '')
+                startLineNum = result.rindex(';')+1
+                lineNumber = result[startLineNum:].strip()
+                result = result[:startLineNum-1].strip()
+                problemTerms.append(result)
+                lineNumbers.append(lineNumber)
+            errorMsg.append(''.join([pslErrors.errorNoLine, " Substitution does not",
+                " define a function. Variable: ", pslErrors.color_token(var),
+                " maps to the terms:\n\t", '\n\t'.join([' Line: '.join([
+                    pslErrors.color_token(term),
+                    pslErrors.color_line_number(lineNum)]) for term, lineNum
+                    in zip(problemTerms, lineNumbers)])]))
+        raise pslErrors.TranslationError('\n'.join(errorMsg)) 
+    elif errorType.strip() == "$$$invalidSorting":
+        var, termLineNum = [s.strip() for s in errorTerm.split('|->')]
+        var, variableSort = var.split(':')
+        termLineNum = termLineNum.replace('${', '').replace('}$', '')
+        lineNumberIndex = termLineNum.rindex(';')+1
+        lineNum = termLineNum[lineNumberIndex:].strip()
+        term = termLineNum[:lineNumberIndex-1].strip()
+        raise pslErrors.TranslationError(' '.join([pslErrors.error, 
+            pslErrors.color_line_number(lineNum), "Variable", 
+            pslErrors.color_token(var), "has sort", 
+            pslErrors.color_token(variableSort), "but term",
+            pslErrors.color_token(term), "does not."]))
+
 
 
 
@@ -469,7 +507,7 @@ def compute_end_of_term(errorType, errorTerm):
     raise ValueError(' '.join(["End of error term of type: ", errorType, "not found when trying to extract the term from:", errorTerm]))
            
 MAX_ITERATIONS = 100
-def compute_sorts(defMap, syntaxFileName, pslTree):
+def compute_sorts(defMap, syntaxFileName, parseTree):
     """
     Computes the sorts of the user-defined shorthand. 
     
@@ -482,7 +520,7 @@ def compute_sorts(defMap, syntaxFileName, pslTree):
     Returns a dictionary mapping shorthand to their respective sorts.
     """
     is_function(defMap)
-    role_variables_correct(defMap, pslTree)
+    role_variables_correct(defMap, parseTree)
     SHORTHAND = 0
     LINE_NUMBER = 1
     ROLE = 0
@@ -581,14 +619,14 @@ def is_function(defMap):
         else:
             definedShorthand[shorthand] = (term, lineNumber)
 
-def role_variables_correct(defMap, pslTree):
+def role_variables_correct(defMap, parseTree):
     """
     Given a mapping from pairs (role, term) |-> (shorthand, lineNum)
     checks to make sure that the variables in term are allowed
     to show up in terms associated with role. 
     """
     #Working on modifying the disjoint_vars code from pslTree.py to work here.
-    protocol = pslTree.get_protocol()
+    protocol = parseTree.get_protocol()
     roleMap = protocol.variables_per_role()
     declaredVars = protocol.declared_variables()
     roleTermPairs = defMap.keys()
@@ -671,8 +709,8 @@ def make_coherent(equations, syntax):
     if stderr:
         raise pslErrors.TranslationError(stderr)
     eqLines = [line for line in stdout.split('\n') if 'eq' in line.split()]
-    equations = [line for line in equations if not 'eq' in line.split()]
-    equations = equations[:-1] + compute_equations(eqLines, syntax) + [equations[-1]]
+    equationModule = [line for line in equations if 'eq' not in line.split()]
+    equationModule = equationModule[:-1] + compute_equations(eqLines, syntax) + [equationModule[-1]]
     return equations
 
 def compute_equations(eqLines, syntax):
@@ -722,10 +760,20 @@ def extract_equation_terms_attributes(eqLines):
     for line in eqLines:
         lefthandSide, righthandSide = line.split('=')
         lefthandSide = lefthandSide.split()[1].strip()
-        righthandSide, attributes = [term.strip() for term in righthandSide.split('[')]
+        righthandSide, attributes = compute_righthand_attributes(righthandSide)
         attributes = attributes[:attributes.index(']')]
         eqDict[lefthandSide] = (righthandSide, attributes)
     return eqDict
+
+def compute_righthand_attributes(righthandSide):
+    """
+    Given a righthand side of a meta equation, splits it into the righthand
+    side of the equation, and the equation attributes, and returns them as
+    an ordered pair.
+    """
+    righthandSide = righthandSide.strip()
+    attributeStart = righthandSide.rfind('[')
+    return (righthandSide[:attributeStart], righthandSide[attributeStart+1:-1])
 
 
 def split_eq_theory(eqTheory):

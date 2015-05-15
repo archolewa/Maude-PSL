@@ -38,66 +38,70 @@ Theory
 // Concatenation
   op _;_ : Msg Msg -> Msg [gather (e E)] .
 
- eq d(K:Key, e(K:Key, Z:Msg )) = Z:Msg .
- eq e(K:Key, d(K:Key, Z:Msg )) = Z:Msg . 
+ var K : Key .
+ var Z : Msg .
+ eq d(K, e(K, Z)) = Z .
+ eq e(K, d(K, Z)) = Z . 
 
 
 Protocol
-    vars A B S : Name .
-    vars KAS KBS KAB : Key .
+    vars ANAME BNAME SNAME : Name .
+    vars KAS KBS KAB KBA : Key .
     vars r1 r2 r3 : Fresh .
-    vars TA TS : TimeStamp .
+    vars MA MB : Msg .
 
-    Def(A) = KeyAS := mkey(A, S), KeyAB := seskey(A, B, n(A, r2)) . 
-    Def(S) = KeyAS := mkey(A, S), KeyBS := mkey(B, S) .
-    Def(B) = KeyBS := mkey(B, S) .
+    roles A B S .
 
-    In(A) = A, B, S .
-    In(B) = A, B, S .
-    In(S) = A, B, S .
+    Def(A) = keyAS := mkey(ANAME, SNAME), 
+             keyAB := seskey(ANAME, BNAME, n(ANAME, r2)) . 
+    Def(B) = keyBS := mkey(BNAME, SNAME) .
+    Def(S) = keyAS := mkey(ANAME, SNAME), 
+             keyBS := mkey(BNAME, SNAME) .
 
-    1 . A -> S : A ; e(KeyAS, B ; KeyAB) 
-               - A ; e(KeyAS, B ; KAB) .
+    In(A) = ANAME, BNAME, SNAME, MA .
+    In(B) = ANAME, BNAME, SNAME .
+    In(S) = ANAME, BNAME, SNAME .
 
-    2 . S -> B : e(KeyBS, A ; KAB)  
-              |- e(KeyBS, A ; KAB) .
+    1 . A -> S :  ANAME ; e(keyAS, BNAME ; keyAB) 
+               |- ANAME ; e(keyAS, BNAME ; KAB) .
 
-    3 . A -> B : A ; e(KeyAB, M) 
-              |- A ; e(KAB,   M) .
+    2 . S -> B :  e(keyBS, ANAME ; KAB)  
+               |- e(keyBS, ANAME ; KBA) .
 
-    Out(A) = KeyAB .
+    3 . A -> B :  ANAME ; e(keyAB, MA) 
+               |- ANAME ; e(KBA,   MB) .
+
+    Out(A) = keyAB .
     Out(S) = KAB .
-    Out(B) = KAB .
+    Out(B) = KBA .
 
 
 Intruder
-    => N:Name, t(i, r:Fresh), k(i, r:Fresh) .
-    X:Msg, Y:Msg <=> X:Msg ; Y:Msg .
-    K:Key, X:Msg => enc(K:Key, X:Msg), dec(K:Key, X:Msg) .
+    var r : Fresh .
+    vars X Y : Msg .
+    var K : Key .
+    var N : Name .
+    var S : SName .
+          => N, seskey(i, N, n(i, r)), mkey(i, S) .
+    X, Y <=> X ; Y .
+    K, X  => e(K, X), d(K, X) .
 
 
 Attacks
-    vars A B S : Name .
-    vars KAS KBS : Key .
-
     //An empty attack for debugging purposes.
     0 .
-        In(A) = A |-> a, B |-> b, S |-> s, KAS |-> KAS .
         A executes protocol .
-        Out(A) = ditto .
+        Subst(A) = ANAME |-> a, BNAME |-> b, SNAME |-> s .
 
     1 .
-        In(A) = A |-> a, B |-> b, S |-> s, KAS |-> KAS .
         A executes protocol .
-        Intruder learns KeyAB .
-        Out(A) = ditto .
+        Subst(A) = ANAME |-> a, BNAME |-> b, SNAME |-> s .
+        Intruder learns keyAB .
 
     2 .
-        In(A) = A |-> a, B |-> b, S |-> s, KAS |-> KAS .
         A executes protocol .
-        Out(A) = ditto .
+        Subst(A) = ANAME |-> a, BNAME |-> b, SNAME |-> s .
         without:
-            In(B) = A |-> a, B |-> b, S |-> s, KBS |-> KBS .
             B executes protocol .
-            Out(B) = ditto .
+            Subst(B) = ANAME |-> a, BNAME |-> b, SNAME |-> s .
 ends
