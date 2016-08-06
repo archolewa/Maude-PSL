@@ -373,6 +373,7 @@ def gen_intermediate(parseTree, theoryFileName):
 def gen_NPA_code(maudeCode, theoryFileName, parseTree):
     maudeCommand = [MAUDE_COMMAND, NO_PRELUDE, '-no-banner', '-no-advise', '-no-wrap', PRELUDE, NPA_SYNTAX, theoryFileName, 
             TRANSLATION_FILE]
+    print(maudeCommand)
     maudeExecution = subprocess.Popen(maudeCommand, stdout=subprocess.PIPE, 
         stdin=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = maudeExecution.communicate('\n'.join(maudeCode))
@@ -428,7 +429,10 @@ def process_error(error, parseTree):
     Given a partially evaluated PSL specification, extracts the offending error term, and extracts from the error term the information 
     need for a usable error message. Then raises a TranslationError containing said usable error message.
     """
-    errorTermStart = error.index("$$$")
+    try:
+        errorTermStart = error.index("$$$")
+    except ValueError as e:
+        raise ValueError(error)    
     errorType, errorTerm = error[errorTermStart:].split('(', 1)
     numParens = 1
     endOfTerm = compute_end_of_term(errorType, errorTerm)

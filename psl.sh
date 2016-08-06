@@ -5,7 +5,7 @@ then
     echo "Usage: ./psl.sh FILENAME.psl"
 else
     pslFile=$1
-    ./psl.py $pslFile
+    python psl.py $pslFile
     maudeExtension="maude"
     pslExtension=".psl"
     maudeFile="${pslFile/psl/$maudeExtension}"
