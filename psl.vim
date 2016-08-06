@@ -1,6 +1,6 @@
 " Vim syntax file
 " Language: Maude-PSL
-" Maintainer: Andrew Cholewa <acholew2@illinois.edu>
+" Maintainer: Andrew Cholewa <archolewa@gmail.com>
 " A slightly modified version of the syntax file used for the Maude language:
 "
 " Language:      Maude <http://maude.cs.uiuc.edu/>
